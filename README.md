@@ -1,2 +1,66 @@
-# my_project
-개인테스트용 프로젝트
+# 🐶 Spurfy - 반려견 힐링 스파 예약 시스템
+
+> “It’s a dog spa, Spurfy!”  
+> 소중한 반려견들을 위한 감성 스파 + 예약 시스템입니다.
+
+---
+
+## 🧼 주요 기능
+
+### 👤 사용자
+- 회원가입 / 로그인 (JWT 인증)
+- 반려견 등록 / 예약 / 리뷰 작성
+- 스파 서비스 목록 조회
+- 마이페이지 예약 확인
+
+### 👑 관리자
+- 예약 내역 관리 (환불 포함)
+- 리뷰 블라인드 처리
+- 스파 서비스 등록 및 수정
+- 사용자 상태 관리 (비활성화 등)
+
+---
+
+## 🧱 기술 스택
+
+| 구분 | 기술 |
+|------|------|
+| 백엔드 | Spring Boot 3, Spring Security, JPA |
+| 프론트 | React (Vite), TailwindCSS |
+| 데이터베이스 | MySQL |
+| 기타 도구 | Postman, Notion, Miro |
+
+---
+
+## 📊 ERD 요약
+
+- 사용자(users), 반려견(dogs), 스파 서비스(spa_services), 예약(reservations), 리뷰(reviews)
+- 사용자 1:N 강아지, 예약 1:1 리뷰 구조
+
+👉 ERD 및 상세 SQL은 Notion 참고: https://www.notion.so/SPURFY-SOLO-PROJECT-1-206023034fb1806a9cabd9031a1a02d1?source=copy_link
+
+---
+
+## 🔗 API 요약
+
+RESTful API + JWT 기반 인증
+
+예시:
+- `POST /api/users/signup`: 회원가입
+- `POST /api/reservations`: 예약 생성
+- `PATCH /api/reservations/{id}/cancel`: 예약 취소
+- `POST /api/admin/services`: 관리자 서비스 등록
+
+요청/응답 JSON, 에러 핸들링 등 포함 👉 https://www.notion.so/SPURFY-SOLO-PROJECT-3-208023034fb18058b380ed586cce2bbc?source=copy_link
+
+---
+
+## 🚀 실행 방법
+
+```bash
+# 백엔드 실행
+./mvnw spring-boot:run
+
+# 프론트 (vite) 실행
+npm install
+npm run dev
