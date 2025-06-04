@@ -13,10 +13,10 @@
 	</parent>
 
 	<groupId>com.example</groupId>
-	<artifactId>my-site</artifactId>
+	<artifactId>spurfy</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>my-site</name>
-	<description>Demo project for Spring Boot</description>
+	<name>Spurfy</name>
+	<description>Spring Boot 기반 반려견 스파 예약 시스템 - JWT 인증, REST API, MyBatis/JPA 적용</description>
 
 	<properties>
 		<java.version>17</java.version>
