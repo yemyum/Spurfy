@@ -1,8 +1,8 @@
-package com.example.my_site.controller;
+package com.example.oyl.controller;
 
-import com.example.my_site.domain.User;
-import com.example.my_site.jwt.JwtUtil;
-import com.example.my_site.service.UserService;
+import com.example.oyl.domain.User;
+import com.example.oyl.jwt.JwtUtil;
+import com.example.oyl.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

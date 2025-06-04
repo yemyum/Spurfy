@@ -1,6 +1,6 @@
-package com.example.my_site.config;
+package com.example.oyl.config;
 
-import com.example.my_site.jwt.JwtFilter;
+import com.example.oyl.jwt.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

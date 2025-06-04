@@ -1,4 +1,4 @@
-package com.example.my_site;
+package com.example.oyl;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

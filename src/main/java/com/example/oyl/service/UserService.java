@@ -1,8 +1,8 @@
-package com.example.my_site.service;
+package com.example.oyl.service;
 
 
-import com.example.my_site.domain.User;
-import com.example.my_site.repository.UserRepository;
+import com.example.oyl.domain.User;
+import com.example.oyl.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

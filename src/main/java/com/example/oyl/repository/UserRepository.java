@@ -1,6 +1,6 @@
-package com.example.my_site.repository;
+package com.example.oyl.repository;
 
-import com.example.my_site.domain.User;
+import com.example.oyl.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

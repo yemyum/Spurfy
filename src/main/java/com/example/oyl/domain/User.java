@@ -1,4 +1,4 @@
-package com.example.my_site.domain;
+package com.example.oyl.domain;
 
 
 import jakarta.persistence.*;

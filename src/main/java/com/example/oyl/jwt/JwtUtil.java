@@ -1,4 +1,4 @@
-package com.example.my_site.jwt;
+package com.example.oyl.jwt;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
