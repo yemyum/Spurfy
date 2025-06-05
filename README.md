@@ -25,7 +25,7 @@
 
 | 구분 | 기술 |
 |------|------|
-| 백엔드 | Spring Boot 3, Spring Security, JPA |
+| 백엔드 | Spring Boot 3, Spring Security, JPA+MyBatis |
 | 프론트 | React (Vite), TailwindCSS |
 | 데이터베이스 | MySQL |
 | 기타 도구 | Postman, Notion, Miro |
