@@ -6,10 +6,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.security.Key;
+import java.util.Collections;
 
 public class JwtFilter extends OncePerRequestFilter {
 
@@ -20,34 +23,32 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String uri = request.getRequestURI();
         String authHeader = request.getHeader("Authorization");
 
-        // JWT 인증이 필요한 URI만 필터 적용
-        if (uri.startsWith("/api/mypage")) {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                String token = authHeader.substring(7);
-                try {
-                    Claims claims = Jwts.parserBuilder()
-                            .setSigningKey(key)
-                            .build()
-                            .parseClaimsJws(token)
-                            .getBody();
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
 
-                    request.setAttribute("username", claims.getSubject());
-                } catch (Exception e) {
-                    System.out.println("❌ 토큰 파싱 실패: " + e.getMessage());
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
-                    return;
-                }
-            } else {
-                System.out.println("⚠️ Authorization 헤더가 없거나 형식이 잘못됨");
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing Authorization Header");
+                String username = claims.getSubject();
+
+                // ✅ 인증 정보 SecurityContext에 등록
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                request.setAttribute("username", username);
+
+            } catch (Exception e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
                 return;
             }
         }
 
-        // ✅ 필터는 무조건 마지막에 한 번만 호출
         filterChain.doFilter(request, response);
     }
 }

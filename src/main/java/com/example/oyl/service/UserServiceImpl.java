@@ -1,7 +1,9 @@
 package com.example.oyl.service;
 
 import com.example.oyl.domain.User;
+import com.example.oyl.dto.UserLoginRequestDTO;
 import com.example.oyl.dto.UserSignupRequestDTO;
+import com.example.oyl.jwt.JwtUtil;
 import com.example.oyl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,5 +38,18 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String login(UserLoginRequestDTO dto) {
+        User user = userRepository.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 이메일입니다."));
+
+        if (!user.getPassword().equals(dto.getPassword())) {
+            throw new RuntimeException("비밀번호가 일치하지 않습니다.");
+        }
+
+        return JwtUtil.createToken(user.getEmail()); // JWT 발급
     }
 }

@@ -1,6 +1,7 @@
 package com.example.oyl.controller;
 
 import com.example.oyl.common.ApiResponse;
+import com.example.oyl.dto.UserLoginRequestDTO;
 import com.example.oyl.dto.UserSignupRequestDTO;
 import com.example.oyl.service.UserService;
 import jakarta.validation.Valid;
@@ -26,4 +27,28 @@ public class UserController {
                         .build()
         );
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> login(@RequestBody UserLoginRequestDTO requestDTO) {
+        String token = userService.login(requestDTO); // JWT 반환
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .code("S002")
+                        .message("로그인 성공")
+                        .data(token)
+                        .build()
+        );
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
