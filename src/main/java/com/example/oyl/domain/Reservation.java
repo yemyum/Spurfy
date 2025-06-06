@@ -34,8 +34,13 @@ public class Reservation {
     private LocalDate reservationDate;
     private LocalTime reservationTime;
 
-    private int reservationStatus; // 1: 예약완료, 2: 취소됨 등
-    private int refundStatus;      // 0: 없음, 1: 대기, 2: 완료
+    @Enumerated(EnumType.STRING)
+    @Column(name = "reservation_status", nullable = false) // DB에 문자열로 저장하기!
+    private ReservationStatus reservationStatus; // 1: 예약완료, 2: 취소됨 등
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_status", nullable = false)
+    private RefundStatus refundStatus;      // 0: 없음, 1: 대기, 2: 완료
+
     private String refundType;     // 자동 or 수동
     private String cancelReason;
 
