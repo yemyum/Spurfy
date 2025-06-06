@@ -11,7 +11,7 @@ import java.util.Date;
 public class JwtUtil {
 
     private static final String SECRET_KEY = "my-super=secret-key-for-jwt-encoding!!";
-    private static final long EXPIRATION_TIME = 1000 * 60 * 30; // 30분
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24; // 24시간 (테스트용, 배포할 땐 30분~1시간으로 줄이기!)
 
     private static final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 

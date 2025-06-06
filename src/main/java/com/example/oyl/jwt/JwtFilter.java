@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 // ✅ 인증 정보 SecurityContext에 등록
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication); // 인증된 사용자라고 알려주는 역할
 
                 request.setAttribute("username", username);
 
