@@ -19,7 +19,7 @@ public class Dog {
     @Column(name = "dog_id")
     private String dogId; // ex: dog_001
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -38,4 +38,13 @@ public class Dog {
 
     @Column(name = "created_at")
     private LocalDate createdAt;
+
+    public void updateDog(String name, String breed, LocalDate birthDate, String gender, BigDecimal weight, String notes) {
+        this.name = name;
+        this.breed = breed;
+        this.birthDate = birthDate;
+        this.gender = gender;
+        this.weight = weight;
+        this.notes = notes;
+    }
 }
