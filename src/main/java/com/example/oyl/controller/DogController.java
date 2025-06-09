@@ -1,5 +1,6 @@
 package com.example.oyl.controller;
 
+import com.example.oyl.common.ApiResponse;
 import com.example.oyl.dto.DogRequestDTO;
 import com.example.oyl.dto.DogResponseDTO;
 import com.example.oyl.dto.DogUpdateRequestDTO;
@@ -17,13 +18,19 @@ public class DogController {
     private final DogService dogService;
 
     @PostMapping
-    public ResponseEntity<DogResponseDTO> registerDog (@RequestBody DogRequestDTO dto) {
-
+    public ResponseEntity<ApiResponse<DogResponseDTO>> registerDog (@RequestBody DogRequestDTO dto) {
         String userEmail = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
 
         DogResponseDTO response = dogService.registerDog(userEmail, dto);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(
+                ApiResponse.<DogResponseDTO>builder()
+                        .code("S001")
+                        .message("강아지 등록 성공!")
+                        .data(response)
+                        .build()
+        );
     }
 
     @PatchMapping("/{dogId}")
@@ -32,28 +39,31 @@ public class DogController {
             @RequestBody DogUpdateRequestDTO dto
             ) {
 
-        try {
-            String userEmail = SecurityContextHolder.getContext()
-                    .getAuthentication().getName(); // JWT 기반 인증 사용자
+        String userEmail = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
 
-            dogService.updateDog(userEmail, dogId, dto);
-            return ResponseEntity.ok("강아지 정보가 수정되었습니다.");
-
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        dogService.updateDog(userEmail, dogId, dto);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code("S001")
+                        .message("강아지 정보가 수정되었습니다.")
+                        .data(null)
+                        .build()
+        );
     }
 
     @DeleteMapping("/{dogId}")
     public ResponseEntity<?> deleteDog(@PathVariable String dogId) {
-        try {
-            String useEmail = SecurityContextHolder.getContext()
-                    .getAuthentication().getName();
+        String userEmail = SecurityContextHolder.getContext()
+                .getAuthentication().getName();
 
-                    dogService.deleteDog(useEmail, dogId);
-                    return ResponseEntity.ok("강아지가 삭제되었습니다.");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        dogService.deleteDog(userEmail, dogId);
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder()
+                        .code("S001")
+                        .message("강아지가 삭제되었습니다.")
+                        .data(null)
+                        .build()
+        );
     }
 }

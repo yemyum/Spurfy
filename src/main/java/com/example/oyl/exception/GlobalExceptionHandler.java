@@ -34,4 +34,12 @@ public class GlobalExceptionHandler {
         errorResponse.put("message", "서버 오류가 발생했습니다.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<Map<String, Object>> handleCustomException(CustomException ex) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("code", ex.getErrorCode().getCode());
+        errorResponse.put("message", ex.getErrorCode().getMessage());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
 }

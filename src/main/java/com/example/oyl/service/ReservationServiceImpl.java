@@ -5,6 +5,8 @@ import com.example.oyl.dto.CancelReservationDTO;
 import com.example.oyl.dto.ReservationRequestDTO;
 import com.example.oyl.dto.ReservationResponseDTO;
 import com.example.oyl.dto.ReservationSummaryDTO;
+import com.example.oyl.exception.CustomException;
+import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.DogRepository;
 import com.example.oyl.repository.ReservationRepository;
 import com.example.oyl.repository.SpaServiceRepository;
@@ -31,13 +33,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public void cancelReservation(String userEmail, CancelReservationDTO dto) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Reservation reservation = reservationRepository.findById(dto.getReservationId())
-                .orElseThrow(() -> new RuntimeException("예약 정보 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (!reservation.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인의 예약만 취소할 수 있습니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
         reservation.setReservationStatus(ReservationStatus.CANCELED); // 취소됨
@@ -54,13 +56,13 @@ public class ReservationServiceImpl implements ReservationService {
     public void createReservation(ReservationRequestDTO dto, String userEmail) {
 
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         validateReservationOwnership(dto.getDogId(), user);
         validateNotPastDate(dto.getReservationDate());
 
         Dog dog = dogRepository.findById(dto.getDogId())
-                .orElseThrow(() -> new RuntimeException("강아지 정보 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
 
         validateDuplicateReservation(dog, dto.getReservationDate());
         validateSpaServiceExistence(dto.getServiceId());
@@ -71,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .user(user)
                 .dog(dog)
                 .spaService(spaServiceRepository.findById(dto.getServiceId())
-                        .orElseThrow(() -> new RuntimeException("스파 서비스 없음")))
+                        .orElseThrow(() -> new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND)))
                 .reservationDate(dto.getReservationDate())
                 .reservationTime(dto.getReservationTime())
                 .reservationStatus(ReservationStatus.RESERVED)
@@ -88,17 +90,17 @@ public class ReservationServiceImpl implements ReservationService {
     // 1단계 : 본인 강아지인지 확인
     private void validateReservationOwnership(String dogId, User user) {
         Dog dog = dogRepository.findById(dogId)
-                .orElseThrow(() -> new RuntimeException("해당 강아지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
 
         if (!dog.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인의 강아지만 예약할 수 있습니다!");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_DOG);
         }
     }
 
     // 2단계 : 과거 날짜 방지
     private void validateNotPastDate(LocalDate reservationDate) {
         if (reservationDate.isBefore(LocalDate.now())) {
-            throw new RuntimeException("과거 날짜로는 예약할 수 없습니다!");
+            throw new CustomException(ErrorCode.INVALID_RESERVATION_DATE);
         }
     }
 
@@ -107,7 +109,7 @@ public class ReservationServiceImpl implements ReservationService {
         boolean exists = reservationRepository.existsByDogAndReservationDate(dog, reservationDate);
 
         if (exists) {
-            throw new RuntimeException("해당 날짜에 이미 예약이 존재합니다!");
+            throw new CustomException(ErrorCode.DUPLICATE_RESERVATION);
         }
     }
 
@@ -116,14 +118,14 @@ public class ReservationServiceImpl implements ReservationService {
         boolean exists = spaServiceRepository.existsById(serviceId);
 
         if (!exists) {
-            throw new RuntimeException("존재하지 않는 스파 서비스 입니다!");
+            throw new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND);
         }
     }
 
     @Override
     public List<ReservationSummaryDTO> getMyReservations(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Reservation> reservations = reservationRepository.findByUser(user);
 
@@ -144,13 +146,13 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public ReservationResponseDTO getReservationDetail(String userEmail, String reservationId) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RuntimeException("예약 정보 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (!reservation.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인의 예약만 조회할 수 있습니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
         return ReservationResponseDTO.builder()
