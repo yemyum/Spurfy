@@ -1,7 +1,11 @@
 package com.example.oyl.service;
 
+import com.example.oyl.dto.ReviewMyPageDTO;
+import com.example.oyl.dto.ReviewPublicDTO;
 import com.example.oyl.dto.ReviewRequestDTO;
 import com.example.oyl.dto.ReviewUpdateDTO;
+
+import java.util.List;
 
 public interface ReviewService {
 
@@ -10,5 +14,9 @@ public interface ReviewService {
     void updateReview(String reviewId, String userEmail, ReviewUpdateDTO dto);
 
     void deleteReview(String reviewId, String userEmail);
+
+    List<ReviewMyPageDTO> getMyReviews(String userEmail);
+
+    List<ReviewPublicDTO> getReviewsByService(String serviceId);
 
 }

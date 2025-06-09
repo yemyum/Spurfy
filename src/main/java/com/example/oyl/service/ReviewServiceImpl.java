@@ -4,6 +4,8 @@ import com.example.oyl.domain.Dog;
 import com.example.oyl.domain.Reservation;
 import com.example.oyl.domain.Review;
 import com.example.oyl.domain.User;
+import com.example.oyl.dto.ReviewMyPageDTO;
+import com.example.oyl.dto.ReviewPublicDTO;
 import com.example.oyl.dto.ReviewRequestDTO;
 import com.example.oyl.dto.ReviewUpdateDTO;
 import com.example.oyl.repository.*;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -109,5 +113,53 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.delete(review);
     }
 
+    @Override
+    public List<ReviewMyPageDTO> getMyReviews(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("사용자 정보를 찾을 수 없습니다!"));
+
+        // 1. 유저 Id로 리뷰 목록 조회
+        List<Review> reviews = reviewRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId()); // DTO 변환 전에 데이터 불러오기!
+
+        // 2. 날짜 포맷 세팅
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        // 3. 리뷰를 DTO로 반환
+        return reviews.stream()
+                .map(r -> ReviewMyPageDTO.builder()
+                        .reviewId(r.getReviewId())
+                        .reservationId(r.getReservation().getReservationId())
+                        .serviceId(r.getReservation().getSpaService().getServiceId())
+                        .serviceName(r.getReservation().getSpaService().getName())
+                        .dogName(r.getDog().getName())
+                        .reservationDate(r.getReservation().getReservationDate().toString()) // DTO에서 타입 -> String -> 문자열로 포맷!
+                        .price(r.getReservation().getSpaService().getPrice())
+                        .rating(r.getRating())
+                        .content(r.getContent())
+                        .imageUrl(r.getImageUrl())
+                        .createdAt(r.getCreatedAt().format(formatter))
+                        .build())
+            .toList();
+    }
+
+    @Override
+    public List<ReviewPublicDTO> getReviewsByService(String serviceId) {
+        List<Review> reviews = reviewRepository
+                .findByReservationSpaServiceServiceIdAndIsBlindedFalseOrderByCreatedAtDesc(serviceId);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return reviews.stream()
+                .map(r -> ReviewPublicDTO.builder()
+                        .reviewId(r.getReviewId())
+                        .userNickname(r.getUser().getNickname())
+                        .dogName(r.getDog().getName())
+                        .rating(r.getRating())
+                        .content(r.getContent())
+                        .imageUrl(r.getImageUrl())
+                        .createdAt(r.getCreatedAt().format(formatter))
+                        .build())
+                .toList();
+    }
 
 }
