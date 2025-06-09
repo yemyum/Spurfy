@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface DogRepository extends JpaRepository<Dog, String> {
 
-    @Override
-    Optional<Dog> findById(String dogId);
 }

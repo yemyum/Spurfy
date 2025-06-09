@@ -10,4 +10,5 @@ public interface SpaServiceRepository extends JpaRepository<SpaService, String> 
     List<SpaService> findByIsActiveTrue();
 
     boolean existsById(String serviceId);// is_active = true
+
 }

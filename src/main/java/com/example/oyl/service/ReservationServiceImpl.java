@@ -3,6 +3,8 @@ package com.example.oyl.service;
 import com.example.oyl.domain.*;
 import com.example.oyl.dto.CancelReservationDTO;
 import com.example.oyl.dto.ReservationRequestDTO;
+import com.example.oyl.dto.ReservationResponseDTO;
+import com.example.oyl.dto.ReservationSummaryDTO;
 import com.example.oyl.repository.DogRepository;
 import com.example.oyl.repository.ReservationRepository;
 import com.example.oyl.repository.SpaServiceRepository;
@@ -13,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -116,4 +119,56 @@ public class ReservationServiceImpl implements ReservationService {
             throw new RuntimeException("존재하지 않는 스파 서비스 입니다!");
         }
     }
+
+    @Override
+    public List<ReservationSummaryDTO> getMyReservations(String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        List<Reservation> reservations = reservationRepository.findByUser(user);
+
+        return reservations.stream()
+                .map(reservation -> new ReservationSummaryDTO(
+                        reservation.getReservationId(),
+                        user.getNickname(),                             // 닉네임
+                        reservation.getDog().getName(),                 // 강아지 이름
+                        reservation.getSpaService().getName(),          // 서비스 이름
+                        reservation.getReservationDate(),               // 예약 날짜
+                        reservation.getReservationTime(),               // 예약 시간
+                        reservation.getReservationStatus(),             // 예약 상태
+                        reservation.getRefundStatus()                   // 환불 상태
+                ))
+                .toList();
+    }
+
+    @Override
+    public ReservationResponseDTO getReservationDetail(String userEmail, String reservationId) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("사용자 없음"));
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RuntimeException("예약 정보 없음"));
+
+        if (!reservation.getUser().getUserId().equals(user.getUserId())) {
+            throw new RuntimeException("본인의 예약만 조회할 수 있습니다.");
+        }
+
+        return ReservationResponseDTO.builder()
+                .reservationId(reservation.getReservationId())
+                .userId(reservation.getUser().getUserId())
+                .dogId(reservation.getDog().getDogId())
+                .serviceId(reservation.getSpaService().getServiceId())
+                .dogName(reservation.getDog().getName())
+                .serviceName(reservation.getSpaService().getName())
+                .reservationDate(reservation.getReservationDate())
+                .reservationTime(reservation.getReservationTime())
+                .reservationStatus(reservation.getReservationStatus())
+                .refundStatus(reservation.getRefundStatus())
+                .refundType(reservation.getRefundType())
+                .cancelReason(reservation.getCancelReason())
+                .refundedAt(reservation.getRefundedAt())
+                .createdAt(reservation.getCreatedAt())
+                .build();
+    }
+
 }
