@@ -17,10 +17,10 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse> signup(@RequestBody @Valid UserSignupRequestDTO requestDTO) {
-        userService.signup(requestDTO); // 핵심!
+    public ResponseEntity<ApiResponse<Void>> signup(@RequestBody @Valid UserSignupRequestDTO requestDTO) {
+        userService.signup(requestDTO);
         return ResponseEntity.ok(
-                ApiResponse.builder()
+                ApiResponse.<Void>builder()
                         .code("S001")
                         .message("회원가입 성공")
                         .data(null)
@@ -29,11 +29,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse> login(@RequestBody UserLoginRequestDTO requestDTO) {
-        String token = userService.login(requestDTO); // JWT 반환
+    public ResponseEntity<ApiResponse<String>> login(@RequestBody UserLoginRequestDTO requestDTO) {
+        String token = userService.login(requestDTO);
 
         return ResponseEntity.ok(
-                ApiResponse.builder()
+                ApiResponse.<String>builder()
                         .code("S002")
                         .message("로그인 성공")
                         .data(token)

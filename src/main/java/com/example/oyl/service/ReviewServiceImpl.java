@@ -8,6 +8,8 @@ import com.example.oyl.dto.ReviewMyPageDTO;
 import com.example.oyl.dto.ReviewPublicDTO;
 import com.example.oyl.dto.ReviewRequestDTO;
 import com.example.oyl.dto.ReviewUpdateDTO;
+import com.example.oyl.exception.CustomException;
+import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +31,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("로그인 유저 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     }
 
     @Transactional
@@ -38,18 +40,18 @@ public class ReviewServiceImpl implements ReviewService {
         User user = getUserByEmail(userEmail);
 
         Reservation reservation = reservationRepository.findById(dto.getReservationId())
-                .orElseThrow(() -> new RuntimeException("예약 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (!reservation.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인의 예약이 아님");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
         if (reviewRepository.existsByReservation_ReservationId(dto.getReservationId())) {
-            throw new RuntimeException("이미 작성된 리뷰가 있음");
+            throw new CustomException(ErrorCode.DUPLICATE_REVIEW);
         }
 
         Dog dog = dogRepository.findById(dto.getDogId())
-                .orElseThrow(() -> new RuntimeException("강아지 정보 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
 
         Review review = Review.builder()
                 .reviewId(UUID.randomUUID().toString())
@@ -72,10 +74,10 @@ public class ReviewServiceImpl implements ReviewService {
         User user = getUserByEmail(userEmail);
 
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("리뷰 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         if (!review.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인이 작성한 리뷰만 수정 가능!");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
         }
 
         review.updateReview(

@@ -3,6 +3,8 @@ package com.example.oyl.service;
 import com.example.oyl.domain.SpaService;
 import com.example.oyl.dto.SpaServiceDTO;
 import com.example.oyl.dto.SpaServiceSummaryDTO;
+import com.example.oyl.exception.CustomException;
+import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.SpaServiceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,7 +32,7 @@ public class SpaServiceServiceImpl implements SpaServiceService {
     @Override
     public SpaServiceDTO getSpaServiceDetail(String serviceId) {
         SpaService spa = spaServiceRepository.findById(serviceId)
-                .orElseThrow(() -> new RuntimeException("해당 스파 서비스가 존재하지 않습니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND));
 
         return SpaServiceDTO.builder()
                 .serviceId(spa.getServiceId())
