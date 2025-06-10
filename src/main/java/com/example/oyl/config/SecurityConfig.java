@@ -16,6 +16,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (API용)
+                .cors(cors -> {}) // CORS 활성화!
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/signup", "/api/users/login").permitAll() // 회원가입/로그인 열어주기
                         .anyRequest().authenticated() // 나머지는 인증 필요

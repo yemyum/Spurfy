@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dogs")
@@ -66,4 +68,33 @@ public class DogController {
                         .build()
         );
     }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<DogResponseDTO>>> getMyDogs() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<DogResponseDTO> dogs = dogService.getMyDogs(email);
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<DogResponseDTO>>builder()
+                        .code("S001")
+                        .message("강아지 목록 조회 성공")
+                        .data(dogs)
+                        .build()
+        );
+    }
+
+    @GetMapping("/{dogId}")
+    public ResponseEntity<ApiResponse<DogResponseDTO>> getDogDetail(@PathVariable String dogId) {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+        DogResponseDTO dog = dogService.getDogDetail(userEmail, dogId);
+
+        return ResponseEntity.ok(
+                ApiResponse.<DogResponseDTO>builder()
+                        .code("S001")
+                        .message("강아지 상세 조회 성공!")
+                        .data(dog)
+                        .build()
+        );
+    }
+
 }
