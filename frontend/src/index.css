@@ -71,3 +71,18 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+body.loading::after {
+  content: '로딩 중...';
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  font-size: 2rem;
+  color: hotpink;
+  background: white;
+  padding: 1rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
