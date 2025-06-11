@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### 민감 정보 (.env, DB 설정 등) ###
+.env
+.env.*
+application.properties
+application-secret.properties
