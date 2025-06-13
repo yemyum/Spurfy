@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,4 +17,7 @@ public class SpaServiceDTO {
     private boolean isActive; // 직관적인 true/false로 변경
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    private List<String> availableTimes;
+
 }
