@@ -47,18 +47,17 @@ public class PaymentServiceImpl implements PaymentService {
             throw new CustomException(ErrorCode.PAYMENT_UNAUTHORIZED);
 
         }
-        // 결제 엔티티 생성
+
         Payment payment = Payment.builder()
                 .paymentId(UUID.randomUUID().toString())
                 .reservation(reservation)
                 .user(user)
                 .amount(dto.getAmount())
                 .paymentMethod(dto.getPaymentMethod())
-                .paymentStatus(PaymentStatus.PENDING)
-                .createdAt(LocalDateTime.now())// 기본은 PENDING으로
+                .paymentStatus("PENDING")
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        // 저장
         paymentRepository.save(payment);
 
         return PaymentResponseDTO.from(payment);
@@ -83,17 +82,18 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findFirstByReservation_ReservationId(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 
-            // 결제의 주인(유저)이 본인인지 체크!
-            if (!payment.getUser().getEmail().equals(userEmail)) {
-                throw new CustomException(ErrorCode.PAYMENT_UNAUTHORIZED);
+        // 결제의 주인(유저)이 본인인지 체크!
+        if (!payment.getUser().getEmail().equals(userEmail)) {
+            throw new CustomException(ErrorCode.PAYMENT_UNAUTHORIZED);
         }
 
 
-            if (payment.getPaymentStatus() == PaymentStatus.PAID) {
+        // Enum 대신 문자열 비교!
+        if ("PAID".equals(payment.getPaymentStatus())) {
             throw new CustomException(ErrorCode.ALREADY_PAID);
         }
 
-        payment.setPaymentStatus(PaymentStatus.PAID);
+        payment.setPaymentStatus("PAID");    // 문자열로 상태 변경!
 
         Reservation reservation = payment.getReservation();
         reservation.setPaymentStatus("PAID");

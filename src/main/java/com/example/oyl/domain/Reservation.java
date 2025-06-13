@@ -33,24 +33,28 @@ public class Reservation {
     private LocalDate reservationDate;
     private LocalTime reservationTime;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "reservation_status", nullable = false) // DB에 문자열로 저장하기!
-    private ReservationStatus reservationStatus; // 1: 예약완료, 2: 취소됨 등
-    @Enumerated(EnumType.STRING)
+    //!! 여기서 Enum 다 빼고 String으로!!
+    @Column(name = "reservation_status", nullable = false)
+    private String reservationStatus;
+
     @Column(name = "refund_status", nullable = false)
-    private RefundStatus refundStatus;      // 0: 없음, 1: 대기, 2: 완료
+    private String refundStatus;
 
     @Column(name = "payment_status", length = 20)
     private String paymentStatus;
 
-    private String refundType;     // 자동 or 수동
+    private String refundType;
     private String cancelReason;
-
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
 
-    public void setReservationStatus(ReservationStatus reservationStatus) {
+    // setter도 String으로 고쳐!
+    public void setReservationStatus(String reservationStatus) {
         this.reservationStatus = reservationStatus;
+    }
+
+    public void setRefundStatus(String refundStatus) {
+        this.refundStatus = refundStatus;
     }
 
     public void setPaymentStatus(String paymentStatus) {
@@ -61,10 +65,6 @@ public class Reservation {
         this.cancelReason = cancelReason;
     }
 
-    public void setRefundStatus(RefundStatus refundStatus) {
-        this.refundStatus = refundStatus;
-    }
-
     public void setRefundType(String refundType) {
         this.refundType = refundType;
     }
@@ -72,5 +72,4 @@ public class Reservation {
     public void setRefundedAt(LocalDateTime refundedAt) {
         this.refundedAt = refundedAt;
     }
-
 }

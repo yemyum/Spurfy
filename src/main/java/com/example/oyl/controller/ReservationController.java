@@ -2,10 +2,7 @@ package com.example.oyl.controller;
 
 import com.example.oyl.common.ApiResponse;
 import com.example.oyl.domain.*;
-import com.example.oyl.dto.CancelReservationDTO;
-import com.example.oyl.dto.ReservationRequestDTO;
-import com.example.oyl.dto.ReservationResponseDTO;
-import com.example.oyl.dto.ReservationSummaryDTO;
+import com.example.oyl.dto.*;
 import com.example.oyl.repository.DogRepository;
 import com.example.oyl.repository.ReservationRepository;
 import com.example.oyl.repository.SpaServiceRepository;
@@ -31,16 +28,20 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    // ✅ 예약 등록
-    @PostMapping
-    public ResponseEntity<ApiResponse<Void>> createReservation(@RequestBody ReservationRequestDTO dto) {
+    // ✅ 순수 예약 저장용 API (결제와 분리!)
+    @PostMapping("")
+    public ResponseEntity<ApiResponse<ReservationResponseDTO>> reserveOnly(
+            @RequestBody ReservationRequestDTO dto) {
+
+        // 1. (프론트에서 결제 완료된 뒤, 정보와 함께 이 API 호출)
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        reservationService.createReservation(dto, email);
+        ReservationResponseDTO response = reservationService.reserveOnly(email, dto);
+
         return ResponseEntity.ok(
-                ApiResponse.<Void>builder()
+                ApiResponse.<ReservationResponseDTO>builder()
                         .code("S001")
-                        .message("예약 완료! 🐶🛁")
-                        .data(null)
+                        .message("예약 저장 완료! 🐶📅")
+                        .data(response)
                         .build()
         );
     }

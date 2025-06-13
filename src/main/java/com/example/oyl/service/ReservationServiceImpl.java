@@ -1,22 +1,18 @@
 package com.example.oyl.service;
 
 import com.example.oyl.domain.*;
-import com.example.oyl.dto.CancelReservationDTO;
-import com.example.oyl.dto.ReservationRequestDTO;
-import com.example.oyl.dto.ReservationResponseDTO;
-import com.example.oyl.dto.ReservationSummaryDTO;
+import com.example.oyl.dto.*;
 import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
-import com.example.oyl.repository.DogRepository;
-import com.example.oyl.repository.ReservationRepository;
-import com.example.oyl.repository.SpaServiceRepository;
-import com.example.oyl.repository.UserRepository;
+import com.example.oyl.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +24,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final DogRepository dogRepository;
     private final UserRepository userRepository;
     private final SpaServiceRepository spaServiceRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     @Override
@@ -42,9 +39,10 @@ public class ReservationServiceImpl implements ReservationService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
-        reservation.setReservationStatus(ReservationStatus.CANCELED); // 취소됨
+        // enum 빼고 문자열로 세팅!
+        reservation.setReservationStatus("CANCELED"); // 취소됨
         reservation.setCancelReason(dto.getCancelReason());
-        reservation.setRefundStatus(RefundStatus.WAITING); // 환불 대기
+        reservation.setRefundStatus("WAITING"); // 환불 대기
         reservation.setRefundType("자동");
         reservation.setRefundedAt(null);
 
@@ -53,38 +51,46 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 등록
     @Transactional
-    public void createReservation(ReservationRequestDTO dto, String userEmail) {
-
-        User user = userRepository.findByEmail(userEmail)
+    @Override
+    public ReservationResponseDTO reserveOnly(String email, ReservationRequestDTO dto) {
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        validateReservationOwnership(dto.getDogId(), user);
-        validateNotPastDate(dto.getReservationDate());
 
         Dog dog = dogRepository.findById(dto.getDogId())
                 .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
 
-        validateDuplicateReservation(dog, dto.getReservationDate());
-        validateSpaServiceExistence(dto.getServiceId());
+        SpaService spa = spaServiceRepository.findById(dto.getServiceId())
+                .orElseThrow(() -> new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND));
 
-        // 여기! 저장 로직 추가됨
+        // 1. 예약 정보 저장
         Reservation reservation = Reservation.builder()
                 .reservationId(UUID.randomUUID().toString())
                 .user(user)
                 .dog(dog)
-                .spaService(spaServiceRepository.findById(dto.getServiceId())
-                        .orElseThrow(() -> new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND)))
-                .reservationDate(dto.getReservationDate())
-                .reservationTime(dto.getReservationTime())
-                .reservationStatus(ReservationStatus.RESERVED)
-                .refundStatus(RefundStatus.NONE)
-                .refundType("자동")
-                .cancelReason("")
-                .refundedAt(null)
+                .spaService(spa)
+                .reservationDate(LocalDate.parse(dto.getReservationDate()))
+                .reservationTime(LocalTime.parse(dto.getReservationTime()))
+                .reservationStatus("RESERVED") // 예약 완료
+                .refundStatus("NONE") // 환불 없음
                 .createdAt(LocalDateTime.now())
                 .build();
 
         reservationRepository.save(reservation);
+
+        // 2. 결제 정보도 payments 테이블에 저장! (이 부분 추가)
+        Payment payment = Payment.builder()
+                .paymentId(UUID.randomUUID().toString())
+                .reservation(reservation) // 외래키 연결
+                .user(user)
+                .amount(BigDecimal.valueOf(spa.getPrice()))  // BigDecimal 변환
+                .paymentMethod("CARD") // 더미
+                .paymentStatus("SUCCESS")  // 성공 처리
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        paymentRepository.save(payment); // payments 저장!
+
+        return ReservationResponseDTO.from(reservation);
     }
 
     // 1단계 : 본인 강아지인지 확인
@@ -98,8 +104,15 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     // 2단계 : 과거 날짜 방지
-    private void validateNotPastDate(LocalDate reservationDate) {
-        if (reservationDate.isBefore(LocalDate.now())) {
+    private void validateNotPastDate(LocalDate reservationDate, LocalTime reservationTime) {
+        LocalDate today = LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        if (reservationDate.isBefore(today)) {
+            throw new CustomException(ErrorCode.INVALID_RESERVATION_DATE);
+        }
+
+        if (reservationDate.isEqual(today) && reservationTime.isBefore(now)) {
             throw new CustomException(ErrorCode.INVALID_RESERVATION_DATE);
         }
     }

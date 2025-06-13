@@ -27,7 +27,7 @@ public class PaymentResponseDTO {
                 .userId(payment.getUser().getUserId())
                 .amount(payment.getAmount())
                 .paymentMethod(payment.getPaymentMethod())
-                .paymentStatus(payment.getPaymentStatus().name()) // enum -> String
+                .paymentStatus(payment.getPaymentStatus())
                 .createdAt(payment.getCreatedAt())
                 .build();
     }
