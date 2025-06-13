@@ -58,7 +58,18 @@ function SpaDetail() {
         ))}
       </select>
       <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-      <input type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+      
+      {/* 시간 선택은 select, 가능한 시간대만! */}
+      <select value={time} onChange={e => setTime(e.target.value)}>
+        <option value="">시간 선택</option>
+        {spa.availableTimes && spa.availableTimes.length > 0 ? (
+          spa.availableTimes.map((t) => (
+            <option key={t} value={t}>{t}</option>
+          ))
+        ) : (
+          <option value="" disabled>가능한 시간이 없습니다</option>
+        )}
+      </select>
       <button onClick={handleReservation}>예약하기</button>
     </div>
   );
