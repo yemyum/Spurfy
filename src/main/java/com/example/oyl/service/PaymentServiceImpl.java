@@ -96,6 +96,6 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setPaymentStatus(PaymentStatus.PAID);
 
         Reservation reservation = payment.getReservation();
-        reservation.setPaymentStatus("PAID");
+        reservation.setPaymentStatus(PaymentStatus.PAID);
     }
 }

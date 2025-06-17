@@ -35,6 +35,7 @@ function SpaDetail() {
         time,
         amount: spa.price,
         spaName: spa.name,
+        dogName: dogList.find(d => d.dogId === selectedDogId)?.name || '',
       },
     });
   };

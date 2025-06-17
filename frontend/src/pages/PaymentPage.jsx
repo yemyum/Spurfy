@@ -42,8 +42,8 @@ function PaymentPage() {
       const res = await api.post('/reservation', {
         dogId: state.dogId,
         serviceId: state.serviceId,
-        reservationDate: state.date,
-        reservationTime: state.time,
+        reservationDate: state.reservationDate,
+        reservationTime: state.reservationTime,
       });
 
       const newId = res.data.data.reservationId;

@@ -33,8 +33,9 @@ public class Payment {
     @Column(name = "payment_method")
     private String paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 20)
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

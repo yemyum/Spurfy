@@ -28,19 +28,16 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    // ✅ 순수 예약 저장용 API (결제와 분리!)
-    @PostMapping("")
-    public ResponseEntity<ApiResponse<ReservationResponseDTO>> reserveOnly(
-            @RequestBody ReservationRequestDTO dto) {
-
-        // 1. (프론트에서 결제 완료된 뒤, 정보와 함께 이 API 호출)
+    // ✅ 예약+결제 동시 등록
+    @PostMapping("/pay")
+    public ResponseEntity<ApiResponse<ReservationResponseDTO>> reserveAndPay(
+            @RequestBody ReservationPaymentRequestDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        ReservationResponseDTO response = reservationService.reserveOnly(email, dto);
-
+        ReservationResponseDTO response = reservationService.reserveAndPay(dto, email);
         return ResponseEntity.ok(
                 ApiResponse.<ReservationResponseDTO>builder()
                         .code("S001")
-                        .message("예약 저장 완료! 🐶📅")
+                        .message("예약+결제 완료!")
                         .data(response)
                         .build()
         );

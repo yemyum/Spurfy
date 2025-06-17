@@ -1,6 +1,7 @@
 package com.example.oyl.dto;
 
 import com.example.oyl.domain.Payment;
+import com.example.oyl.domain.PaymentStatus;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -17,7 +18,7 @@ public class PaymentResponseDTO {
     private String userId;
     private BigDecimal amount;
     private String paymentMethod;
-    private String paymentStatus;
+    private PaymentStatus paymentStatus;
     private LocalDateTime createdAt;
 
     public static PaymentResponseDTO from(Payment payment) {

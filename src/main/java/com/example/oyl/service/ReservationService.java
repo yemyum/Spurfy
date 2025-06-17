@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface ReservationService {
 
-    // 예약 등록
-    ReservationResponseDTO reserveOnly(String email, ReservationRequestDTO dto);
+    // 결제 + 예약 등록
+    ReservationResponseDTO reserveAndPay(ReservationPaymentRequestDTO dto, String userEmail);
 
     // 예약 취소
     void cancelReservation(String userEmail, CancelReservationDTO dto);
