@@ -8,6 +8,7 @@ import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.jwt.JwtUtil;
 import com.example.oyl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,21 +20,30 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder; // 의존성 주입
 
     @Override
     @Transactional
     public void signup(UserSignupRequestDTO requestDTO) {
 
-        // 중복 이메일 체크 추가
+        // 중복 이메일 체크
         if (userRepository.existsByEmail(requestDTO.getEmail())) {
             throw new CustomException(ErrorCode.DUPLICATE_USER_EMAIL);
         }
+
+        // 중복 닉네임 체크
+        if (userRepository.existsByNickname(requestDTO.getNickname())) {
+            throw new CustomException(ErrorCode.DUPLICATE_NICKNAME);
+        }
+
+        // 비밀번호 암호화
+        String encodedPw = passwordEncoder.encode(requestDTO.getPassword());
 
         // DTO -> Entity 변환
         User user = User.builder()
                 .userId(UUID.randomUUID().toString())  // 고유 ID 자동 생성
                 .email(requestDTO.getEmail())
-                .password(requestDTO.getPassword())   // 나중엔 암호화해야 함
+                .password(requestDTO.getPassword())    // 나중엔 암호화해야 함!!
                 .name(requestDTO.getName())
                 .nickname(requestDTO.getNickname())
                 .phone(requestDTO.getPhone())

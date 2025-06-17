@@ -67,7 +67,7 @@ public class ReservationServiceImpl implements ReservationService {
         validateDuplicateReservation(dog, dto.getReservationDate());
         validateSpaServiceExistence(dto.getServiceId());
 
-        // 여기! 저장 로직 추가됨
+        // 저장 로직
         Reservation reservation = Reservation.builder()
                 .reservationId(UUID.randomUUID().toString())
                 .user(user)

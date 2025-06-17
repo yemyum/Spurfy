@@ -58,7 +58,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .createdAt(LocalDateTime.now())// 기본은 PENDING으로
                 .build();
 
-        // 저장
+        // 저장 꼭!
         paymentRepository.save(payment);
 
         return PaymentResponseDTO.from(payment);
@@ -69,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findFirstByReservation_ReservationId(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 
-            // 결제의 주인(유저)이 본인인지 체크!
+            // 결제 당사자(유저)가 본인인지 체크!
             if (!payment.getUser().getEmail().equals(userEmail)) {
                 throw new CustomException(ErrorCode.PAYMENT_UNAUTHORIZED);
             }
@@ -83,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = paymentRepository.findFirstByReservation_ReservationId(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
 
-            // 결제의 주인(유저)이 본인인지 체크!
+            // 결제 당사자(유저)가 본인인지 체크!
             if (!payment.getUser().getEmail().equals(userEmail)) {
                 throw new CustomException(ErrorCode.PAYMENT_UNAUTHORIZED);
         }

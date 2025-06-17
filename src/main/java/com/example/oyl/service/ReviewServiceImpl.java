@@ -93,10 +93,10 @@ public class ReviewServiceImpl implements ReviewService {
         User user = getUserByEmail(userEmail);
 
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("리뷰 없음"));
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
 
         if (!review.getUser().getUserId().equals(user.getUserId())) {
-            throw new RuntimeException("본인이 작성한 리뷰만 삭제할 수 있습니다!");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
         }
 
         reviewRepository.delete(review);
