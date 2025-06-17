@@ -14,9 +14,6 @@ public class ReservationRequestDTO {
     private String dogId;             // 필수: 어떤 강아지가 예약하는지
     private String serviceId;         // 필수: 어떤 스파 서비스인지
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDate reservationDate; // 필수: 예약일
-
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime reservationTime; // 필수: 예약 시간
+    private String reservationDate; // yyyy-MM-dd
+    private String reservationTime; // HH:mm
 }

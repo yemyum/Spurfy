@@ -1,16 +1,13 @@
 package com.example.oyl.service;
 
-import com.example.oyl.dto.CancelReservationDTO;
-import com.example.oyl.dto.ReservationRequestDTO;
-import com.example.oyl.dto.ReservationResponseDTO;
-import com.example.oyl.dto.ReservationSummaryDTO;
+import com.example.oyl.dto.*;
 
 import java.util.List;
 
 public interface ReservationService {
 
     // 예약 등록
-    void createReservation(ReservationRequestDTO dto, String userEmail);
+    ReservationResponseDTO reserveOnly(String email, ReservationRequestDTO dto);
 
     // 예약 취소
     void cancelReservation(String userEmail, CancelReservationDTO dto);

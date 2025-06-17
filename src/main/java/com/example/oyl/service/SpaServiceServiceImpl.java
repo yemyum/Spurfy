@@ -42,7 +42,12 @@ public class SpaServiceServiceImpl implements SpaServiceService {
                 .price(spa.getPrice())
                 .isActive(spa.isActive())
                 .createdAt(spa.getCreatedAt())
-                .updatedAt(spa.getCreatedAt())
+                .updatedAt(spa.getUpdatedAt())
+                .availableTimes(
+                        spa.getAvailableTimes() == null || spa.getAvailableTimes().isBlank()
+                                ? List.of()
+                                : List.of(spa.getAvailableTimes().split(","))
+                )
                 .build();
     }
 }

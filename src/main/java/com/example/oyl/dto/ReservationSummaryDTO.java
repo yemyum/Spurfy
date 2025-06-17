@@ -19,13 +19,13 @@ public class ReservationSummaryDTO {
     private String serviceName;           // 스파 서비스 이름
     private LocalDate reservationDate;    // 예약 날짜
     private LocalTime reservationTime;    // 예약 시간
-    private ReservationStatus reservationStatus;        // "RESERVED" or "CANCELED"
-    private RefundStatus refundStatus;                  // "NONE", "WAITING", "COMPLETED", "REJECTED"
+    private String reservationStatus;        // "RESERVED" or "CANCELED"
+    private String refundStatus;                  // "NONE", "WAITING", "COMPLETED", "REJECTED"
 
     // 생성자 명시적으로 추가해주기
     public ReservationSummaryDTO(String reservationId, String userNickname, String dogName,
                                  String serviceName, LocalDate reservationDate, LocalTime reservationTime,
-                                 ReservationStatus reservationStatus, RefundStatus refundStatus) {
+                                 String reservationStatus, String refundStatus) {
         this.reservationId = reservationId;
         this.userNickname = userNickname;
         this.dogName = dogName;

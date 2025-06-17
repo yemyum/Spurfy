@@ -35,5 +35,8 @@ public class SpaService {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updateAt;
+    private LocalDateTime updatedAt;
+
+    @Column(name = "available_times")
+    private String availableTimes; // "10:00,12:00,14:00" 형태
 }
