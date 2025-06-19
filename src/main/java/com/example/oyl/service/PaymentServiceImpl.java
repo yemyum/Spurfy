@@ -20,6 +20,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -58,13 +59,14 @@ public class PaymentServiceImpl implements PaymentService {
                 .createdAt(LocalDateTime.now())// 기본은 PENDING으로
                 .build();
 
-        // 저장 꼭!
+        // // DB 변경 (INSERT)
         paymentRepository.save(payment);
 
         return PaymentResponseDTO.from(payment);
     }
 
     @Override
+    @Transactional(readOnly = true) // <-- 조회 메서드이므로 readOnly = true 명시
     public PaymentResponseDTO getPaymentByReservationId(String userEmail, String reservationId) {
         Payment payment = paymentRepository.findFirstByReservation_ReservationId(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));

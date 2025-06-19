@@ -11,6 +11,7 @@ import com.example.oyl.repository.DogRepository;
 import com.example.oyl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class DogServiceImpl implements DogService {
 
     private final DogRepository dogRepository;
@@ -108,6 +110,7 @@ public class DogServiceImpl implements DogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<DogResponseDTO> getMyDogs(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -128,6 +131,7 @@ public class DogServiceImpl implements DogService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DogResponseDTO getDogDetail(String userEmail, String dogId) {
         Dog dog = dogRepository.findByDogIdAndUserEmail(dogId, userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));

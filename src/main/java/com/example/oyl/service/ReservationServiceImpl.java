@@ -18,6 +18,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -27,7 +28,6 @@ public class ReservationServiceImpl implements ReservationService {
     private final PaymentRepository paymentRepository;
 
     // 예약+결제 동시
-    @Transactional
     @Override
     public ReservationResponseDTO reserveAndPay(ReservationPaymentRequestDTO dto, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
@@ -56,7 +56,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .refundedAt(null)
                 .createdAt(LocalDateTime.now())
                 .build();
-        reservationRepository.save(reservation);
+        reservationRepository.save(reservation);   // INSERT
 
         Payment payment = Payment.builder()
                 .paymentId(UUID.randomUUID().toString())
@@ -73,7 +73,6 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     // 예약 취소
-    @Transactional
     @Override
     public void cancelReservation(String userEmail, CancelReservationDTO dto) {
         User user = userRepository.findByEmail(userEmail)
@@ -96,6 +95,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 내 예약 목록 조회
     @Override
+    @Transactional(readOnly = true)
     public List<ReservationSummaryDTO> getMyReservations(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
@@ -118,6 +118,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     // 예약 상세 조회
     @Override
+    @Transactional(readOnly = true)
     public ReservationResponseDTO getReservationDetail(String userEmail, String reservationId) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

@@ -63,7 +63,8 @@ public class UserServiceImpl implements UserService{
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        if (!user.getPassword().equals(dto.getPassword())) {
+        // 비밀번호 비교: 입력받은 비밀번호를 암호화된 비밀번호와 비교
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 

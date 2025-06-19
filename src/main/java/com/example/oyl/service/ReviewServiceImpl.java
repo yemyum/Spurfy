@@ -103,6 +103,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewMyPageDTO> getMyReviews(String userEmail) {
         User user = getUserByEmail(userEmail);
         List<Review> reviews = reviewRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId());
@@ -127,6 +128,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ReviewPublicDTO> getReviewsByService(String serviceId) {
         List<Review> reviews = reviewRepository
                 .findByReservationSpaServiceServiceIdAndIsBlindedFalseOrderByCreatedAtDesc(serviceId);
