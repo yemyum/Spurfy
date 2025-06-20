@@ -39,11 +39,14 @@ function PaymentPage() {
       // if (!paymentResult.success) { ... }
 
       // 결제 성공 후 예약 등록
-      const res = await api.post('/reservation', {
+      const res = await api.post('/reservation/pay', {
         dogId: state.dogId,
         serviceId: state.serviceId,
-        reservationDate: state.reservationDate,
-        reservationTime: state.reservationTime,
+        serviceId: state.serviceId,
+        reservationDate: state.date,
+        reservationTime: state.time,
+        amount: state.amount,
+        paymentMethod: 'CARD'
       });
 
       const newId = res.data.data.reservationId;
@@ -51,7 +54,9 @@ function PaymentPage() {
       navigate(`/payment/${newId}`);
     } catch (err) {
       console.error(err);
-      alert("예약 저장 실패! 🐽💥");
+      console.error("🐽 결제 에러:", err);
+      console.log("🔍 서버 응답:", err.response?.data);  // 이거!!
+      alert('결제 실패!');
     }
   };
 

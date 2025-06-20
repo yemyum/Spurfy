@@ -1,3 +1,4 @@
+// App.jsx
 import React from 'react';
 import './App.css';
 import './index.css';
@@ -6,13 +7,16 @@ import { Routes, Route } from 'react-router-dom';
 
 function App() {
   return (
-    <>
-      <Routes>
-        {routeList.map(({ path, element }, idx) => (
-          <Route key={idx} path={path} element={element} />
-        ))}
-      </Routes>
-    </>
+    <Routes>
+      {routeList.map(({ path, element, children }, idx) => (
+        <Route key={idx} path={path} element={element}>
+          {children &&
+            children.map((child, cIdx) => (
+              <Route key={cIdx} path={child.path} element={child.element} />
+            ))}
+        </Route>
+      ))}
+    </Routes>
   );
 }
 

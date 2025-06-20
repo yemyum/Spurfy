@@ -10,6 +10,7 @@ function SpaDetail() {
   const [selectedDogId, setSelectedDogId] = useState('');
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [reviews, setReviews] = useState([]);
 
   useEffect(() => {
     api.get(`/spa-services/${id}`)
@@ -19,6 +20,12 @@ function SpaDetail() {
     api.get('/dogs')
       .then((res) => setDogList(res.data.data))
       .catch(() => alert('강아지 목록 불러오기 실패🐶'));
+
+    // 리뷰 데이터 추가로 가져오기!
+    api.get(`/reviews/public/${id}`)
+      .then(res => setReviews(res.data.data || []))
+      .catch(() => {});
+
   }, [id]);
 
   // [예약하기]는 결제페이지로 정보만 넘김!
@@ -72,6 +79,19 @@ function SpaDetail() {
         )}
       </select>
       <button onClick={handleReservation}>예약하기</button>
+    <hr />
+      <h3>서비스 리뷰 (최신 3~4개)</h3>
+      <div>
+        {reviews.length === 0 && <div>아직 리뷰가 없습니다!</div>}
+        {reviews.slice(0, 4).map(r => (
+          <div key={r.reviewId} className="border rounded p-3 mb-3">
+            <div className="font-semibold">{r.userNickname}</div>
+            <div className="text-yellow-500 mb-1">{"⭐".repeat(r.rating)}</div>
+            <div className="text-gray-700">{r.content}</div>
+            <div className="text-xs text-gray-400">{r.createdAt?.slice(0,10)}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

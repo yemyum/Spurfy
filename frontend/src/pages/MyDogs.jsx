@@ -40,7 +40,13 @@ function MyDogs() {
 
   return (
     <div style={{ maxWidth: '600px', margin: 'auto' }}>
-      <h2>🐶 나의 강아지 목록</h2>
+      <h2>🐾 반려견 케어</h2>
+      <h2>🐶 나의 반려견 리스트</h2>
+
+      <div style={{ textAlign: 'right', marginBottom: '10px' }}>
+      <button onClick={() => navigate('/dogs/register')}>+ 강아지 등록</button>
+      </div>
+
       {dogs.length === 0 ? (
         <p>등록된 강아지가 없어요!</p>
       ) : (
