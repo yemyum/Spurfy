@@ -1,9 +1,6 @@
 package com.example.oyl.service;
 
-import com.example.oyl.domain.Dog;
-import com.example.oyl.domain.Reservation;
-import com.example.oyl.domain.Review;
-import com.example.oyl.domain.User;
+import com.example.oyl.domain.*;
 import com.example.oyl.dto.ReviewMyPageDTO;
 import com.example.oyl.dto.ReviewPublicDTO;
 import com.example.oyl.dto.ReviewRequestDTO;
@@ -37,10 +34,18 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     @Override
     public void createReview(String userEmail, ReviewRequestDTO dto) {
+
+        // 1. 유저 조회
         User user = getUserByEmail(userEmail);
 
+        // 2. 예약 조회
         Reservation reservation = reservationRepository.findById(dto.getReservationId())
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
+
+        if (reservation.getReservationStatus() != ReservationStatus.COMPLETED) {
+            throw new CustomException(ErrorCode.NOT_COMPLETED_RESERVATION);
+        }
+
 
         if (!reservation.getUser().getUserId().equals(user.getUserId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
@@ -106,7 +111,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public List<ReviewMyPageDTO> getMyReviews(String userEmail) {
         User user = getUserByEmail(userEmail);
-        List<Review> reviews = reviewRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId());
+        List<Review> reviews = reviewRepository.findAllWithDogAndServiceByUserId(user.getUserId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -130,8 +135,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     @Transactional(readOnly = true)
     public List<ReviewPublicDTO> getReviewsByService(String serviceId) {
-        List<Review> reviews = reviewRepository
-                .findByReservationSpaServiceServiceIdAndIsBlindedFalseOrderByCreatedAtDesc(serviceId);
+        List<Review> reviews = reviewRepository.findAllWithUserAndDogByServiceId(serviceId);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 

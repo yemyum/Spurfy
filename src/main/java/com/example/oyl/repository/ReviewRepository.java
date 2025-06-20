@@ -1,7 +1,9 @@
 package com.example.oyl.repository;
 
 import com.example.oyl.domain.Review;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -10,10 +12,11 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     // 예약 Id로 리뷰 존재 여부 확인 (중복 방지용)
     boolean existsByReservation_ReservationId(String reservationId);
 
-    // 마이페이지에서 로그인 유저의 리뷰 조회
-    List<Review> findByUserUserIdOrderByCreatedAtDesc(String userId);
+    // 리뷰와 연결된 유저, 강아지를 한 번에 전부 조회
+    @Query("SELECT r FROM Review r JOIN FETCH r.user u JOIN FETCH r.dog d WHERE r.reservation.spaService.serviceId = :serviceId AND r.isBlinded = false ORDER BY r.createdAt DESC")
+    List<Review> findAllWithUserAndDogByServiceId(@Param("serviceId") String serviceId);
 
-    // 특정 스파 서비스에 달린 모든 리뷰 조회 (비로그인 허용!)
-    List<Review> findByReservationSpaServiceServiceIdAndIsBlindedFalseOrderByCreatedAtDesc(String serviceId);
+    @Query("SELECT r FROM Review r JOIN FETCH r.dog d JOIN FETCH r.reservation res JOIN FETCH res.spaService WHERE r.user.userId = :userId ORDER BY r.createdAt DESC")
+    List<Review> findAllWithDogAndServiceByUserId(@Param("userId") String userId);
 
 }

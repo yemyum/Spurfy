@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
         User user = User.builder()
                 .userId(UUID.randomUUID().toString())  // 고유 ID 자동 생성
                 .email(requestDTO.getEmail())
-                .password(requestDTO.getPassword())    // 나중엔 암호화해야 함!!
+                .password(encodedPw)    // 암호화!
                 .name(requestDTO.getName())
                 .nickname(requestDTO.getNickname())
                 .phone(requestDTO.getPhone())

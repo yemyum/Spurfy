@@ -12,7 +12,6 @@ public interface ReservationService {
     // 예약 취소
     void cancelReservation(String userEmail, CancelReservationDTO dto);
 
-
     // 예약 목록
     List<ReservationSummaryDTO> getMyReservations(String userEmail);
 

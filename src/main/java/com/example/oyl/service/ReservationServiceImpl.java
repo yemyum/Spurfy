@@ -30,17 +30,33 @@ public class ReservationServiceImpl implements ReservationService {
     // 예약+결제 동시
     @Override
     public ReservationResponseDTO reserveAndPay(ReservationPaymentRequestDTO dto, String userEmail) {
+        try {
+        System.out.println("🎯 [START] reserveAndPay 진입");
+        System.out.println("📧 userEmail = " + userEmail);
+        System.out.println("🐶 dogId = " + dto.getDogId());
+        System.out.println("🛁 serviceId = " + dto.getServiceId());
+        System.out.println("💸 amount = " + dto.getAmount());
+
+
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        System.out.println("✅ user 찾음");
+
         Dog dog = dogRepository.findById(dto.getDogId())
                 .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
+        System.out.println("✅ dog 찾음");
+
         SpaService service = spaServiceRepository.findById(dto.getServiceId())
                 .orElseThrow(() -> new CustomException(ErrorCode.SPA_SERVICE_NOT_FOUND));
+        System.out.println("✅ service 찾음");
 
         LocalDate date = LocalDate.parse(dto.getReservationDate());
+        System.out.println("📅 예약 날짜: " + date);
+
         validateReservationOwnership(dog, user);
         validateNotPastDate(date);
         validateDuplicateReservation(dog, date);
+        System.out.println("✅ 유효성 검증 통과");
 
         Reservation reservation = Reservation.builder()
                 .reservationId(UUID.randomUUID().toString())
@@ -57,6 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
                 .createdAt(LocalDateTime.now())
                 .build();
         reservationRepository.save(reservation);   // INSERT
+        System.out.println("✅ 예약 저장 완료");
 
         Payment payment = Payment.builder()
                 .paymentId(UUID.randomUUID().toString())
@@ -68,8 +85,14 @@ public class ReservationServiceImpl implements ReservationService {
                 .createdAt(LocalDateTime.now())
                 .build();
         paymentRepository.save(payment);
+        System.out.println("✅ 결제 저장 완료");
 
         return ReservationResponseDTO.from(reservation);
+        } catch (Exception e) {
+            System.out.println("💥 예외 발생! " + e.getMessage());
+            e.printStackTrace(); // ❗ 콘솔에 에러 로그 출력!!
+            throw new CustomException(ErrorCode.INTERNAL_ERROR);
+        }
     }
 
     // 예약 취소
@@ -100,18 +123,21 @@ public class ReservationServiceImpl implements ReservationService {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        List<Reservation> reservations = reservationRepository.findByUser(user);
+        List<Reservation> reservations = reservationRepository.findByUser_UserIdWithDetails(user.getUserId());
 
         return reservations.stream()
                 .map(reservation -> new ReservationSummaryDTO(
                         reservation.getReservationId(),
                         user.getNickname(),
                         reservation.getDog().getName(),
+                        reservation.getDog().getDogId(),
                         reservation.getSpaService().getName(),
+                        reservation.getSpaService().getServiceId(),
                         reservation.getReservationDate(),
                         reservation.getReservationTime(),
                         reservation.getReservationStatus(),
-                        reservation.getRefundStatus()
+                        reservation.getRefundStatus(),
+                        reservation.getSpaService().getPrice()
                 ))
                 .toList();
     }

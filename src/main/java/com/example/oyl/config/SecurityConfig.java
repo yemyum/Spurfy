@@ -1,7 +1,9 @@
 package com.example.oyl.config;
 
 import com.example.oyl.jwt.JwtFilter;
+import com.example.oyl.repository.UserRepository;
 import jakarta.servlet.Filter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -11,7 +13,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final UserRepository userRepository;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -28,11 +33,12 @@ public class SecurityConfig {
 
     @Bean
     public Filter jwtFilter() {
-        return new JwtFilter();
+        return new JwtFilter(userRepository); // 전달
     }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 

@@ -21,7 +21,8 @@ public enum ErrorCode {
     DUPLICATE_REVIEW("RV003", "이미 해당 예약에 대한 리뷰가 작성되었습니다."),
     DUPLICATE_USER_EMAIL("U002", "이미 존재하는 이메일입니다."),
     INVALID_PASSWORD("U003", "비밀번호가 일치하지 않습니다."),
-    DUPLICATE_NICKNAME("N001", "이미 존재하는 닉네임 입니다.");
+    DUPLICATE_NICKNAME("N001", "이미 존재하는 닉네임 입니다."),
+    NOT_COMPLETED_RESERVATION("RV004", "이용 완료된 예약만 리뷰 작성이 가능합니다.");
 
     private final String code;
     private final String message;
