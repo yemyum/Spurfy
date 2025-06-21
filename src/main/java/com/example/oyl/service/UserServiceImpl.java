@@ -7,8 +7,12 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.jwt.JwtUtil;
 import com.example.oyl.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,5 +73,15 @@ public class UserServiceImpl implements UserService{
         }
 
         return JwtUtil.createToken(user.getEmail()); // JWT 발급
+    }
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        if (authentication != null){
+            // Spring Security가 제공하는 로그아웃 핸들러를 사용해서 세션을 무효화하고 보안 컨텍스트를 클리어해.
+            // 이렇게 하면 서버 측에서 사용자의 인증 상태가 해제돼.
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
+        }
+        // 이 부분은 SecurityContextLogoutHandler가 자동으로 처리하므로 SecurityContextHolder.clearContext()를 따로 호출할 필요는 없어.
     }
 }

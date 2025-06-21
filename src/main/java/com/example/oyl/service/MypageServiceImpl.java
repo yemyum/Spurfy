@@ -109,6 +109,12 @@ public class MypageServiceImpl implements MypageService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+        // 비밀번호 확인 추가!
+        // 입력받은 비밀번호(request.getPassword())와 DB에 저장된 암호화된 비밀번호(user.getPassword())를 비교
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD); // 비밀번호가 일치하지 않으면 에러 발생
+        }
+
         // 사용자 상태를 '탈퇴' (0)으로 변경
         user.deactivate(); // User 엔티티의 deactivate 메서드 호출 (userStatus = 0)
         userRepository.save(user); // 변경된 상태 저장
