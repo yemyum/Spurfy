@@ -16,6 +16,8 @@ import ReviewWrite from './pages/ReviewWrite';
 import SpaList from './pages/SpaList';
 import SpaDetail from './pages/SpaDetail';
 import PaymentPage from './pages/PaymentPage';
+import MyReservationDetail from './pages/MyReservationDetail';
+import WithdrawalPage from './pages/Withdrawal';
 
 const routeList = [
   { path: '/', element: <Home /> },
@@ -35,8 +37,10 @@ const routeList = [
       { path: 'profile', element: <Profile /> },
       { path: 'dogs', element: <MyDogs /> },
       { path: 'reservations', element: <MyReservationList /> },
+      { path: 'reservations/:reservationId', element: <MyReservationDetail /> },
       { path: 'reviews', element: <MyReviewList /> },
       { path: 'reviews/:reviewId', element: <MyReviewDetail /> },
+      { path: 'mypage/withdrawal', element: <WithdrawalPage /> },
     ],
   },
   { path: '/review/write', element: <ReviewWrite /> },

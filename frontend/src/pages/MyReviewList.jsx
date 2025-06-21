@@ -34,21 +34,22 @@ function MyReviewList() {
           <p className="mt-2 text-gray-700 truncate">{r.content}</p>
           <div className="flex gap-2 mt-4">
             <button
-              className="bg-yellow-400 hover:bg-yellow-500 text-white rounded px-3 py-1 text-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/mypage/reviews/edit/${r.reviewId}`, { state: r });
-              }}
-            >
-              수정
-            </button>
+            className="bg-yellow-400 hover:bg-yellow-500 text-white rounded px-3 py-1 text-sm"
+  onClick={(e) => {
+    e.stopPropagation();
+    // ⭐⭐ `edit/` 부분을 제거하고, `state`에 `isEditing: true` 추가! ⭐⭐
+    navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
+  }}
+>
+  수정
+</button>
             <button
               className="bg-red-500 hover:bg-red-600 text-white rounded px-3 py-1 text-sm"
               onClick={async (e) => {
                 e.stopPropagation();
                 if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
                 try {
-                  await api.delete(`/reviews/${r.reviewId}`);
+                  await api.delete(`/mypage/reviews/${r.reviewId}`);
                   setReviews((prev) => prev.filter((item) => item.reviewId !== r.reviewId));
                 } catch (err) {
                   alert("리뷰 삭제 실패");
