@@ -54,6 +54,10 @@ function Withdrawal() {
 
       if (res.data.code === 'S001') {
         alert('회원 탈퇴가 성공적으로 처리되었습니다. 이용해주셔서 감사합니다.');
+
+        localStorage.removeItem('token'); // JWT 토큰 삭제
+        localStorage.removeItem('refreshToken'); // 리프레시 토큰도 삭제!
+
         navigate('/login'); // 탈퇴 성공 시 로그인 페이지로 이동
       } else {
         // 백엔드에서 에러 메시지가 온 경우
