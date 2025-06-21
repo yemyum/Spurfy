@@ -24,5 +24,7 @@ public class ReviewMyPageDTO {
     private String content;
     private String imageUrl;
     private String createdAt;
+    private boolean isBlinded;
+    private String updatedAt;    // (LocalDateTime을 String으로 변환해서)
 
 }

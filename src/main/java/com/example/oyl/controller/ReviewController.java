@@ -87,4 +87,19 @@ public class ReviewController {
         );
     }
 
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ApiResponse<ReviewMyPageDTO>> getReviewDetail(@PathVariable String reviewId) {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName(); // 현재 로그인한 사용자 이메일
+
+        ReviewMyPageDTO reviewDetail = reviewService.getReviewDetailForMypage(reviewId, userEmail);
+
+        return ResponseEntity.ok(
+                ApiResponse.<ReviewMyPageDTO>builder()
+                        .code("S001")
+                        .message("리뷰 상세 조회 성공!")
+                        .data(reviewDetail)
+                        .build()
+        );
+    }
+
 }

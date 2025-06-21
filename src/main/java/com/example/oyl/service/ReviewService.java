@@ -19,4 +19,6 @@ public interface ReviewService {
 
     List<ReviewPublicDTO> getReviewsByService(String serviceId);
 
+    ReviewMyPageDTO getReviewDetailForMypage(String reviewId, String userEmail);
+
 }

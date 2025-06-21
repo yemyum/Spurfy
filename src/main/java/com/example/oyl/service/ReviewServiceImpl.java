@@ -152,4 +152,42 @@ public class ReviewServiceImpl implements ReviewService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ReviewMyPageDTO getReviewDetailForMypage(String reviewId, String userEmail) {
+
+        // 1. 현재 로그인한 사용자 정보 조회
+        User currentUser = getUserByEmail(userEmail);
+
+        // 2. reviewId로 리뷰 엔티티 조회 (리뷰가 없으면 예외 발생)
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
+
+        // 3. 권한 체크 : 조회하려는 리뷰의 작성자가 현재 로그인한 사용자와 동일한지 확인!
+        // 만약 리뷰의 user ID가 현재 로그인한 user ID와 다르면 접근 권한 없음 예외 발생
+        if (!review.getUser().getUserId().equals(currentUser.getUserId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_REVIEW_ACCESS); // 권한 없음
+        }
+
+            // 4. 리뷰 상세 정보를 DTO로 반환
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+            return ReviewMyPageDTO.builder()
+                    .reviewId(review.getReviewId())
+                    .reservationId(review.getReservation().getReservationId())
+                    .serviceId(review.getReservation().getSpaService().getServiceId())
+                    .serviceName(review.getReservation().getSpaService().getName())
+                    .dogName(review.getDog().getName())
+                    .reservationDate(review.getReservation().getReservationDate().toString()) // ReservationDate가 LocalDate면 toString()으로 충분
+                    .price(review.getReservation().getSpaService().getPrice())
+                    .rating(review.getRating())
+                    .content(review.getContent())
+                    .imageUrl(review.getImageUrl())
+                    .createdAt(review.getCreatedAt().format(formatter))
+                    .isBlinded(review.isBlinded()) // boolean 타입 그대로
+                    .updatedAt(review.getUpdatedAt() != null ? review.getUpdatedAt().format(formatter) : null) // updatedAt이 null일 수 있으니 체크
+                    .build();
+    }
+
+
 }
