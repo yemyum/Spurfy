@@ -13,7 +13,7 @@ public interface ReservationService {
     void cancelReservation(String userEmail, CancelReservationDTO dto);
 
     // 예약 목록
-    List<ReservationSummaryDTO> getMyReservations(String userEmail);
+    List<ReservationResponseDTO> getMyReservations(String userEmail);
 
     // 예약 상세조회
     ReservationResponseDTO getReservationDetail(String userEmail, String reservationId);

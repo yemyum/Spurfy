@@ -28,8 +28,9 @@ public class ReservationResponseDTO {
     private String cancelReason;
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
+    private boolean hasReview;
 
-    public static ReservationResponseDTO from(Reservation reservation) {
+    public static ReservationResponseDTO from(Reservation reservation, boolean hasReview) {
         return ReservationResponseDTO.builder()
                 .reservationId(reservation.getReservationId())
                 .userId(reservation.getUser().getUserId())
@@ -45,6 +46,7 @@ public class ReservationResponseDTO {
                 .cancelReason(reservation.getCancelReason())
                 .refundedAt(reservation.getRefundedAt())
                 .createdAt(reservation.getCreatedAt())
+                .hasReview(hasReview)
                 .build();
     }
 }

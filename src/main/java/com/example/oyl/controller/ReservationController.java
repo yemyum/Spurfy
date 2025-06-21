@@ -45,11 +45,11 @@ public class ReservationController {
 
     // ✅ 내 예약 리스트 조회 (마이페이지)
     @GetMapping("/mypage/reservations")
-    public ResponseEntity<ApiResponse<List<ReservationSummaryDTO>>> getMyReservations() {
+    public ResponseEntity<ApiResponse<List<ReservationResponseDTO>>> getMyReservations() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<ReservationSummaryDTO> dtoList = reservationService.getMyReservations(email);
+        List<ReservationResponseDTO> dtoList = reservationService.getMyReservations(email);
         return ResponseEntity.ok(
-                ApiResponse.<List<ReservationSummaryDTO>>builder()
+                ApiResponse.<List<ReservationResponseDTO>>builder()
                         .code("S001")
                         .message("예약 리스트 조회 성공!")
                         .data(dtoList)

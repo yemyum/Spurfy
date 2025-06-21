@@ -26,6 +26,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final UserRepository userRepository;
     private final SpaServiceRepository spaServiceRepository;
     private final PaymentRepository paymentRepository;
+    private final ReviewRepository reviewRepository;
 
     // 예약+결제 동시
     @Override
@@ -87,7 +88,7 @@ public class ReservationServiceImpl implements ReservationService {
         paymentRepository.save(payment);
         System.out.println("✅ 결제 저장 완료");
 
-        return ReservationResponseDTO.from(reservation);
+        return ReservationResponseDTO.from(reservation, false);
         } catch (Exception e) {
             System.out.println("💥 예외 발생! " + e.getMessage());
             e.printStackTrace(); // ❗ 콘솔에 에러 로그 출력!!
@@ -119,26 +120,21 @@ public class ReservationServiceImpl implements ReservationService {
     // 내 예약 목록 조회
     @Override
     @Transactional(readOnly = true)
-    public List<ReservationSummaryDTO> getMyReservations(String userEmail) {
+    public List<ReservationResponseDTO> getMyReservations(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         List<Reservation> reservations = reservationRepository.findByUser_UserIdWithDetails(user.getUserId());
 
         return reservations.stream()
-                .map(reservation -> new ReservationSummaryDTO(
-                        reservation.getReservationId(),
-                        user.getNickname(),
-                        reservation.getDog().getName(),
-                        reservation.getDog().getDogId(),
-                        reservation.getSpaService().getName(),
-                        reservation.getSpaService().getServiceId(),
-                        reservation.getReservationDate(),
-                        reservation.getReservationTime(),
-                        reservation.getReservationStatus(),
-                        reservation.getRefundStatus(),
-                        reservation.getSpaService().getPrice()
-                ))
+                .map(reservation -> {
+                    // 해당 예약(reservation)에 대한 리뷰가 ReviewRepository에 존재하는지 확인
+                    // Review 엔티티에 reservationId 필드가 String으로 직접 있다면
+                    boolean hasReview = reviewRepository.existsByReservation_ReservationId(reservation.getReservationId());
+
+                    // ReservationResponseDTO.from 메서드를 사용하여 DTO로 변환 시, 계산된 hasReview 값도 함께 넘겨줌
+                    return ReservationResponseDTO.from(reservation, hasReview);
+                })
                 .toList();
     }
 
@@ -155,7 +151,7 @@ public class ReservationServiceImpl implements ReservationService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
-        return ReservationResponseDTO.from(reservation);
+        return ReservationResponseDTO.from(reservation, false); // 새로 생성된 리뷰가 없다면 false!
     }
 
     // ======= private 검증 함수들 반드시 필요! =======
