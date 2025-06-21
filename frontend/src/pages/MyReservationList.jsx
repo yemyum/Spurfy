@@ -78,14 +78,14 @@ function MyReservationList() {
             </button>
           )}
 
-          {r.reservationStatus === "COMPLETED" && (
-            <button
-              onClick={() => handleReviewWrite(r)}
-              className="bg-blue-500 text-white px-3 py-1 rounded mt-2"
-            >
-              리뷰작성
-            </button>
-          )}
+          {r.reservationStatus === "COMPLETED" && !r.hasReview && ( // <-- 여기에 !r.hasReview 추가!
+          <button
+            onClick={() => handleReviewWrite(r)}
+            className="bg-blue-500 text-white px-3 py-1 rounded mt-2"
+          >
+            리뷰작성
+          </button>
+        )}
         </div>
       ))}
     </div>
