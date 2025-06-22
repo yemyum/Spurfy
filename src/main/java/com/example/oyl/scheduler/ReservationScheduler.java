@@ -18,7 +18,7 @@ public class ReservationScheduler {
 
     private final ReservationRepository reservationRepository;
 
-    @Scheduled(fixedDelay = 10000) // 10초마다 실행
+    @Scheduled(fixedDelay = 86400000) // 24시간 (하루)마다 실행
     public void autoCompleteReservations() {
         LocalDate today = LocalDate.now();
         List<Reservation> targets = reservationRepository

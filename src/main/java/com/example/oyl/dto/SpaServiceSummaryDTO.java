@@ -11,7 +11,7 @@ public class SpaServiceSummaryDTO {
 
     private String serviceId;
     private String name;
-    private int price;
+    private Long price;
     private int durationMinutes;
 
 }

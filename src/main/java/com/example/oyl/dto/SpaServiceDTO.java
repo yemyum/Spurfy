@@ -13,7 +13,7 @@ public class SpaServiceDTO {
     private String name;
     private String description;
     private Integer durationMinutes;
-    private Integer price;
+    private Long price;
     private boolean isActive; // 직관적인 true/false로 변경
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

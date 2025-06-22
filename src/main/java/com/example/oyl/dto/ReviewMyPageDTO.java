@@ -19,7 +19,7 @@ public class ReviewMyPageDTO {
     private String serviceName;
     private String dogName;
     private String reservationDate; // String 또는 LocalDate로 교체 가능 (프론트 포맷 따라!)
-    private int price;
+    private Long price;
     private int rating;
     private String content;
     private String imageUrl;

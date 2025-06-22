@@ -17,6 +17,8 @@ public enum ErrorCode {
     PAYMENT_UNAUTHORIZED("P003", "본인 결제에만 접근/조회/변경할 수 있습니다."),
     ALREADY_PAID("P004", "이미 결제 완료된 예약입니다."),
     REVIEW_NOT_FOUND("RV001", "해당 리뷰가 존재하지 않습니다."),
+    CANNOT_CANCEL_COMPLETED_RESERVATION("R005", "이용 완료된 예약은 취소할 수 없습니다."),
+    CANNOT_CANCEL_PAST_RESERVATION("R006", "이미 지난 예약은 취소할 수 없습니다."),
     UNAUTHORIZED_REVIEW_ACCESS("RV002", "본인이 작성한 리뷰에만 접근할 수 있습니다."),
     DUPLICATE_REVIEW("RV003", "이미 해당 예약에 대한 리뷰가 작성되었습니다."),
     DUPLICATE_USER_EMAIL("U002", "이미 존재하는 이메일입니다."),

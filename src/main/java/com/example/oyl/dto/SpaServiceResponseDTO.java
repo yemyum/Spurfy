@@ -8,7 +8,7 @@ public class SpaServiceResponseDTO {
     private String name;
     private String description;
     private Integer durationMinutes;
-    private Integer price;
+    private Long price;
     private boolean isActive;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

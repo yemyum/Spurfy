@@ -23,7 +23,7 @@ public class SpaService {
 
     @Column(name = "duration_minutes")
     private Integer durationMinutes;
-    private Integer price;
+    private Long price;
 
     @Column(name = "image_url")
     private String imageUrl;

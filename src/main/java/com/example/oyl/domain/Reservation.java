@@ -33,6 +33,9 @@ public class Reservation {
     private LocalDate reservationDate;
     private LocalTime reservationTime;
 
+    @Column(nullable = false)
+    private Long price;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "reservation_status", nullable = false)
     private ReservationStatus reservationStatus;

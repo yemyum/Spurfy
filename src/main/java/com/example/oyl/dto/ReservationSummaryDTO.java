@@ -23,12 +23,12 @@ public class ReservationSummaryDTO {
     private LocalTime reservationTime;    // 예약 시간
     private ReservationStatus reservationStatus;        // "RESERVED" or "CANCELED"
     private RefundStatus refundStatus;                  // "NONE", "WAITING", "COMPLETED", "REJECTED"
-    private int price;
+    private Long price;
 
     // 생성자 명시적으로 추가해주기
     public ReservationSummaryDTO(String reservationId, String userNickname, String dogName, String dogId,
                                  String serviceName, String serviceId, LocalDate reservationDate, LocalTime reservationTime,
-                                 ReservationStatus reservationStatus, RefundStatus refundStatus, int price) {
+                                 ReservationStatus reservationStatus, RefundStatus refundStatus, Long price) {
         this.reservationId = reservationId;
         this.userNickname = userNickname;
         this.dogName = dogName;

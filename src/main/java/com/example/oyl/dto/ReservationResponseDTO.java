@@ -23,6 +23,7 @@ public class ReservationResponseDTO {
     private LocalDate reservationDate;
     private LocalTime reservationTime;
     private ReservationStatus reservationStatus;
+    private Long price;
     private RefundStatus refundStatus;
     private RefundType refundType;
     private String cancelReason;
@@ -41,6 +42,7 @@ public class ReservationResponseDTO {
                 .reservationDate(reservation.getReservationDate())
                 .reservationTime(reservation.getReservationTime())
                 .reservationStatus(reservation.getReservationStatus())
+                .price(reservation.getPrice())
                 .refundStatus(reservation.getRefundStatus())
                 .refundType(reservation.getRefundType())
                 .cancelReason(reservation.getCancelReason())
