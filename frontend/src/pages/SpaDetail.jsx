@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
+import StarRating from '../components/Common/StarRating';
 
 function SpaDetail() {
   const navigate = useNavigate();
@@ -11,6 +12,7 @@ function SpaDetail() {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
   const [reviews, setReviews] = useState([]);
+  const [averageRating, setAverageRating] = useState(0); 
 
   useEffect(() => {
     api.get(`/spa-services/${id}`)
@@ -21,10 +23,21 @@ function SpaDetail() {
       .then((res) => setDogList(res.data.data))
       .catch(() => alert('강아지 목록 불러오기 실패🐶'));
 
-    // 리뷰 데이터 추가로 가져오기!
-    api.get(`/reviews/public/${id}`)
-      .then(res => setReviews(res.data.data || []))
-      .catch(() => {});
+    // 리뷰 데이터 가져오기!
+        api.get(`/reviews/public/${id}`)
+            .then(res => {
+                const fetchedReviews = res.data.data || [];
+                setReviews(fetchedReviews);
+                
+                // ⭐ 평균 별점 계산 ⭐
+                if (fetchedReviews.length > 0) {
+                    const totalRating = fetchedReviews.reduce((sum, r) => sum + r.rating, 0);
+                    setAverageRating(totalRating / fetchedReviews.length);
+                } else {
+                    setAverageRating(0);
+                }
+            })
+            .catch(() => {});
 
   }, [id]);
 
@@ -80,17 +93,37 @@ function SpaDetail() {
       </select>
       <button onClick={handleReservation}>예약하기</button>
     <hr />
-      <h3>서비스 리뷰 (최신 3~4개)</h3>
-      <div>
+       <h3>서비스 리뷰 ({reviews.length}개)</h3> {/* 전체 리뷰 개수 표시 */}
+            {/* ⭐ 평균 별점 표시 (선택 사항) ⭐ */}
+            {reviews.length > 0 && (
+                <div className="flex items-center mb-4">
+                    <span className="font-semibold text-xl mr-2">총 평점: {averageRating.toFixed(1)}</span>
+                    <StarRating rating={averageRating} readOnly={true} size="medium" />
+                </div>
+            )}
+            <div>
         {reviews.length === 0 && <div>아직 리뷰가 없습니다!</div>}
         {reviews.slice(0, 4).map(r => (
           <div key={r.reviewId} className="border rounded p-3 mb-3">
             <div className="font-semibold">{r.userNickname}</div>
-            <div className="text-yellow-500 mb-1">{"⭐".repeat(r.rating)}</div>
+            <div className="mb-1">
+                <StarRating rating={r.rating} readOnly={true} size="small" /> 
+            </div>
             <div className="text-gray-700">{r.content}</div>
+            {r.imageUrl && ( // 이미지가 있으면 보여주기
+              <img src={r.imageUrl} alt="Review Image" className="max-w-full h-auto rounded-md mb-2" />
+            )}
             <div className="text-xs text-gray-400">{r.createdAt?.slice(0,10)}</div>
           </div>
         ))}
+        {reviews.length > 4 && ( // 4개보다 리뷰가 많을 때만 "더보기" 버튼 생성!
+            <button
+                onClick={() => navigate(`/spa-reviews/${id}`)} // 새로운 리뷰 상세 페이지로 이동!
+                className="w-full py-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+                리뷰 전체 보기 ({reviews.length}개)
+            </button>
+        )}
       </div>
     </div>
   );

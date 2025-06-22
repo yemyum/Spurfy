@@ -35,14 +35,14 @@ function MyReviewList() {
           <div className="flex gap-2 mt-4">
             <button
             className="bg-yellow-400 hover:bg-yellow-500 text-white rounded px-3 py-1 text-sm"
-  onClick={(e) => {
-    e.stopPropagation();
-    // ⭐⭐ `edit/` 부분을 제거하고, `state`에 `isEditing: true` 추가! ⭐⭐
-    navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
-  }}
->
-  수정
-</button>
+            onClick={(e) => {
+            e.stopPropagation();
+            // ⭐⭐ `edit/` 부분을 제거하고, `state`에 `isEditing: true` 추가! ⭐⭐
+            navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
+          }}
+          >
+          수정
+          </button>
             <button
               className="bg-red-500 hover:bg-red-600 text-white rounded px-3 py-1 text-sm"
               onClick={async (e) => {

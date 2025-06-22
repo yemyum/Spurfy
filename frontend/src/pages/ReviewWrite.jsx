@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import api from "../api/axios";
+import StarRating from '../components/Common/StarRating';
 
 function ReviewWrite() {
   const { state } = useLocation();
@@ -42,6 +43,10 @@ function ReviewWrite() {
     }
   };
 
+    const handleRatingChange = (newRating) => {
+    setForm({ ...form, rating: newRating });
+  };
+
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold text-blue-800 mb-4">리뷰 작성</h2>
@@ -55,17 +60,18 @@ function ReviewWrite() {
       </div>
 
       <label className="block font-semibold mb-1">별점을 선택해주세요.</label>
-      <select
-        className="border p-2 rounded w-full mb-4"
-        value={form.rating}
-        onChange={(e) => setForm({ ...form, rating: parseInt(e.target.value) })}
-      >
-        {[5, 4, 3, 2, 1].map((v) => (
-          <option key={v} value={v}>{"⭐".repeat(v)} ({v}점)</option>
-        ))}
-      </select>
+      
 
       <label className="block font-semibold mb-1">리뷰를 작성해주세요.</label>
+      {/* StarRating 컴포넌트 삽입 및 props 이름 맞추기! */}
+      <div className="mb-4">
+        <StarRating
+          rating={form.rating}
+          onRate={handleRatingChange}
+          readOnly={false}
+          size="large"
+        />
+      </div>
       <textarea
         rows="4"
         className="border p-3 rounded w-full mb-4"

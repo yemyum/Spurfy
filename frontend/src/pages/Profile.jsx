@@ -186,6 +186,7 @@ function Profile() {
       const res = await api.put('/mypage/password', { // ⭐ 백엔드 API 경로 확인! ⭐
         currentPassword,
         newPassword,
+        confirmPassword: confirmNewPassword,
       });
 
       if (res.data.code === 'S001') {
