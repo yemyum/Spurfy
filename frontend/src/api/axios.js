@@ -46,9 +46,12 @@ api.interceptors.response.use(
     hideLoading();
 
     if (err.response && err.response.status === 401) {
-      console.warn('401 Unauthorized! 로그인 필요!');
-      localStorage.removeItem('token');
-      window.location.href = '/login'; // 로그인 경로 맞게 수정!
+      const msg = err.response.data;
+      if (msg === "Token Expired") {
+      alert("로그인 세션이 만료되었습니다. 다시 로그인 해주세요!");
+      } else {
+      alert("로그인 정보가 잘못되었습니다. 다시 로그인 해주세요!");
+      }
     }
 
     return Promise.reject(err);
