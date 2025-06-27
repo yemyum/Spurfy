@@ -1,7 +1,12 @@
 package com.example.oyl.exception;
 
 
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
 public class CustomException extends RuntimeException{
+
     private final ErrorCode errorCode;
 
     // 1. ErrorCode만 받는 생성자 (기존)
@@ -16,7 +21,8 @@ public class CustomException extends RuntimeException{
         this.errorCode = errorCode;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public HttpStatus getHttpStatus() {
+        return errorCode.getHttpStatus();
     }
+
 }

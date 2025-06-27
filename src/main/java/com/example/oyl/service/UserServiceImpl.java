@@ -75,13 +75,4 @@ public class UserServiceImpl implements UserService{
         return JwtUtil.createToken(user.getEmail()); // JWT 발급
     }
 
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        if (authentication != null){
-            // Spring Security가 제공하는 로그아웃 핸들러를 사용해서 세션을 무효화하고 보안 컨텍스트를 클리어해.
-            // 이렇게 하면 서버 측에서 사용자의 인증 상태가 해제돼.
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
-        // 이 부분은 SecurityContextLogoutHandler가 자동으로 처리하므로 SecurityContextHolder.clearContext()를 따로 호출할 필요는 없어.
-    }
 }

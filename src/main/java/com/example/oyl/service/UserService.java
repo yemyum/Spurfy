@@ -20,6 +20,4 @@ public interface UserService {
 
     String login(UserLoginRequestDTO requestDTO);
 
-    void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication);
-
 }

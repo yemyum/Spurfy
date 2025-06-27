@@ -70,10 +70,6 @@
 			<groupId>org.glassfish.web</groupId>
 			<artifactId>jakarta.servlet.jsp.jstl</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.glassfish.web</groupId>
-			<artifactId>jakarta.servlet.jsp.jstl</artifactId>
-		</dependency>
 
 		<!-- 개발 편의성 (핫 리로드 등) -->
 		<dependency>
@@ -130,9 +126,18 @@
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 		</dependency>
-
-
-
+		<!-- Google Cloud Vision AI Client Library -->
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-vision</artifactId>
+			<version>3.64.0</version>
+		</dependency>
+		<!-- Google Cloud Core (Vision API가 의존하는 기본 라이브러리) -->
+		<dependency>
+			<groupId>com.google.cloud</groupId>
+			<artifactId>google-cloud-core</artifactId>
+			<version>2.58.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
