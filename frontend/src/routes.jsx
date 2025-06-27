@@ -23,6 +23,7 @@ import PaymentPage from './pages/PaymentPage';
 import MyReservationDetail from './pages/MyReservationDetail';
 import WithdrawalPage from './pages/Withdrawal';
 import SpaReviewsPage from './pages/SpaReviewsPage';
+import DogImageAnalysisPage from './pages/DogImageAnalysisPage';
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,7 @@ const router = createBrowserRouter([
       // ⭐ 회원 탈퇴 페이지는 MypageLayout 안이 아닌, RootLayout 바로 아래에 두는 것이 일반적 ⭐
       // 그래야 MypageLayout의 사이드바 같은 요소 없이, 메인 헤더만 있는 상태로 탈퇴 페이지를 볼 수 있음!
       { path: '/mypage/withdrawal', element: <WithdrawalPage /> },
+      { path: '/dog-spa-ai', element: <DogImageAnalysisPage /> },
 
       // ⭐ 마이페이지 관련 라우트들은 MypageLayout을 부모로 사용⭐
       {

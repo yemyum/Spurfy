@@ -20,26 +20,19 @@ function RootLayout() {
   }, []);
 
   // ⭐⭐ 로그아웃 처리 함수 ⭐⭐
-  const handleLogout = async () => {
-    if (!window.confirm("로그아웃 하시겠습니까?")) {
-      return;
-    }
-    try {
-      // 백엔드 로그아웃 API 호출
-      await api.post('/users/logout'); // 우리가 UserController에 만든 /api/users/logout 엔드포인트 호출
-      
-      // 프론트엔드에서 로그인 상태 초기화 (토큰 삭제 등)
-      localStorage.removeItem('token'); // JWT 토큰 삭제
-      localStorage.removeItem('refreshToken'); // 리프레시 토큰도 있다면 삭제
-      setIsAuthenticated(false); // 로그인 상태 업데이트 (AuthContext 사용 시 authLogout() 호출)
-
-      alert('로그아웃 되었습니다.');
-      navigate('/login'); // 로그인 페이지로 이동
-    } catch (error) {
-      console.error('로그아웃 실패:', error);
-      alert('로그아웃 실패: ' + (error.response?.data?.message || '알 수 없는 오류가 발생했습니다.'));
-    }
-  };
+const handleLogout = () => {
+  if (!window.confirm("로그아웃 하시겠습니까?")) {
+    return;
+  }
+  // 1. 토큰 지우고,
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  // 2. 상태도 false로
+  setIsAuthenticated(false);
+  // 3. 안내 및 이동
+  alert('로그아웃 되었습니다.');
+  navigate('/login');
+};
 
   return (
     <div className="min-h-screen bg-gray-100">
