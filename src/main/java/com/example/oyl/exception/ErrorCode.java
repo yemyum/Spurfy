@@ -31,7 +31,8 @@ public enum ErrorCode {
     NOT_COMPLETED_RESERVATION("RV004", "이용 완료된 예약만 리뷰 작성이 가능합니다.", HttpStatus.BAD_REQUEST),
     NEW_PASSWORD_CONFIRM_MISMATCH("U004", "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     AI_ANALYSIS_FAILED("AI01", "이미지 분석 AI 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
-    GPT_RECOMMENDATION_FAILED("AI02", "GPT 추천 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE);
+    GPT_RECOMMENDATION_FAILED("AI02", "GPT 추천 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
+    NOT_A_DOG_IMAGE("AI03", "사진에서 강아지를 인식할 수 없습니다. 강아지 사진을 다시 업로드해주세요.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
