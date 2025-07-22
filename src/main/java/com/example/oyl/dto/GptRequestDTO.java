@@ -1,6 +1,5 @@
 package com.example.oyl.dto;
 
-import com.mysql.cj.protocol.Message;
 import lombok.Data;
 
 import java.util.List;

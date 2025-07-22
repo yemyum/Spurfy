@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 public interface AiRecommendHistoryRepository extends JpaRepository<AiRecommendHistory, Long> {
 
     // 하루 요청 제한 확인용!
-    int countByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
+    long countByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
 
 }

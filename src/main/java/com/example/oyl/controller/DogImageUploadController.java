@@ -6,6 +6,8 @@ import com.example.oyl.service.DogImageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,12 +17,16 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/dog-image")
 @RequiredArgsConstructor
+@PreAuthorize("isAuthenticated()")
 public class DogImageUploadController {
 
     private final DogImageService dogImageService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> uploadDogImages(@RequestParam("dogImageFile") MultipartFile dogImageFile) {
+    public ResponseEntity<ApiResponse<String>> uploadDogImages(
+            @RequestParam("dogImageFile") MultipartFile dogImageFile,
+            @RequestParam("question") String question
+    ) {
         // React에서 'dogImageFile'이라는 이름으로 파일을 보낼 거라고 약속!
         // 1. 파일이 비어있는지 먼저 확인! (파일이 없는 요청이 올 수도 있으니까)
         if (dogImageFile.isEmpty()) {
@@ -34,7 +40,9 @@ public class DogImageUploadController {
         }
 
         try {
-            String result = dogImageService.analyzeAndRecommendSpa(dogImageFile);
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+            System.out.println("로그인한 사용자 이메일: " + userEmail);
+            String result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, question);
 
             return ResponseEntity.ok(
                     ApiResponse.<String>builder()

@@ -8,6 +8,7 @@ import com.example.oyl.dto.ReviewUpdateDTO;
 import com.example.oyl.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,7 @@ public class ReviewController {
 
 
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createReview(@RequestBody ReviewRequestDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         reviewService.createReview(email, dto);
@@ -36,6 +38,7 @@ public class ReviewController {
     }
 
     @PutMapping("/{reviewId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> updateReview(@PathVariable String reviewId,
                                           @RequestBody ReviewUpdateDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -50,6 +53,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{reviewId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> deleteReview(@PathVariable String reviewId) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         reviewService.deleteReview(reviewId, email);
@@ -63,6 +67,7 @@ public class ReviewController {
     }
 
     @GetMapping("/my")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<ReviewMyPageDTO>>> getMyReviews() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ReviewMyPageDTO> reviews = reviewService.getMyReviews(email);
@@ -88,6 +93,7 @@ public class ReviewController {
     }
 
     @GetMapping("/{reviewId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ReviewMyPageDTO>> getReviewDetail(@PathVariable String reviewId) {
         String userEmail = SecurityContextHolder.getContext().getAuthentication().getName(); // 현재 로그인한 사용자 이메일
 

@@ -12,12 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
+@PreAuthorize("isAuthenticated()")
 public class MypageController {
 
     private final MypageService mypageService;
@@ -30,7 +32,7 @@ public class MypageController {
                 ApiResponse.<UserProfileResponseDTO>builder()
                         .code("S001")
                         .message("마이페이지 프로필 조회 성공!")
-                        .data(profile)                          // 리턴값은 이메일에 해당하는 유저 프로필 전체!
+                        .data(profile)       // 리턴값은 이메일에 해당하는 유저 프로필 전체!
                         .build()
         );
     }

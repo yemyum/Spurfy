@@ -7,6 +7,7 @@ import com.example.oyl.dto.DogUpdateRequestDTO;
 import com.example.oyl.service.DogService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/dogs")
+@PreAuthorize("isAuthenticated()")
 public class DogController {
 
     private final DogService dogService;

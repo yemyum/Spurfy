@@ -10,6 +10,7 @@ import com.example.oyl.repository.UserRepository;
 import com.example.oyl.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/reservation")
+@PreAuthorize("isAuthenticated()")
 public class ReservationController {
 
     private final ReservationService reservationService;

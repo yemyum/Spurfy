@@ -32,7 +32,8 @@ public enum ErrorCode {
     NEW_PASSWORD_CONFIRM_MISMATCH("U004", "새 비밀번호와 확인 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     AI_ANALYSIS_FAILED("AI01", "이미지 분석 AI 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
     GPT_RECOMMENDATION_FAILED("AI02", "GPT 추천 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
-    NOT_A_DOG_IMAGE("AI03", "사진에서 강아지를 인식할 수 없습니다. 강아지 사진을 다시 업로드해주세요.", HttpStatus.BAD_REQUEST);
+    NOT_A_DOG_IMAGE("AI03", "사진에서 강아지를 인식할 수 없습니다. 강아지 사진을 다시 업로드해주세요.", HttpStatus.BAD_REQUEST),
+    CONVERSATION_LIMIT_EXCEEDED("E005", "하루 AI 대화 횟수 제한을 초과했습니다.", HttpStatus.TOO_MANY_REQUESTS);
 
     private final String code;
     private final String message;

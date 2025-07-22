@@ -25,7 +25,7 @@ public class WebClientConfig {
     @Bean
     public WebClient googleVisionWebClient() {
         return WebClient.builder()
-                .baseUrl("https://vision.googleapis.com/v1/images:annotate")
+                .baseUrl("https://vision.googleapis.com/v1/")
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
