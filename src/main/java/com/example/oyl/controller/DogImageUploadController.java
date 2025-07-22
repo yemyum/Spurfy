@@ -34,7 +34,6 @@ public class DogImageUploadController {
         }
 
         try {
-            // ⭐⭐⭐ 서비스 계층에 실제 로직 처리를 위임! ⭐⭐⭐
             String result = dogImageService.analyzeAndRecommendSpa(dogImageFile);
 
             return ResponseEntity.ok(

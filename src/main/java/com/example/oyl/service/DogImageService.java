@@ -16,7 +16,7 @@ public class DogImageService {
     // private final OpenAIApiClient openAIApiClient;
 
     // 강아지 이미지를 분석하고 스파 서비스를 추천하는 핵심 메서드
-    public String analyzeAndRecommendSpa(MultipartFile dogImageFile) { // throws IOException 제거 (예외를 CustomException으로 감쌀거니까)
+    public String analyzeAndRecommendSpa(MultipartFile dogImageFile) {
 
         // 1. 파일이 비어있는지 서비스 계층에서 다시 한번 확인 (컨트롤러에서도 하지만 서비스에서도 중요 로직 시작 전 확인)
         if (dogImageFile.isEmpty()) {
