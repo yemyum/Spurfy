@@ -53,22 +53,22 @@ public class DogImageUploadController {
             );
 
         } catch (CustomException e) { // 파일 저장/처리 중 IOException 발생 시
-                e.printStackTrace();
+                // e.printStackTrace();
             return ResponseEntity
                     .status(e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.BAD_REQUEST) // CustomException의 getHttpStatus() 사용
                     .body(ApiResponse.<String>builder()
-                                .code("E002")
-                                .message("파일 처리 중 오류가 발생했습니다: " + e.getMessage())
+                                .code(e.getErrorCode() != null ? e.getErrorCode().getCode() : "E00X")
+                                .message(e.getMessage())
                                 .data(null)
                                 .build()
             );
 
         } catch (Exception e) {  // CustomException 외의 모든 예상치 못한 에러를 여기서 잡음
-            e.printStackTrace();
+                // e.printStackTrace();
             return ResponseEntity.internalServerError().body(
                     ApiResponse.<String>builder()
-                            .code("E002")
-                            .message("파일 업로드 처리 중 오류가 발생했습니다:" + e.getMessage())
+                            .code("E999")
+                            .message("예상치 못한 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
                             .data(null)
                             .build()
             );
