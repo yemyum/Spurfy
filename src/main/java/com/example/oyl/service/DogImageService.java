@@ -3,12 +3,15 @@ package com.example.oyl.service;
 import com.example.oyl.client.GoogleVisionClient;
 import com.example.oyl.client.GptClient;
 import com.example.oyl.domain.AiRecommendHistory;
+import com.example.oyl.domain.SpaService;
+import com.example.oyl.dto.GptSpaRecommendationResponseDTO;
 import com.example.oyl.dto.SpaLabelRecommendationRequestDTO;
 import com.example.oyl.dto.SpaRecommendationRequestDTO;
 import com.example.oyl.dto.VisionAnalysisResult;
 import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.AiRecommendHistoryRepository;
+import com.example.oyl.repository.SpaServiceRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +25,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -35,12 +35,13 @@ public class DogImageService {
     private final GoogleVisionClient googleVisionClient;
     private final GptClient gptClient;
     private final AiRecommendHistoryRepository aiRecommendHistoryRepository;
+    private final SpaServiceRepository spaServiceRepository;
     private final ObjectMapper objectMapper;
 
     private static final int MAX_DAILY_AI_CALLS = 10;  // 실제 서비스는 5번 이하로 수정해두기
 
     // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
-    public String analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {
+    public GptSpaRecommendationResponseDTO analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {
 
         if (dogImageFile.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT);
@@ -180,7 +181,7 @@ public class DogImageService {
         List<String> finalHealthIssuesToUse = new ArrayList<>(combinedHealthIssuesSet);
         log.info("최종적으로 GPT에 전달될 건강 문제: {}", finalHealthIssuesToUse);
 
-        String spaRecommendation;
+        GptSpaRecommendationResponseDTO spaRecommendationDto;
         try {
             log.info("GPT 호출 결정 - finalBreedToUse: '{}'", finalBreedToUse);
             // 이 조건문은 GPT에 어떤 DTO를 보낼지 결정하는 중요한 부분
@@ -198,7 +199,7 @@ public class DogImageService {
                         .breed(finalBreedToUse) // "알 수 없는 견종의 강아지"가 전달됨
                         .build();
 
-                spaRecommendation = gptClient.recommendSpaByLabels(labelDto);
+                spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto); // DTO로 받음
             } else {  // Vision이 맞추거나 사용자가 선택했을 때 (이 경우 recommendSpa 호출)
                 log.info("Calling gptClient.recommendSpa...");
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
@@ -211,14 +212,36 @@ public class DogImageService {
                         .question(question)
                         .build();
 
-                spaRecommendation = gptClient.recommendSpa(request);
+                spaRecommendationDto = gptClient.recommendSpa(request); // DTO로 받음
             }
+
+            // ⭐⭐ GPT 응답 후 spaSlug가 null일 경우 DB에서 찾아 채워넣는 로직 추가 ⭐⭐
+            if (spaRecommendationDto != null && spaRecommendationDto.getSpaSlug() == null && spaRecommendationDto.getSpaName() != null) {
+                String cleanSpaName = spaRecommendationDto.getSpaName()
+                        .replace("**", "")
+                        .replace("🧘‍♀️ ", "")
+                        .replace("🌸 ", "")
+                        .replace("🛁 ", "")
+                        .replace("🌿 ", "")
+                        .replace("에요!", "")
+                        .trim();
+
+                // DB에서 스파 이름으로 SpaService 엔티티를 찾음
+                Optional<SpaService> foundSpa = spaServiceRepository.findByName(cleanSpaName);
+
+                // 찾았다면 해당 스파의 slug를 DTO에 설정
+                foundSpa.ifPresent(spaService -> {
+                    spaRecommendationDto.setSpaSlug(spaService.getSlug());
+                    log.info("DB에서 spaSlug 찾아서 채워넣음: {}", spaService.getSlug());
+                });
+            }
+
         } catch (Exception e) {
             log.error("GPT 호출 실패", e);
             throw new CustomException(ErrorCode.GPT_RECOMMENDATION_FAILED, "스파 추천 실패: " + e.getMessage());
         }
 
-        log.info("GPT 추천 완료 → {}", spaRecommendation);
+        log.info("GPT 추천 DTO 완료 → {}", spaRecommendationDto);
 
         try {
             String imageUrlForHistory = "/api/images/" + savedFileName;
@@ -228,7 +251,7 @@ public class DogImageService {
                     .imageUrl(imageUrlForHistory)
                     .detectedBreed(detectedBreed)
                     .isDog(true)
-                    .recommendResult(spaRecommendation)
+                    .recommendResult(objectMapper.writeValueAsString(spaRecommendationDto))
                     .prompt(question)
                     .errorMessage(null)
                     .build();
@@ -239,11 +262,7 @@ public class DogImageService {
             log.warn("AI 추천 기록 저장 실패 → {}", e.getMessage());
         }
 
-        String imageUrl = "/api/images/" + savedFileName;
-        if ("알 수 없는 견종의 강아지".equals(detectedBreed)) {
-            return spaRecommendation;  // 그냥 추천 멘트만 출력
-        } else {
-            return "견종: " + detectedBreed + ", 추천 스파: " + spaRecommendation;
-        }
+        return spaRecommendationDto; // DTO 객체를 그대로 반환
     }
+
 }

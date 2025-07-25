@@ -1,6 +1,7 @@
 package com.example.oyl.controller;
 
 import com.example.oyl.common.ApiResponse;
+import com.example.oyl.domain.SpaService;
 import com.example.oyl.dto.SpaServiceDTO;
 import com.example.oyl.dto.SpaServiceSummaryDTO;
 import com.example.oyl.service.SpaServiceService;
@@ -40,6 +41,18 @@ public class SpaServiceController {
                         .code("S001")
                         .message("스파 서비스 상세 조회 성공!")
                         .data(dto)
+                        .build()
+        );
+    }
+
+    @GetMapping("/slug/{spaSlug}")
+    public ResponseEntity<ApiResponse<SpaServiceDTO>> getSpaDetailBySlug(@PathVariable String spaSlug) {
+        SpaServiceDTO spa = spaServiceService.getSpaServiceBySlug(spaSlug);
+        return ResponseEntity.ok(
+                ApiResponse.<SpaServiceDTO>builder()
+                        .code("S001") // 성공 코드
+                        .message("스파 서비스 상세 조회 성공 (슬러그 기반)!")
+                        .data(spa) // 데이터
                         .build()
         );
     }

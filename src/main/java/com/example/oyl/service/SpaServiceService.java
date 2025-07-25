@@ -10,4 +10,6 @@ public interface SpaServiceService {
     List<SpaServiceSummaryDTO> getActiveSpaServices();
 
     SpaServiceDTO getSpaServiceDetail(String serviceId);
+
+    SpaServiceDTO getSpaServiceBySlug(String spaSlug);
 }

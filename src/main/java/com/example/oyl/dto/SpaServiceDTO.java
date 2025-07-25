@@ -19,5 +19,6 @@ public class SpaServiceDTO {
     private LocalDateTime updatedAt;
 
     private List<String> availableTimes;
+    private String slug;
 
 }

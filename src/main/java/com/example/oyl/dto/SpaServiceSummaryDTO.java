@@ -13,5 +13,6 @@ public class SpaServiceSummaryDTO {
     private String name;
     private Long price;
     private int durationMinutes;
+    private String slug;
 
 }

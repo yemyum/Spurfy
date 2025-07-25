@@ -18,7 +18,7 @@ public class GptClient {
     private final WebClient gptWebClient;
     private final ObjectMapper objectMapper;
 
-    public String recommendSpa(SpaRecommendationRequestDTO dto) {
+    public GptSpaRecommendationResponseDTO recommendSpa(SpaRecommendationRequestDTO dto) {
         log.info("GptClient.recommendSpa called with breed: '{}'", dto.getBreed());
 
         // 1. 사용자 입력 요약 텍스트 만들기
@@ -76,6 +76,7 @@ public class GptClient {
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");
         promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 민감견 저자극 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
+        promptBuilder.append("- 'spaName'에 해당하는 스파의 URL 친화적인 슬러그(slug) 값을 영어 소문자, 하이픈(-)으로만 구성하여 'spaSlug' 필드에 넣어줘. (예: '웰컴 스파' -> 'welcome-spa', '프리미엄 브러싱 스파' -> 'premium-brushing-spa', '릴렉싱 테라피 스파' -> 'relaxing-therapy-spa', '카밍 스킨 스파' -> 'calming-skin-spa')\n");
         promptBuilder.append("- 문장은 총 4~6줄 내외, 다정하지만 과장된 감성 멘트는 자제\n\n");
 
         promptBuilder.append("[추천 가능한 스파 목록]\n");
@@ -90,6 +91,7 @@ public class GptClient {
         promptBuilder.append("  \"compliment\": \"두 번째 줄: 강아지에 대한 담백한 칭찬 (예: 사진 속 강아지의 생기 넘치는 모습이 인상 깊었어요!)\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"세 번째 줄: 이 아이에게 추천하는 스파는: (고정멘트)\",\n");
         promptBuilder.append("  \"spaName\": \"네 번째 줄: 이모지 포함 마크다운 굵은 글씨로 스파 이름만 강조 (예: **\\\"🌸 프리미엄 브러싱 스파\\\"**에요!)\",\n");
+        promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
         promptBuilder.append("  \"spaDescription\": [\n");
         promptBuilder.append("    \"다섯~여섯 번째 줄: 해당 스파에 대한 간단한 설명 (줄바꿈 포함, \\\"-\\-\\\" 형식으로 시작, 최대 2개까지 가능, 예: - 섬세한 브러싱과 고급 케어가 잘 어울릴 것 같아요.)\"\n");
         promptBuilder.append("  ],\n");
@@ -112,7 +114,7 @@ public class GptClient {
         return parseAndFormatGptResponse(callGptApi(request));
     }
 
-    public String recommendSpaByLabels(SpaLabelRecommendationRequestDTO dto) {
+    public GptSpaRecommendationResponseDTO recommendSpaByLabels(SpaLabelRecommendationRequestDTO dto) {
         log.info("GptClient.recommendSpaByLabels called with breed: '{}'", dto.getBreed());
 
         String labelsInfo = String.format("Google Vision API 라벨 분석 결과:\n- 주요 라벨: %s\n", String.join(", ", dto.getLabels()));
@@ -175,6 +177,7 @@ public class GptClient {
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");
         promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 민감견 저자극 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
+        promptBuilder.append("- 'spaName'에 해당하는 스파의 URL 친화적인 슬러그(slug) 값을 영어 소문자, 하이픈(-)으로만 구성하여 'spaSlug' 필드에 넣어줘. (예: '웰컴 스파' -> 'welcome-spa', '프리미엄 브러싱 스파' -> 'premium-brushing-spa', '릴렉싱 테라피 스파' -> 'relaxing-therapy-spa', '카밍 스킨 스파' -> 'calming-skin-spa')\n");
         promptBuilder.append("- 문장은 총 4~6줄 내외, 다정하지만 과장된 감성 멘트는 자제\n\n");
 
         promptBuilder.append("[추천 가능한 스파 목록]\n");
@@ -193,6 +196,7 @@ public class GptClient {
         promptBuilder.append("  \"compliment\": \"두 번째 줄: 강아지에 대한 담백한 칭찬 (예: 사진 속 강아지의 생기 넘치는 모습이 인상 깊었어요!)\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"세 번째 줄: 이 아이에게 추천하는 스파는: (고정멘트)\",\n");
         promptBuilder.append("  \"spaName\": \"네 번째 줄: 이모지 포함 마크다운 굵은 글씨로 스파 이름만 강조 (예: **\\\"🌸 프리미엄 브러싱 스파\\\"**에요!)\",\n");
+        promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
         promptBuilder.append("  \"spaDescription\": [\n");
         promptBuilder.append("    \"다섯~여섯 번째 줄: 해당 스파에 대한 간단한 설명 (줄바꿈 포함, \\\"-\\-\\\" 형식으로 시작, 최대 2개까지 가능, 예: - 섬세한 브러싱과 고급 케어가 잘 어울릴 것 같아요.)\"\n");
         promptBuilder.append("  ],\n");
@@ -215,33 +219,28 @@ public class GptClient {
     }
 
     // GPT 응답을 파싱하고 최종 문자열로 포맷
-    private String parseAndFormatGptResponse(String gptRawResponse) {
+    private GptSpaRecommendationResponseDTO parseAndFormatGptResponse(String gptRawResponse) {
         log.info("Received raw GPT response: {}", gptRawResponse);
         try {
             // GPT가 반환한 원시 JSON 문자열을 DTO 객체로 변환
             GptSpaRecommendationResponseDTO parsedResponse = objectMapper.readValue(gptRawResponse, GptSpaRecommendationResponseDTO.class);
+            log.info("Parsed GPT response DTO: {}", parsedResponse);
 
-            // DTO 객체의 필드들을 사용하여 최종 출력 문자열 조립
-            StringBuilder finalOutput = new StringBuilder();
-            finalOutput.append(parsedResponse.getIntro()).append("\n");
-            finalOutput.append(parsedResponse.getCompliment()).append("\n");
-            finalOutput.append(parsedResponse.getRecommendationHeader()).append("\n");
-            finalOutput.append(parsedResponse.getSpaName()).append("\n");
-
-            // spaDescription 리스트를 줄바꿈하여 추가
-            if (parsedResponse.getSpaDescription() != null && !parsedResponse.getSpaDescription().isEmpty()) {
-                for (String desc : parsedResponse.getSpaDescription()) {
-                    finalOutput.append(desc).append("\n");
-                }
-            }
-            finalOutput.append(parsedResponse.getClosing());
-            log.info("Final formatted GPT output: {}", finalOutput.toString());
-            return finalOutput.toString();
+            // DTO 객체를 그대로 반환
+            return parsedResponse;
 
         } catch (Exception e) {
             log.error("GPT 응답 JSON 파싱 또는 포맷팅 실패: {}", gptRawResponse, e);
-            // 파싱 실패 시 기본 오류 메시지 반환
-            return "죄송해요! 스파 추천 정보를 처리하는 데 문제가 발생했어요. \n조금 뒤에 다시 시도해 주세요!";
+            // 파싱 실패 시 기본 오류 메시지를 담은 DTO 반환
+            GptSpaRecommendationResponseDTO errorResponse = new GptSpaRecommendationResponseDTO();
+            errorResponse.setIntro("죄송해요! 스파 추천 정보를 처리하는 데 문제가 발생했어요.");
+            errorResponse.setCompliment("조금 뒤에 다시 시도해 주세요!");
+            errorResponse.setRecommendationHeader("");
+            errorResponse.setSpaName("");
+            errorResponse.setSpaSlug("");
+            errorResponse.setSpaDescription(List.of());
+            errorResponse.setClosing("");
+            return errorResponse;
         }
     }
 

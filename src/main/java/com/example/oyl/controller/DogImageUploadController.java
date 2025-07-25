@@ -1,6 +1,7 @@
 package com.example.oyl.controller;
 
 import com.example.oyl.common.ApiResponse;
+import com.example.oyl.dto.GptSpaRecommendationResponseDTO;
 import com.example.oyl.exception.CustomException;
 import com.example.oyl.service.DogImageService;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class DogImageUploadController {
     private final DogImageService dogImageService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<String>> uploadDogImages(
+    public ResponseEntity<ApiResponse<GptSpaRecommendationResponseDTO>> uploadDogImages(
             @RequestParam("dogImageFile") MultipartFile dogImageFile,
             @RequestParam(value = "checklist", required = false) String checklist,
             @RequestParam(value = "question", required = false) String question
@@ -32,7 +33,7 @@ public class DogImageUploadController {
         // 1. 파일이 비어있는지 먼저 확인! (파일이 없는 요청이 올 수도 있으니까)
         if (dogImageFile == null || dogImageFile.isEmpty()) {
             return ResponseEntity.badRequest().body(
-                    ApiResponse.<String>builder()
+                    ApiResponse.<GptSpaRecommendationResponseDTO>builder()
                             .code("E001")
                             .message("사진은 필수입니다. 파일을 선택해주세요!")
                             .data(null)
@@ -43,10 +44,10 @@ public class DogImageUploadController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             System.out.println("로그인한 사용자 이메일: " + userEmail);
-            String result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
+            GptSpaRecommendationResponseDTO result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
 
             return ResponseEntity.ok(
-                    ApiResponse.<String>builder()
+                    ApiResponse.<GptSpaRecommendationResponseDTO>builder()
                             .code("S004")
                             .message("강아지 사진 분석 및 스파 추천 완료!")
                             .data(result) // 서비스에서 받은 최종 결과를 데이터로 넘겨줌
@@ -57,7 +58,7 @@ public class DogImageUploadController {
                 e.printStackTrace();
             return ResponseEntity
                     .status(e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.BAD_REQUEST) // CustomException의 getHttpStatus() 사용
-                    .body(ApiResponse.<String>builder()
+                    .body(ApiResponse.<GptSpaRecommendationResponseDTO>builder()
                                 .code(e.getErrorCode() != null ? e.getErrorCode().getCode() : "E00X")
                                 .message(e.getMessage())
                                 .data(null)
@@ -67,7 +68,7 @@ public class DogImageUploadController {
         } catch (Exception e) {  // CustomException 외의 모든 예상치 못한 에러를 여기서 잡음
                 e.printStackTrace();
             return ResponseEntity.internalServerError().body(
-                    ApiResponse.<String>builder()
+                    ApiResponse.<GptSpaRecommendationResponseDTO>builder()
                             .code("E999")
                             .message("예상치 못한 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.")
                             .data(null)

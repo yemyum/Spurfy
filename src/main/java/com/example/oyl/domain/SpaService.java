@@ -21,6 +21,8 @@ public class SpaService {
     private String name;
     private String description;
 
+    private String slug;
+
     @Column(name = "duration_minutes")
     private Integer durationMinutes;
     private Long price;
