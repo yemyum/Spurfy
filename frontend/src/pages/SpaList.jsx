@@ -18,7 +18,7 @@ function SpaList() {
       <ul>
         {list.map((spa) => (
           <li key={spa.serviceId}>
-            <Link to={`/spalist/${spa.serviceId}`}>
+            <Link to={`/spalist/slug/${spa.slug}`}>
               <strong>{spa.name}</strong> - {spa.price.toLocaleString()}원 / {spa.durationMinutes}분
             </Link>
           </li>

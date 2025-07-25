@@ -5,7 +5,7 @@ import StarRating from '../components/Common/StarRating';
 
 function SpaDetail() {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { spaSlug } = useParams();
   const [spa, setSpa] = useState(null);
   const [dogList, setDogList] = useState([]);
   const [selectedDogId, setSelectedDogId] = useState('');
@@ -15,7 +15,7 @@ function SpaDetail() {
   const [averageRating, setAverageRating] = useState(0); 
 
   useEffect(() => {
-    api.get(`/spa-services/${id}`)
+    api.get(`/spa-services/slug/${spaSlug}`)
       .then((res) => setSpa(res.data.data))
       .catch(() => alert('상세정보 불러오기 실패🐽'));
 
@@ -24,7 +24,7 @@ function SpaDetail() {
       .catch(() => alert('강아지 목록 불러오기 실패🐶'));
 
     // 리뷰 데이터 가져오기!
-        api.get(`/reviews/public/${id}`)
+        api.get(`/reviews/public/slug/${spaSlug}`)
             .then(res => {
                 const fetchedReviews = res.data.data || [];
                 setReviews(fetchedReviews);
@@ -39,7 +39,7 @@ function SpaDetail() {
             })
             .catch(() => {});
 
-  }, [id]);
+  }, [spaSlug]);
 
   // [예약하기]는 결제페이지로 정보만 넘김!
   const handleReservation = () => {
@@ -118,7 +118,7 @@ function SpaDetail() {
         ))}
         {reviews.length > 4 && ( // 4개보다 리뷰가 많을 때만 "더보기" 버튼 생성!
             <button
-                onClick={() => navigate(`/spa-reviews/${id}`)} // 새로운 리뷰 상세 페이지로 이동!
+                onClick={() => navigate(`/spa-reviews/slug/${spaSlug}`)} // 새로운 리뷰 상세 페이지로 이동!
                 className="w-full py-2 mt-4 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
                 리뷰 전체 보기 ({reviews.length}개)

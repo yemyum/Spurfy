@@ -4,20 +4,21 @@ import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
 
 function SpaReviewsPage() {
-    const { id } = useParams();
+    const { spaSlug } = useParams();
     const [reviews, setReviews] = useState([]);
     const [spaName, setSpaName] = useState('');
+    const [averageRating, setAverageRating] = useState(0);
 
     useEffect(() => {
         // 1. 스파 서비스 정보 가져오기 (리뷰 페이지 상단에 스파 이름 보여주기 위해)
-        api.get(`/spa-services/${id}`)
+        api.get(`/spa-services/slug/${spaSlug}`)
             .then(res => {
                 setSpaName(res.data.data.name);
             })
             .catch(() => console.error('스파 정보 불러오기 실패'));
 
         // 2. 이 스파 서비스의 모든 리뷰 가져오기!
-        api.get(`/reviews/public/${id}`)
+        api.get(`/reviews/public/slug/${spaSlug}`)
             .then(res => {
                 const fetchedReviews = res.data.data || [];
                 setReviews(fetchedReviews);
@@ -33,7 +34,7 @@ function SpaReviewsPage() {
                 console.error('리뷰 불러오기 실패:', error);
                 alert('리뷰를 불러오는 데 실패했어요! 😭');
             });
-    }, [id]);
+    }, [spaSlug]);
 
     if (!spaName) return <div>리뷰 로딩중...</div>; // 스파 이름이 없으면 로딩 중으로!
 

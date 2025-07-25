@@ -1,22 +1,27 @@
 import { useState } from "react";
 import api from '../api/axios';
 import ChecklistForm from "../components/Common/ChecklistForm";
+import { useNavigate } from 'react-router-dom';
 
 function DogImageAnalysisPage() {
   const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadMessage, setUploadMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [checklistData, setChecklistData] = useState(null);
   const [freeTextQuestion, setFreeTextQuestion] = useState('');
+  const [recommendationResult, setRecommendationResult] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 전용 상태
+
+  const navigate = useNavigate();
 
   // 파일 선택 핸들러
   const handleFileChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setSelectedFile(event.target.files[0]);
-      setUploadMessage('');
+      setErrorMessage(''); // 파일 선택 시 에러 메시지 초기화
+      setRecommendationResult(null); // 새로운 파일 선택 시 이전 결과 초기화
     } else {
       setSelectedFile(null);
-      setUploadMessage('파일을 선택하지 않았습니다.');
+      setErrorMessage('파일을 선택하지 않았습니다.');
     }
   };
 
@@ -30,12 +35,13 @@ function DogImageAnalysisPage() {
   // 파일 업로드 + 분석 요청
   const handleImageAnalysis = async () => {
     if (!selectedFile) {
-      setUploadMessage('사진은 필수입니다.');
+      setErrorMessage('오류: 사진은 필수입니다. 파일을 선택해주세요!');
       return;
     }
 
     setLoading(true);
-    setUploadMessage('사진 분석 요청 중...');
+    setErrorMessage(''); // 새로운 요청 시 에러 메시지 초기화
+    setRecommendationResult(null); // 새로운 요청 시 이전 결과 초기화
 
     const formData = new FormData();
     formData.append('dogImageFile', selectedFile);  // 사용자가 고른 이미지
@@ -56,33 +62,42 @@ function DogImageAnalysisPage() {
 
       // GPT 추천 내용만 표시
       if (response.data && response.data.data) {
-        setUploadMessage(response.data.data);
-      } else if (response.data && response.data.message) {
-        setUploadMessage(`성공: ${response.data.message}`);
+        setRecommendationResult(response.data.data); // DTO 객체를 그대로 저장
+        setErrorMessage(''); // 성공했으니 에러 메시지 초기화
       } else {
-        setUploadMessage('이미지 분석은 성공했지만 응답 형식이 이상함!');
+        setErrorMessage('이미지 분석은 성공했지만 응답 형식이 이상합니다!');
       }
       setSelectedFile(null);
       setChecklistData(null);
       setFreeTextQuestion('');
     } catch (error) {
-      let errorMessage = '이미지 분석 요청 중 오류가 발생했습니다!';
+      let msg = '이미지 분석 요청 중 오류가 발생했습니다!';
       if (error.response?.data?.message) {
-        errorMessage = `오류: ${error.response.data.message} (${error.response.data.code})`;
+        msg = `오류: ${error.response.data.message} (${error.response.data.code})`;
       } else if (error.message) {
-        errorMessage = `오류: ${error.message}`;
+        msg = `오류: ${error.message}`;
       }
-      setUploadMessage(errorMessage);
+      setErrorMessage(msg);
+      setRecommendationResult(null); // 에러 발생 시 결과 초기화
     } finally {
       setLoading(false);
     }
   };
 
-  // 에러 메시지일 경우에만 빨간색 배경을 적용하도록 로직 변경
-  const isError = uploadMessage.startsWith('오류:'); // '오류:'로 시작하면 에러 메시지
-  const messageBg = isError
+  // 스파 예약하러 가기 버튼 클릭 핸들러
+  const handleGoToSpaDetail = (spaSlug) => {
+    if (spaSlug) {
+      navigate(`/spalist/slug/${spaSlug}`);
+    } else {
+      alert('스파 상세 페이지로 이동할 수 없습니다. 정보가 부족해요.');
+    }
+  };
+
+  // 메시지 배경 스타일 (에러 메시지 전용)
+  const messageBg = errorMessage.startsWith('오류:')
     ? "bg-red-50 border-red-400 text-red-700"
-    : "bg-green-50 border-green-400 text-green-800"; // 그 외는 성공 또는 로딩 메시지로 간주
+    : ""; // 에러가 아니면 배경색 없음
+
 
   return (
     <div className="max-w-lg mx-auto mt-16 p-8 bg-white rounded-2xl shadow-lg border border-gray-100">
@@ -157,11 +172,34 @@ function DogImageAnalysisPage() {
         {loading ? '분석 중...' : '추천 받기'}
       </button>
 
-      {uploadMessage && (
+      {recommendationResult && (
+        <div className="mt-7 py-4 px-4 border-l-4 rounded-lg font-semibold shadow-sm bg-green-50 border-green-400 text-green-800">
+          <p>{recommendationResult.intro}</p>
+          <p>{recommendationResult.compliment}</p>
+          <p>{recommendationResult.recommendationHeader}</p>
+          <p dangerouslySetInnerHTML={{ __html: recommendationResult.spaName }}></p> {/* 마크다운 렌더링 */}
+          {recommendationResult.spaDescription && recommendationResult.spaDescription.map((desc, index) => (
+            <p key={index}>{desc}</p>
+          ))}
+          <p>{recommendationResult.closing}</p>
+
+          {recommendationResult.spaSlug && (
+            <button
+              onClick={() => handleGoToSpaDetail(recommendationResult.spaSlug)}
+              className="mt-4 w-full py-2 px-4 bg-blue-500 text-white font-bold rounded-xl shadow hover:bg-blue-600 transition active:scale-95"
+            >
+              추천받은 스파로 예약하러 가기 →
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* 에러 메시지 표시 */}
+      {errorMessage && (
         <div
           className={`mt-7 py-4 px-4 border-l-4 rounded-lg text-center whitespace-pre-wrap font-semibold shadow-sm ${messageBg}`}
         >
-          {uploadMessage}
+          {errorMessage}
         </div>
       )}
     </div>

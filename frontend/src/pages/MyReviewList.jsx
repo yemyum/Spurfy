@@ -25,11 +25,18 @@ function MyReviewList() {
             className="font-semibold text-blue-600 hover:underline inline-block"
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/spalist/${r.serviceId}`);
+              if (r.spaSlug) {
+                navigate(`/spalist/slug/${r.spaSlug}`); 
+              } else {
+                // 슬러그가 없으면 기존 ID로라도 이동시키거나, 에러 메시지 표시
+                navigate(`/spalist/${r.serviceId}`); // 임시로 기존 ID 사용하거나,
+                // alert('스파 정보를 찾을 수 없습니다.'); // 사용자에게 알림
+              }
             }}
           >
             {r.serviceName}
           </h3>
+
           <p className="text-sm text-gray-500">작성일: {r.createdAt}</p>
           <p className="mt-2 text-gray-700 truncate">{r.content}</p>
           <div className="flex gap-2 mt-4">
@@ -37,7 +44,6 @@ function MyReviewList() {
             className="bg-yellow-400 hover:bg-yellow-500 text-white rounded px-3 py-1 text-sm"
             onClick={(e) => {
             e.stopPropagation();
-            // ⭐⭐ `edit/` 부분을 제거하고, `state`에 `isEditing: true` 추가! ⭐⭐
             navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
           }}
           >
