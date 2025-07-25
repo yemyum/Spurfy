@@ -89,7 +89,7 @@ public class GoogleVisionClient {
                         String desc = label.getDescription();
                         return desc != null &&
                                 (desc.equalsIgnoreCase("dog") || desc.equalsIgnoreCase("puppy") || desc.equalsIgnoreCase("canine")) &&
-                                label.getScore() > 0.7;
+                                label.getScore() >= 0.7;
                     });
 
             Optional<GoogleVisionResponseDTO.Response.LabelAnnotation> detectedBreedLabel = labels.stream()

@@ -13,8 +13,12 @@ import java.util.List;
 @Builder
 public class SpaLabelRecommendationRequestDTO {
     private List<String> labels; // 비전 API 라벨 값들
+    private String breed;
     private String ageGroup;
     private List<String> skinTypes;
-    private List<String> healthConditions;
+    private List<String> healthIssues;
     private String activityLevel;
+
+    private String checklist;
+    private String question;
 }

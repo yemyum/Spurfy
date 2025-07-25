@@ -25,15 +25,16 @@ public class DogImageUploadController {
     @PostMapping
     public ResponseEntity<ApiResponse<String>> uploadDogImages(
             @RequestParam("dogImageFile") MultipartFile dogImageFile,
-            @RequestParam("question") String question
+            @RequestParam(value = "checklist", required = false) String checklist,
+            @RequestParam(value = "question", required = false) String question
     ) {
         // React에서 'dogImageFile'이라는 이름으로 파일을 보낼 거라고 약속!
         // 1. 파일이 비어있는지 먼저 확인! (파일이 없는 요청이 올 수도 있으니까)
-        if (dogImageFile.isEmpty()) {
+        if (dogImageFile == null || dogImageFile.isEmpty()) {
             return ResponseEntity.badRequest().body(
                     ApiResponse.<String>builder()
                             .code("E001")
-                            .message("파일을 찾을 수 없습니다. 파일을 선택해주세요.")
+                            .message("사진은 필수입니다. 파일을 선택해주세요!")
                             .data(null)
                             .build()
             );
@@ -42,7 +43,7 @@ public class DogImageUploadController {
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
             System.out.println("로그인한 사용자 이메일: " + userEmail);
-            String result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, question);
+            String result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
 
             return ResponseEntity.ok(
                     ApiResponse.<String>builder()
@@ -53,7 +54,7 @@ public class DogImageUploadController {
             );
 
         } catch (CustomException e) { // 파일 저장/처리 중 IOException 발생 시
-                // e.printStackTrace();
+                e.printStackTrace();
             return ResponseEntity
                     .status(e.getHttpStatus() != null ? e.getHttpStatus() : HttpStatus.BAD_REQUEST) // CustomException의 getHttpStatus() 사용
                     .body(ApiResponse.<String>builder()
@@ -64,7 +65,7 @@ public class DogImageUploadController {
             );
 
         } catch (Exception e) {  // CustomException 외의 모든 예상치 못한 에러를 여기서 잡음
-                // e.printStackTrace();
+                e.printStackTrace();
             return ResponseEntity.internalServerError().body(
                     ApiResponse.<String>builder()
                             .code("E999")
