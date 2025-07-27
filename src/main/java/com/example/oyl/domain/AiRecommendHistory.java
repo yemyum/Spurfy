@@ -1,10 +1,7 @@
 package com.example.oyl.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.jasper.util.UniqueAttributesImpl;
 
 import java.time.LocalDateTime;
@@ -15,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class AiRecommendHistory {
 
     @Id
@@ -23,7 +21,7 @@ public class AiRecommendHistory {
 
     private String userId;
 
-    @Column(nullable = false, length = 255)
+    @Column(name = "image_url", length = 255)
     private String imageUrl;
 
     private String detectedBreed;

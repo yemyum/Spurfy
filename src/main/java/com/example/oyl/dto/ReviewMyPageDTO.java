@@ -27,4 +27,6 @@ public class ReviewMyPageDTO {
     private boolean isBlinded;
     private String updatedAt;    // (LocalDateTime을 String으로 변환해서)
 
+    private String spaSlug;
+
 }

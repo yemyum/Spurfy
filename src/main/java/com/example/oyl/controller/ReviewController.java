@@ -108,4 +108,17 @@ public class ReviewController {
         );
     }
 
+    @GetMapping("/public/slug/{spaSlug}")
+    public ResponseEntity<ApiResponse<List<ReviewPublicDTO>>> getReviewsBySpaSlug(@PathVariable String spaSlug) {
+        List<ReviewPublicDTO> reviews = reviewService.getReviewsBySpaSlug(spaSlug);
+
+        return ResponseEntity.ok(
+                ApiResponse.<List<ReviewPublicDTO>>builder()
+                        .code("S001")
+                        .message("슬러그 기반 스파 리뷰 목록 조회 성공!")
+                        .data(reviews)
+                        .build()
+        );
+    }
+
 }

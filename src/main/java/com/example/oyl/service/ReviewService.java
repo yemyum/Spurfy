@@ -21,4 +21,6 @@ public interface ReviewService {
 
     ReviewMyPageDTO getReviewDetailForMypage(String reviewId, String userEmail);
 
+    List<ReviewPublicDTO> getReviewsBySpaSlug(String spaSlug);
+
 }

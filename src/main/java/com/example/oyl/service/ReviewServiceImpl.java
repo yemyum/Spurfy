@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -116,19 +117,29 @@ public class ReviewServiceImpl implements ReviewService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
         return reviews.stream()
-                .map(r -> ReviewMyPageDTO.builder()
-                        .reviewId(r.getReviewId())
-                        .reservationId(r.getReservation().getReservationId())
-                        .serviceId(r.getReservation().getSpaService().getServiceId())
-                        .serviceName(r.getReservation().getSpaService().getName())
-                        .dogName(r.getDog().getName())
-                        .reservationDate(r.getReservation().getReservationDate().toString())
-                        .price(r.getReservation().getSpaService().getPrice())
-                        .rating(r.getRating())
-                        .content(r.getContent())
-                        .imageUrl(r.getImageUrl())
-                        .createdAt(r.getCreatedAt().format(formatter))
-                        .build())
+                .map(r -> {
+                    String spaSlug = null;
+                    if (r.getReservation() != null && r.getReservation().getSpaService() != null) {
+                        spaSlug = r.getReservation().getSpaService().getSlug();
+                    }
+
+                    return ReviewMyPageDTO.builder()
+                            .reviewId(r.getReviewId())
+                            .reservationId(r.getReservation() != null ? r.getReservation().getReservationId() : null)
+                            .serviceId(r.getReservation() != null && r.getReservation().getSpaService() != null ? r.getReservation().getSpaService().getServiceId() : null)
+                            .serviceName(r.getReservation() != null && r.getReservation().getSpaService() != null ? r.getReservation().getSpaService().getName() : null)
+                            .dogName(r.getDog() != null ? r.getDog().getName() : null)
+                            .reservationDate(r.getReservation() != null && r.getReservation().getReservationDate() != null ? r.getReservation().getReservationDate().toString() : null)
+                            .price(r.getReservation() != null && r.getReservation().getSpaService() != null ? r.getReservation().getSpaService().getPrice() : null)
+                            .rating(r.getRating())
+                            .content(r.getContent())
+                            .imageUrl(r.getImageUrl())
+                            .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(formatter) : null)
+                            .isBlinded(r.isBlinded())
+                            .updatedAt(r.getUpdatedAt() != null ? r.getUpdatedAt().format(formatter) : null)
+                            .spaSlug(spaSlug)
+                            .build();
+                })
                 .toList();
     }
 
@@ -187,6 +198,23 @@ public class ReviewServiceImpl implements ReviewService {
                     .isBlinded(review.isBlinded()) // boolean 타입 그대로
                     .updatedAt(review.getUpdatedAt() != null ? review.getUpdatedAt().format(formatter) : null) // updatedAt이 null일 수 있으니 체크
                     .build();
+    }
+
+    public List<ReviewPublicDTO> getReviewsBySpaSlug(String spaSlug) {
+        // 1. ReviewRepository를 사용해서 해당 슬러그를 가진 스파의 리뷰들을 가져옴
+        List<Review> reviews = reviewRepository.findBySpaServiceSlug(spaSlug);
+
+        // 2. 가져온 Review 엔티티들을 ReviewPublicDTO로 변환해서 반환
+        return reviews.stream()
+                .map(r -> ReviewPublicDTO.builder()
+                        .reviewId(r.getReviewId())
+                        .userNickname(r.getUser() != null ? r.getUser().getNickname() : "알 수 없음") // User에서 닉네임 가져옴
+                        .content(r.getContent())
+                        .rating(r.getRating())
+                        .imageUrl(r.getImageUrl())
+                        .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
+                        .build())
+                .collect(Collectors.toList());
     }
 
 

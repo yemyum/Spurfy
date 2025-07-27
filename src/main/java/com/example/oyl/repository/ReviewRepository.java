@@ -19,4 +19,8 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     @Query("SELECT r FROM Review r JOIN FETCH r.dog d JOIN FETCH r.reservation res JOIN FETCH res.spaService WHERE r.user.userId = :userId ORDER BY r.createdAt DESC")
     List<Review> findAllWithDogAndServiceByUserId(@Param("userId") String userId);
 
+    // Reservation을 통해 SpaService의 slug로 Review를 찾아오는 쿼리
+    @Query("SELECT r FROM Review r JOIN r.reservation res JOIN res.spaService ss WHERE ss.slug = :spaSlug")
+    List<Review> findBySpaServiceSlug(@Param("spaSlug") String spaSlug);
+
 }

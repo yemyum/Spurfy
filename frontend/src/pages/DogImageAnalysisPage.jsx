@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from '../api/axios';
 import ChecklistForm from "../components/Common/ChecklistForm";
+import HistoryItem from "../components/Common/HistoryItem";
 import { useNavigate } from 'react-router-dom';
 
 function DogImageAnalysisPage() {
@@ -10,8 +11,29 @@ function DogImageAnalysisPage() {
   const [freeTextQuestion, setFreeTextQuestion] = useState('');
   const [recommendationResult, setRecommendationResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 전용 상태
+  const [historyList, setHistoryList] = useState([]);   // 이전 기록들을 저장할 배열
 
   const navigate = useNavigate();
+
+   // 컴포넌트 마운트 시 (페이지 로드 시) 기록 불러오기
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await api.get('/recommendations/history');
+
+        if (response.data && response.data.data) {
+          setHistoryList(response.data.data); // 받아온 기록들을 상태에 저장
+        } else {
+          console.warn('이전 기록을 불러왔으나 데이터 형식이 올바르지 않습니다.');
+        }
+      } catch (error) {
+        console.error('이전 기록 불러오기 실패:', error);
+      }
+    };
+
+    fetchHistory(); // 함수 호출!
+  }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행!
+
 
   // 파일 선택 핸들러
   const handleFileChange = (event) => {
@@ -202,6 +224,23 @@ function DogImageAnalysisPage() {
           {errorMessage}
         </div>
       )}
+
+      {/* 이전 AI 추천 기록 섹션*/}
+      <div className="mt-10 p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-inner max-h-96 overflow-y-auto">
+        <h3 className="text-xl font-bold text-purple-800 mb-4 sticky top-0 bg-white p-2 z-10 rounded-t-lg">추천 내역들 🐾</h3>
+        {historyList.length > 0 ? (
+          historyList
+            .map((item) => (
+              <HistoryItem
+                key={item.id}
+                data={item}
+                onGoToSpaDetail={handleGoToSpaDetail}
+              />
+            ))
+        ) : (
+          <p className="text-center text-gray-500">아직 AI 추천 기록이 없어요.</p>
+        )}
+      </div>
     </div>
   );
 }
