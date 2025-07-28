@@ -19,7 +19,7 @@ public class Payment {
     @Column(name = "payment_id", length = 36)
     private String paymentId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false, unique = true)
     private Reservation reservation;
 

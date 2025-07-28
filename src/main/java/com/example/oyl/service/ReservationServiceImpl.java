@@ -186,7 +186,7 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationResponseDTO getReservationDetail(String userEmail, String reservationId) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Reservation reservation = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findByIdWithPayment(reservationId)
                 .orElseThrow(() -> new CustomException(ErrorCode.RESERVATION_NOT_FOUND));
 
         if (!reservation.getUser().getUserId().equals(user.getUserId())) {

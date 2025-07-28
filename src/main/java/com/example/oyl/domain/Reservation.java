@@ -30,6 +30,9 @@ public class Reservation {
     @JoinColumn(name = "service_id")
     private SpaService spaService;
 
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private Payment payment;
+
     private LocalDate reservationDate;
     private LocalTime reservationTime;
 
@@ -41,16 +44,16 @@ public class Reservation {
     private ReservationStatus reservationStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "refund_status", nullable = false)
-    private RefundStatus refundStatus;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", length = 20)
     private PaymentStatus paymentStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "refund_type")
     private RefundType refundType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "refund_status")
+    private RefundStatus refundStatus;
 
     private String cancelReason;
     private LocalDateTime refundedAt;

@@ -1,9 +1,6 @@
 package com.example.oyl.dto;
 
-import com.example.oyl.domain.RefundStatus;
-import com.example.oyl.domain.RefundType;
-import com.example.oyl.domain.Reservation;
-import com.example.oyl.domain.ReservationStatus;
+import com.example.oyl.domain.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -24,6 +21,8 @@ public class ReservationResponseDTO {
     private LocalTime reservationTime;
     private ReservationStatus reservationStatus;
     private Long price;
+    private Long amount;           // 실제 결제 금액
+    private String paymentMethod;  // 결제 수단]
     private RefundStatus refundStatus;
     private RefundType refundType;
     private String cancelReason;
@@ -32,6 +31,8 @@ public class ReservationResponseDTO {
     private boolean hasReview;
 
     public static ReservationResponseDTO from(Reservation reservation, boolean hasReview) {
+        Payment payment = reservation.getPayment();
+
         return ReservationResponseDTO.builder()
                 .reservationId(reservation.getReservationId())
                 .userId(reservation.getUser().getUserId())
@@ -43,6 +44,8 @@ public class ReservationResponseDTO {
                 .reservationTime(reservation.getReservationTime())
                 .reservationStatus(reservation.getReservationStatus())
                 .price(reservation.getPrice())
+                .amount(payment != null ? payment.getAmount().longValue() : reservation.getPrice())
+                .paymentMethod(payment != null ? payment.getPaymentMethod().toString() : null)
                 .refundStatus(reservation.getRefundStatus())
                 .refundType(reservation.getRefundType())
                 .cancelReason(reservation.getCancelReason())

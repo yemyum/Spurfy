@@ -10,10 +10,16 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReservationRepository extends JpaRepository<Reservation, String> {
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.dog d JOIN FETCH r.user u JOIN FETCH r.spaService s WHERE u.userId = :userId")
+    @Query("SELECT r FROM Reservation r " +
+            "JOIN FETCH r.dog d " +
+            "JOIN FETCH r.user u " +
+            "JOIN FETCH r.spaService s " +
+            "LEFT JOIN FETCH r.payment p " +
+            "WHERE u.userId = :userId")
     List<Reservation> findByUser_UserIdWithDetails(@Param("userId") String userId);
 
     // 이 메서드의 이름은 JPA에게 "Dog와 ReservationDate는 맞는데, ReservationStatus는 이게 아닌 것만 찾아줘!" 라는 의미
@@ -23,5 +29,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
 
     List<Reservation> findByReservationDateBeforeAndReservationStatus(
             LocalDate date, ReservationStatus status);
+
+    @Query("SELECT r FROM Reservation r " +
+            "LEFT JOIN FETCH r.payment p " +
+            "WHERE r.reservationId = :reservationId")
+    Optional<Reservation> findByIdWithPayment(@org.springframework.data.repository.query.Param("reservationId") String reservationId);
 
 }
