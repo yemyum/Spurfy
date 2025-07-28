@@ -1,9 +1,19 @@
-/** @type {import('tailwindcss').Config} */
 export default {
-  content: [],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}"
+  ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        logo: ['Mungyeong-Gamhong-Apple'],
+        body: ['Pretendard', 'sans-serif'],
+      },
+      colors: {
+        spurfyBlue: '#6DA7FF',
+        spurfyLogo: '#BAE5FF',
+      },
+    },
   },
   plugins: [],
 }
-

@@ -52,19 +52,15 @@ api.interceptors.response.use(
       } else {
       alert("로그인 정보가 잘못되었습니다. 다시 로그인 해주세요!");
       }
-      // 토큰 삭제 및 리다이렉트
-      localStorage.removeItem('token'); // 저장된 토큰 삭제!
-
-      // 로그인 페이지로 강제 이동!
-      window.location.href = '/login';
-
-    } else if (err.response && err.response.status === 403) {
-        alert("접근 권한이 없습니다.");
-        // window.location.href = '/'; 
-    }
+      // 강제 리다이렉트 + 토큰 제거
+     setTimeout(() => {
+     localStorage.removeItem('token');
+     window.location.href = '/login';
+     }, 100); // alert 블로킹 우회
 
     return Promise.reject(err);
   }
+}
 );
 
 export default api;

@@ -1,10 +1,6 @@
-// src/layouts/RootLayout.jsx (여기에 이 코드를 복붙해줘!)
-
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-// ⭐ 만약 AuthContext를 만들었다면 아래 줄을 사용하고, 아니라면 주석 처리된 임시 코드를 사용해줘 ⭐
-// import { useAuth } from '../context/AuthContext';
 
 
 function RootLayout() {
@@ -35,23 +31,24 @@ const handleLogout = () => {
 };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-gradient-to-br from-white to-[#e3f2fd] min-h-screen">
+    <div className="min-h-screen">
       {/* 헤더 섹션 */}
-      <header className="bg-blue-600 text-white p-4 shadow-md flex justify-between items-center">
-        <h1 className="text-xl font-bold">Spurfy</h1>
+      <header className="text-spurfyBlue p-10 flex justify-between items-center">
+        <h1 className="font-logo text-spurfyLogo text-4xl">Spurfy</h1>
         <nav>
           {/* 로그인 상태에 따라 버튼 다르게 표시 */}
           {isAuthenticated ? ( // 로그인 되어 있을 때
             <div className="flex space-x-4">
               <button
                 onClick={() => navigate('/mypage/profile')} // 마이페이지로 이동 버튼
-                className="hover:underline"
+                className="p-0 m-0 w-auto h-auto inline-flex items-center justify-center bg-transparent border-none outline-none shadow-none appearance-none focus:outline-none text-spurfyBlue hover:underline"
               >
                 마이페이지
               </button>
               <button
                 onClick={handleLogout} // 로그아웃 버튼
-                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                className="p-0 m-0 w-auto h-auto inline-flex items-center justify-center bg-transparent border-none hover:underline focus:outline-none outline-none shadow-none appearance-none text-gray-500"
               >
                 로그아웃
               </button>
@@ -76,10 +73,11 @@ const handleLogout = () => {
       </header>
 
       {/* 메인 콘텐츠는 Outlet으로 표시 */}
-      <main className="container mx-auto p-4">
-        <Outlet /> {/* ⭐ 여기가 중요! 현재 라우트에 맞는 페이지 컴포넌트가 여기에 렌더링 ⭐ */}
+      <main className="flex-1 p-8 min-w-[700px] min-h-[500px]">
+        <Outlet />
       </main>
     </div>
+  </div>
   );
 }
 
