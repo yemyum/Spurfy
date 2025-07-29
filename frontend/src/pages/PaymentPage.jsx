@@ -11,6 +11,8 @@ function PaymentPage() {
   const [user, setUser] = useState(null);          // 유저 정보
   const [reservation, setReservation] = useState(null); // 결제완료 후 예약 상세
 
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('CARD'); // 기본값을 'CARD'로 설정
+
   // 💡 로그인 유저 정보 로딩
   useEffect(() => {
     api.get('/mypage/profile')
@@ -45,7 +47,7 @@ function PaymentPage() {
         reservationDate: state.date,
         reservationTime: state.time,
         amount: state.amount,
-        paymentMethod: 'CARD'
+        paymentMethod: selectedPaymentMethod
       });
 
       const newId = res.data.data.reservationId;
@@ -65,7 +67,7 @@ function PaymentPage() {
   // 결제 완료 후 상세 조회 페이지
   if (reservationId && reservation) {
     return (
-      <div className="w-1/2 mx-auto select-none mt-10 mb-10 bg-white rounded-2xl shadow-md border border-gray-200">
+      <div className="w-1/2 mx-auto select-none mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200">
         <div className="p-8 space-y-4">
         <h2 className="text-2xl font-bold mt-4 text-center mb-12">예약이 완료되었습니다!</h2>
         <div className="flex justify-between mb-2 text-lg">
@@ -106,7 +108,7 @@ function PaymentPage() {
   // 결제 진행 화면
   return (
     <div className="w-2/3 mx-auto select-none mt-10 mb-10 bg-gray-50 rounded-2xl shadow-md overflow-hidden">
-    <h2 className="bg-[#9EC5FF] text-white font-bold text-xl text-center py-4 rounded-t-2xl">결제하기</h2>
+    <h2 className="bg-[#9EC5FF] text-white font-bold text-xl text-center py-4 rounded-t-2xl">예약하기</h2>
     <div className='p-4 space-y-6'>
       {/* 스파 서비스 정보 */}
     <div className="border-none rounded-md bg-white p-4">
@@ -128,10 +130,19 @@ function PaymentPage() {
     <div className="border-none rounded-md bg-white  p-4 space-y-2">
       <h3 className="text-lg font-semibold">결제수단</h3>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="radio" name="payment" defaultChecked className="accent-[#3B82F6] w-4 h-4" /> 카드
+        <input type="radio" 
+               name="payment" 
+               checked={selectedPaymentMethod === 'CARD'}
+               onChange={() => setSelectedPaymentMethod('CARD')}
+               className="accent-[#3B82F6] w-4 h-4" 
+        /> 카드
       </label>
       <label className="flex items-center gap-2 cursor-pointer">
-        <input type="radio" name="payment" className="accent-[#3B82F6] w-4 h-4" /> 간편결제
+        <input type="radio" 
+               name="payment"
+               checked={selectedPaymentMethod === 'EASY_PAY'}
+               onChange={() => setSelectedPaymentMethod('EASY_PAY')}
+               className="accent-[#3B82F6] w-4 h-4" /> 간편결제
       </label>
     </div>
 

@@ -12,6 +12,8 @@ export default {
       colors: {
         spurfyBlue: '#6DA7FF',
         spurfyLogo: '#BAE5FF',
+        spurfyColor: '#9EC5FF',
+        spurfyNavy: '#7FA3DA',
       },
     },
   },

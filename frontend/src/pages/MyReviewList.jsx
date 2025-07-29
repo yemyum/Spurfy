@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import SpurfyButton from "../components/Common/SpurfyButton";
 
 function MyReviewList() {
   const [reviews, setReviews] = useState([]);
@@ -13,16 +14,17 @@ function MyReviewList() {
   }, []);
 
   return (
-    <div className="review-list">
-      <h2 className="text-xl font-bold mb-4">내가 작성한 리뷰 리스트</h2>
+    <div className="mx-auto p-8 select-none">
+      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 조회</h2>
+      <h2 className="text-xl font-bold mb-6">내가 작성한 리뷰 리스트</h2>
       {reviews.map((r) => (
         <div
           key={r.reviewId}
-          className="review-card border rounded p-4 mb-4 shadow-md cursor-pointer"
+          className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50"
           onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
         >
           <h3
-            className="font-semibold text-blue-600 hover:underline inline-block"
+            className="font-semibold text-lg hover:underline inline-block"
             onClick={(e) => {
               e.stopPropagation();
               if (r.spaSlug) {
@@ -37,20 +39,20 @@ function MyReviewList() {
             {r.serviceName}
           </h3>
 
-          <p className="text-sm text-gray-500">작성일: {r.createdAt}</p>
-          <p className="mt-2 text-gray-700 truncate">{r.content}</p>
+          <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
+          <p className="mt-2 text-gray-800 truncate">{r.content}</p>
           <div className="flex gap-2 mt-4">
-            <button
-            className="bg-yellow-400 hover:bg-yellow-500 text-white rounded px-3 py-1 text-sm"
+            <SpurfyButton variant="primary"
+            className="px-4 py-1 text-sm"
             onClick={(e) => {
             e.stopPropagation();
             navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
           }}
           >
           수정
-          </button>
-            <button
-              className="bg-red-500 hover:bg-red-600 text-white rounded px-3 py-1 text-sm"
+          </SpurfyButton>
+            <SpurfyButton variant="danger"
+              className="px-4 py-1 text-sm"
               onClick={async (e) => {
                 e.stopPropagation();
                 if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
@@ -63,7 +65,7 @@ function MyReviewList() {
               }}
             >
               삭제
-            </button>
+            </SpurfyButton>
           </div>
         </div>
       ))}

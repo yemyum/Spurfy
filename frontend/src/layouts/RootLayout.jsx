@@ -31,7 +31,7 @@ const handleLogout = () => {
 };
 
   return (
-    <div className="bg-gradient-to-br from-white to-[#e3f2fd] min-h-screen">
+    <div className="bg-gradient-to-br from-white to-[#e3f2fd] min-h-screen select-none">
     <div className="min-h-screen">
       {/* 헤더 섹션 */}
       <header className="text-spurfyBlue p-10 flex justify-between items-center">

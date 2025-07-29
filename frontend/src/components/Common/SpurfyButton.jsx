@@ -4,7 +4,7 @@ function SpurfyButton({
   className = '',
   ...props
 }) {
-  const base = 'font-semibold py-2 px-4 rounded-lg transition duration-200 border border-transparent';
+  const base = 'rounded-lg transition font-semibold duration-200 border border-transparent';
   const variants = {
     primary: 'bg-[#9EC5FF] text-white hover:bg-[#7fb5ff]',
     danger: 'bg-[#575757] text-white hover:bg-[#444]',

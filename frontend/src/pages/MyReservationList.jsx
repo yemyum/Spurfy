@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
+import SpurfyButton from '../components/Common/SpurfyButton';
 
 function MyReservationList() {
   const [reservations, setReservations] = useState([]);
@@ -8,10 +9,19 @@ function MyReservationList() {
   const navigate = useNavigate();
 
   const statusLabel = {
-    RESERVED: "예약완료",
-    COMPLETED: "이용완료",
-    CANCELED: "취소됨",
-  };
+  RESERVED: {
+    text: "예약완료",
+    tagClass: "bg-sky-100 text-sky-500",
+  },
+  COMPLETED: {
+    text: "이용완료",
+    tagClass: "bg-green-100 text-green-500",
+  },
+  CANCELED: {
+    text: "취소됨",
+    tagClass: "bg-gray-100 text-gray-500",
+  },
+};
 
   useEffect(() => {
     api.get("/reservation/mypage/reservations")
@@ -40,7 +50,7 @@ function MyReservationList() {
   };
 
   const handleItemClick = (reservationId) => {
-    navigate(`/mypage/reservations/${reservationId}`); // 예약 상세 페이지 경로로 이동!
+    navigate(`/mypage/reservations/${reservationId}`);
 };
   
   const handleCancel = async (r) => {
@@ -60,22 +70,19 @@ function MyReservationList() {
         }
 
         // 3. cancelReason 설정 (사용자 입력 또는 기본값)
-        //    prompt로 받은 값이 빈 문자열이더라도, 일단 넘기거나
-        //    정말 아무 입력도 없으면 '사용자 요청'으로 설정 가능 (이건 선택 사항)
         const finalCancelReason = cancelReasonInput.trim() === "" ? "사용자 요청" : cancelReasonInput;
 
 
         try {
             await api.post("/reservation/cancel", {
                 reservationId: r.reservationId,
-                cancelReason: finalCancelReason, // ⭐ 사용자가 입력한 사유 또는 기본값 ⭐
+                cancelReason: finalCancelReason,
             });
             alert("예약이 취소되었습니다.");
-            // 상태 업데이트: 취소된 예약을 목록에서 제거
             setReservations(prev => prev.filter(item => item.reservationId !== r.reservationId));
         } catch (err) {
             alert("예약 취소 실패: " + (err.response?.data?.message || "오류 발생"));
-            console.error("예약 취소 오류:", err); // 디버깅을 위해 콘솔에 에러 출력
+            console.error("예약 취소 오류:", err);
         }
     };
 
@@ -83,46 +90,70 @@ function MyReservationList() {
   if (reservations.length === 0) return <div className="p-6">예약 내역이 없습니다 🐶</div>;
 
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">나의 예약 리스트</h2>
+    <div className="mx-auto p-8 select-none">
+      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 내역</h2>
+      <h2 className="text-xl font-bold mb-6">나의 예약 리스트</h2>
       {reservations.map((r) => (
-        <div 
-          key={r.reservationId} 
-          className="border p-4 mb-4 rounded shadow-md cursor-pointer hover:bg-gray-50" // ⭐ 여기 추가! ⭐
-          onClick={() => handleItemClick(r.reservationId)}
+        <div
+        key={r.reservationId}
+        className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex items-stretch gap-4"
+         onClick={() => handleItemClick(r.reservationId)}
         >
-          <p>🐾 <strong>{r.serviceName}</strong></p>
-          <p>🐶 {r.dogName}</p>
-          <p>🕒 {r.reservationDate} {r.reservationTime}</p>
-          <p>💰 {r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
-          <p>📌 상태: {statusLabel[r.reservationStatus] || r.reservationStatus}</p>
+  {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
+  <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+    <span className="text-gray-500 text-sm">이미지</span>
+  </div>
 
-          {r.reservationStatus === "RESERVED" && (
-            <button
-               onClick={(e) => {
-                            e.stopPropagation(); // 이벤트 버블링 막기!
-                            handleCancel(r);
-                        }}
-              className="bg-gray-500 text-white px-3 py-1 rounded mt-2"
-            >
-              예약취소
-            </button>
-          )}
-
-          {r.reservationStatus === "COMPLETED" && !r.hasReview && (
-          <button
-            onClick={(e) => {
-                            e.stopPropagation();
-                            handleReviewWrite(r);
-                        }}
-            className="bg-blue-500 text-white px-3 py-1 rounded mt-2"
-          >
-            리뷰작성
-          </button>
-        )}
-        </div>
-      ))}
+  {/* ⭐ 2. 가운데: 예약 정보 텍스트 (서비스명, 날짜, 가격)⭐ */}
+  <div className="flex-grow flex flex-col justify-between">
+    <div> {/* 서비스명 */}
+      <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
     </div>
+    <div> {/* 날짜, 가격 */}
+      <p className="text-gray-600 text-sm mb-1">{r.reservationDate} {r.reservationTime}</p>
+      <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
+    </div>
+  </div>
+
+  {/* ⭐ 3. 오른쪽: 상태 태그와 버튼 영역 ⭐ */}
+   <div className="flex flex-col justify-between items-end">
+    {/* 예약 상태 태그! (맨 위 오른쪽) */}
+    <div
+      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${statusLabel[r.reservationStatus]?.tagClass || 'bg-red-100 text-red-500'}`}
+    >
+      {statusLabel[r.reservationStatus]?.text || r.reservationStatus}
+    </div>
+
+  {/* 버튼 영역 (맨 아래 오른쪽) */}
+  <div>
+    {r.reservationStatus === "RESERVED" && (
+      <SpurfyButton variant="danger"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCancel(r);
+        }}
+        className="px-2 py-1 font-semibold text-sm"
+      >
+        예약취소
+      </SpurfyButton>
+    )}
+
+    {r.reservationStatus === "COMPLETED" && !r.hasReview && (
+      <SpurfyButton variant="ai"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleReviewWrite(r);
+        }}
+        className="px-2 py-1 font-semibold text-sm"
+      >
+        리뷰작성
+      </SpurfyButton>
+    )}
+    </div>
+  </div>
+</div>
+  ))}
+  </div>
   );
 }
 

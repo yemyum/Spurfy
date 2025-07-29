@@ -21,9 +21,9 @@ function Login() {
       const res = await api.post('/users/login', form);
       const token = res.data.data;
 
-      localStorage.setItem('token', token); // ✅ JWT 저장
+      localStorage.setItem('token', token);
       alert('로그인 성공! 🐽💗');
-      navigate('/mypage'); // 마이페이지 등 원하는 경로로 이동!
+      navigate('/');
     } catch (err) {
       console.error('로그인 실패:', err);
       alert('로그인 실패! 다시 확인해줘 💦');

@@ -37,7 +37,6 @@ const router = createBrowserRouter([
       { path: '/spalist', element: <SpaList /> },
       { path: '/spalist/slug/:spaSlug', element: <SpaDetail /> },
       { path: '/spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
-      { path: '/review/write', element: <ReviewWrite /> },
       { path: '/mypage/withdrawal', element: <WithdrawalPage /> },
       { path: '/dog-spa-ai', element: <DogImageAnalysisPage /> },
       {
@@ -60,6 +59,7 @@ const router = createBrowserRouter([
   { path: '/signup', element: <Signup /> },
   { path: '/payment', element: <PaymentPage /> },
   { path: '/payment/:reservationId', element: <PaymentPage /> },
+  { path: '/review/write', element: <ReviewWrite /> },
 ]);
 
 export default router;
