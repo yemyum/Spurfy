@@ -4,10 +4,9 @@ import { styled } from '@mui/material/styles';
 
 const StyledRating = styled(Rating)({
     '& .MuiRating-iconFilled': {
-        color: '#9EC5FF',
+        color: '#7fb5ff',
     },
-    '& .MuiRating-iconHover': {
-        color: '#7fb5ff', 
+    '& .MuiRating-iconHover': { 
         transform: 'none',
         transition: 'none',
     },
@@ -31,7 +30,7 @@ export default function StarRating({ rating, onRate, readOnly = false, size = 's
         <StyledRating
             name="rating"
             value={rating}
-            precision={0.1}
+            precision={0.5}
             readOnly={readOnly}
             onChange={handleChange}
             size={size} // 'small', 'medium', 'large' 등으로 크기 조절 가능
