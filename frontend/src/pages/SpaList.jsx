@@ -44,7 +44,7 @@ function SpaList() {
 
             {/* 예약 버튼 */}
             <Link to={`/spalist/slug/${spa.slug}`}>
-            <SpurfyButton variant="primary" className="w-full text-center mt-2">
+            <SpurfyButton variant="primary" className="w-full px-4 py-2 text-center mt-2">
              예약하러 가기
             </SpurfyButton>
             </Link>

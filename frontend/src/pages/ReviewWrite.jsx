@@ -101,7 +101,7 @@ function ReviewWrite() {
       <div className="bg-gray-50 p-4 rounded-lg">
          <p className="text-xl font-semibold">{reservationData.serviceName}</p>
         <p>
-           {reservationData.dogName} / {formatDate(reservationData.reservationDate)}
+           {reservationData.dogName} | {formatDate(reservationData.reservationDate)}
          </p>
       </div>
     
