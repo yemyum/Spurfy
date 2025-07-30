@@ -14,6 +14,7 @@ export default {
         spurfyLogo: '#BAE5FF',
         spurfyColor: '#9EC5FF',
         spurfyNavy: '#7FA3DA',
+        spurfyAI: '#67F3EC',
       },
     },
   },

@@ -4,7 +4,16 @@ function SpurfyButton({
   className = '',
   ...props
 }) {
-  const base = 'rounded-lg transition font-semibold duration-200 border border-transparent';
+  // *** 기본 스타일(둥글기, 트랜지션, 폰트, 보더)
+  const base = `
+  rounded-lg 
+  transition 
+  font-semibold
+  duration-200 
+  border border-transparent
+`;
+
+  // *** 컬러·상태별 스타일
   const variants = {
     primary: 'bg-[#9EC5FF] text-white hover:bg-[#7fb5ff]',
     danger: 'bg-[#575757] text-white hover:bg-[#444]',

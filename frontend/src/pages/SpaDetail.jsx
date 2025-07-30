@@ -73,7 +73,7 @@ function SpaDetail() {
   if (!Array.isArray(reviews)) return null;
 
   return (
-    <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 bg-white rounded-xl shadow-md border border-gray-200 p-6">
+    <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-6">
     {/* 1. 스파 사진 영역 (임시) */}
     <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
       스파 이미지 (임시)

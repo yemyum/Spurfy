@@ -13,7 +13,7 @@ function SpaList() {
   }, []);
 
   return (
-    <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
+    <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
       <h2 className="text-2xl font-bold mb-8 text-spurfyBlue">스파 서비스</h2>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-8">

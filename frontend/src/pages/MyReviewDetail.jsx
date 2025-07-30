@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import StarRating from '../components/Common/StarRating';
+import SpurfyButton from '../components/Common/SpurfyButton';
 import api from '../api/axios';
 
 function MyReviewDetail() {
@@ -121,34 +122,30 @@ function MyReviewDetail() {
   }
 
   return (
-    <div className="p-5 max-w-2xl mx-auto">
-      <div className="text-2xl font-bold mb-4 border-b-2 pb-2">리뷰 정보</div>
+    <div className="mx-auto p-8 mb-6 select-none">
+      <div className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 관리</div>
 
-      {/* 상태 확인용 문구! */}
-      <div className="mb-2 text-sm text-gray-500">
-        상태: <span className="font-bold">{isEditing ? "수정모드 (별점 클릭가능)" : "상세보기 (별점 클릭불가)"}</span>
-      </div>
-
-      <div className="border rounded p-6 shadow-md bg-white">
-        <h3>{reviewDetail.serviceName}</h3>
-        <p>{reviewDetail.price}원</p>
-        <p>{reviewDetail.dogName} | 작성일 {reviewDetail.createdAt}</p>
+      <div className="border border-gray-200 py-6 rounded-md shadow-sm bg-white mb-6">
+        <div className="pb-4 mb-4 border-b border-gray-200 px-6">
+        <h3 className='text-xl font-semibold'>{reviewDetail.serviceName}</h3>
+        <p className='text-lg font-semibold'>{reviewDetail.price}원</p>
+        <p className='text-gray-400'>{reviewDetail.dogName} | 작성일 {reviewDetail.createdAt}</p>
+        </div>
 
         {/* ⭐⭐ MUI StarRating 컴포넌트 사용 ⭐⭐ */}
-        <div className="mb-4">
+        <div className="pb-4 mb-4 border-b border-gray-200 px-6">
           {isEditing ? (
             // 수정 모드일 때: onRate를 통해 setEditedRating 연결, readOnly={false}
-            <StarRating rating={editedRating} onRate={setEditedRating} readOnly={false} size="large" /> 
+            <StarRating rating={editedRating} onRate={setEditedRating} readOnly={false} /> 
           ) : (
             // 조회 모드일 때: readOnly={true}
-            <StarRating rating={reviewDetail.rating} readOnly={true} size="large" />
+            <StarRating rating={reviewDetail.rating} readOnly={true} />
           )}
-        </div>
 
         {/* 리뷰 내용 */}
         {isEditing ? (
           <textarea
-            className="w-full p-2 border rounded mt-6 min-h-24 resize-y"
+            className="w-full p-2 border rounded mt-2 min-h-24 resize-y focus:outline-none"
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             rows="5"
@@ -170,6 +167,7 @@ function MyReviewDetail() {
             />
           </div>
         )}
+        </div>
 
         {/* 리뷰 이미지 */}
         {reviewDetail.imageUrl && !isEditing && (
@@ -187,7 +185,7 @@ function MyReviewDetail() {
 
         {reviewDetail.isBlinded && (
           <p className="text-red-500 font-bold mt-4 text-center">
-            ⚠️ 이 리뷰는 관리자에 의해 블라인드 처리되었습니다.
+            이 리뷰는 관리자에 의해 블라인드 처리되었습니다.
           </p>
         )}
         {reviewDetail.updatedAt && reviewDetail.updatedAt !== reviewDetail.createdAt && (
@@ -197,16 +195,16 @@ function MyReviewDetail() {
         )}
 
         {/* 버튼 */}
-        <div className="mt-6 flex justify-end gap-2">
+        <div className="mt-6 flex justify-end gap-2 px-6">
           {isEditing ? (
             <>
-              <button onClick={handleUpdateSubmit} className="px-4 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">저장하기</button>
-              <button onClick={handleCancelEdit} className="px-4 py-2 rounded border border-gray-300 bg-gray-100 text-gray-800 hover:bg-gray-200">취소</button>
+              <SpurfyButton variant = "primary" onClick={handleUpdateSubmit} className="px-4 py-2 font-semibold transition duration-200">저장하기</SpurfyButton>
+              <button onClick={handleCancelEdit} className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300">취소</button>
             </>
           ) : (
             <>
-              <button onClick={handleDelete} className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600">삭제하기</button>
-              <button onClick={handleEditMode} className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600">수정하기</button>
+              <SpurfyButton variant = "danger" onClick={handleDelete} className="px-4 py-2 text-sm font-semibold transition duration-200">삭제하기</SpurfyButton>
+              <SpurfyButton variant = "ai" onClick={handleEditMode} className="px-4 py-2 text-sm font-semibold transition duration-200">수정하기</SpurfyButton>
             </>
           )}
         </div>

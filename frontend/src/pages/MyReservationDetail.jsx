@@ -33,6 +33,7 @@ function MyReservationDetail() {
 
     const paymentMethodLabel = {
         CARD: "카드",
+        EASY_PAY: "간편결제"
         //  "TRANSFER": "계좌이체", "KAKAO_PAY": "카카오페이" 등
     }
 
@@ -88,7 +89,7 @@ function MyReservationDetail() {
     const canCancel = reservation.reservationStatus === "RESERVED";
 
     return (
-        <div className="mx-auto p-8 select-none">
+        <div className="mx-auto p-8 mb-6 select-none">
             <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 상세</h2>
 
             <div className="border border-gray-200 py-6 rounded-md shadow-sm bg-white mb-6 relative">

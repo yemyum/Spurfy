@@ -405,7 +405,7 @@ function ProfileInfoRow({ label, value, isEditing, editedValue, onEditChange, ty
           readOnly={label === "이메일"} // 이메일은 readOnly로 고정
         />
       ) : (
-        <p className="text-gray-900 text-xl">{value}</p>
+        <p className="text-gray-900 text-lg">{value}</p>
       )}
     </div>
   );

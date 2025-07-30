@@ -19,7 +19,7 @@ const StyledRating = styled(Rating)({
     },
 });
 
-export default function StarRating({ rating, onRate, readOnly = false, size = 'small' }) {
+export default function StarRating({ rating, onRate, readOnly = false, size = 'middle' }) {
     const handleChange = (event, newValue) => {
         if (!readOnly && onRate) {
             onRate(newValue); // 부모의 setRating(newValue) 호출

@@ -153,7 +153,7 @@ function MyReservationList() {
   </div>
 </div>
   ))}
-  </div>
+</div>
   );
 }
 
