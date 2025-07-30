@@ -105,12 +105,11 @@ function MyReservationList() {
   </div>
 
   {/* ⭐ 2. 가운데: 예약 정보 텍스트 (서비스명, 날짜, 가격)⭐ */}
-  <div className="flex-grow flex flex-col justify-between">
+  <div className="flex-grow flex flex-col justify-between mt-1">
     <div> {/* 서비스명 */}
       <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
-    </div>
-    <div> {/* 날짜, 가격 */}
-      <p className="text-gray-600 text-sm mb-1">{r.reservationDate} {r.reservationTime}</p>
+      {/* 날짜, 가격 */}
+      <p className="text-gray-500 text-sm mb-4">예약날짜: {r.reservationDate} {r.reservationTime}</p>
       <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
     </div>
   </div>

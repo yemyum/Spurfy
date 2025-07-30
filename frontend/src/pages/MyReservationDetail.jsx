@@ -94,7 +94,7 @@ function MyReservationDetail() {
 
             <div className="border border-gray-200 py-6 rounded-md shadow-sm bg-white mb-6 relative">
                 <span
-                  className={`absolute top-4 right-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusLabel[reservation.reservationStatus]?.tagClass || 'bg-gray-100 text-gray-800'}`}
+                  className={`absolute top-4 right-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusLabel[reservation.reservationStatus]?.tagClass || 'bg-red-100 text-red-500'}`}
                 >
                  {statusLabel[reservation.reservationStatus]?.text || reservation.reservationStatus}
                 </span>
@@ -104,8 +104,8 @@ function MyReservationDetail() {
 
                 <div className="pb-4 mb-4 border-b border-gray-200 px-6">
                 <p className="text-lg mb-2">스파 서비스명: <span>{reservation.serviceName}</span></p>
+                <p className="mb-2">예약날짜: {reservation.reservationDate} {reservation.reservationTime}</p>
                 <p className="mb-2">반려견: {reservation.dogName}</p>
-                <p className="mb-2">예약 일시: {reservation.reservationDate} {reservation.reservationTime}</p>
                 </div>
                 {/* 결제 수단 (paymentMethod) */}
                 <div className="pb-4 mb-4 border-b border-gray-200 px-6">
