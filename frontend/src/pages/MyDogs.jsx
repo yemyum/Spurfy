@@ -39,11 +39,11 @@ function MyDogs() {
       <div className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 케어</div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">나의 반려견 리스트</h2>
-       <button 
-        className="whitespace-nowrap px-4 py-2 bg-white hover:bg-gray-50 text-spurfyNavy font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300 text-sm"
+       <SpurfyButton variant='outline' 
+        className="whitespace-nowrap px-4 py-2 shadow-sm text-sm"
         onClick={() => navigate('/mypage/dogs/register')}>
         반려견 등록하기
-       </button>
+       </SpurfyButton>
       </div>
 
       {dogs.length === 0 ? (
@@ -71,7 +71,7 @@ function MyDogs() {
               {/* ⭐ 3. 오른쪽: 수정/삭제 버튼 영역 - 강아지 정보 영역 내부에 배치 ⭐ */}
               <div className="flex gap-2 self-start">
                 <SpurfyButton variant="primary"
-                    className="px-4 py-1 text-sm"
+                    className="px-3 py-1 text-sm"
                     onClick={(e) => {
                     e.stopPropagation(); // 이벤트 버블링 방지!
                     navigate(`/mypage/dogs/${dog.dogId}/edit`);
@@ -80,7 +80,7 @@ function MyDogs() {
                 수정
                 </SpurfyButton>
                 <SpurfyButton variant="danger"
-                    className="px-4 py-1 text-sm"
+                    className="px-3 py-1 text-sm"
                     onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(dog.dogId, dog.name);

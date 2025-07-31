@@ -44,7 +44,7 @@ function MyReviewList() {
           
           <div className="flex gap-2 mt-4">
             <SpurfyButton variant="primary"
-            className="px-4 py-1 text-sm"
+            className="px-3 py-1 text-sm"
             onClick={(e) => {
             e.stopPropagation();
             navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
@@ -53,7 +53,7 @@ function MyReviewList() {
           수정
           </SpurfyButton>
             <SpurfyButton variant="danger"
-              className="px-4 py-1 text-sm"
+              className="px-3 py-1 text-sm"
               onClick={async (e) => {
                 e.stopPropagation();
                 if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;

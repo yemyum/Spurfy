@@ -53,6 +53,34 @@ function MyReservationDetail() {
     });
 };
 
+  const handleCancel = async () => {
+        // 방어 코드: reservation 데이터가 없을 경우를 대비
+        if (!reservation) {
+            console.error("Reservation data is missing when attempting to cancel.");
+            alert("예약 정보를 불러오지 못해 취소할 수 없습니다. 다시 시도해주세요.");
+            return;
+        }
+
+        const cancelReason = window.prompt("정말 예약을 취소하시겠습니까?\n취소 사유를 간단히 입력해주세요 (선택 사항):");
+
+        // 사용자가 '취소'를 누르거나, 입력창을 비워둔 채 '확인'을 누를 수 있음
+        if (cancelReason === null) { // 사용자가 취소 버튼을 눌렀을 경우
+            return;
+        }
+
+        try {
+            await api.post("/reservation/cancel", {
+                reservationId: reservation.reservationId,
+                cancelReason: cancelReason || "사용자 요청 (사유 미입력)", // 사유가 없으면 기본값
+            });
+            alert("예약이 성공적으로 취소되었습니다!");
+            navigate('/mypage/reservations'); // 취소 후 예약 목록 페이지로 이동
+        } catch (err) {
+            console.error("예약 취소 실패:", err);
+            alert("예약 취소 실패: " + (err.response?.data?.message || "알 수 없는 오류 발생"));
+        }
+  };
+
   useEffect(() => {
   // 1. reservationId가 없을 때의 안전 장치 추가
   if (!reservationId) {
@@ -82,7 +110,7 @@ function MyReservationDetail() {
   fetchReservationDetail();
 }, [reservationId, navigate]); // (useCallback 훅을 사용하면 더 좋지만, 지금은 이렇게도 충분)
 
-    if (!reservation) {
+  if (!reservation) {
     return null;
   }
 

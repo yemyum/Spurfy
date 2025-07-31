@@ -9,8 +9,7 @@ function SpurfyButton({
   rounded-lg 
   transition 
   font-semibold
-  duration-200 
-  border border-transparent
+  duration-300
 `;
 
   // *** 컬러·상태별 스타일
@@ -18,9 +17,7 @@ function SpurfyButton({
     primary: 'bg-[#9EC5FF] text-white hover:bg-[#7fb5ff]',
     danger: 'bg-[#575757] text-white hover:bg-[#444]',
     ai: 'bg-[#67F3EC] text-white hover:bg-[#42e3db]',
-    outline: 'border border-[#9EC5FF] text-[#9EC5FF] hover:bg-[#e3f2ff]',
-    ghost: 'text-[#9EC5FF] hover:underline',
-    disabled: 'bg-[#9EC5FF]/50 text-white cursor-not-allowed',
+    outline: 'bg-white text-[#7FA3DA] hover:bg-gray-50 border border-gray-200',
   };
 
   return (

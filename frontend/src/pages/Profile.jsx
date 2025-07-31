@@ -238,12 +238,12 @@ function Profile() {
                 onChange={handleNicknameChange}
                 placeholder="새 닉네임을 입력하세요."
               />
-              <button
+              <SpurfyButton variant='outline'
                 onClick={handleCheckNickname}
-                className="whitespace-nowrap px-4 py-2 text-spurfyNavy bg-white hover:bg-gray-50 font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300 text-sm"
+                className="whitespace-nowrap px-3 py-2 shadow-sm text-sm"
               >
                 중복 확인
-              </button>
+              </SpurfyButton>
             </div>
           ) : ( // 조회 모드일 때
             <p className="text-gray-900 text-lg">{profile.nickname}</p>
@@ -276,9 +276,9 @@ function Profile() {
           <>
             <SpurfyButton
               onClick={handleUpdateProfile}
-              className="px-6 py-1 text-white font-semibold rounded-lg shadow-sm transition duration-300"
+              className="px-4 py-2 shadow-sm"
             >
-              저장
+              저장하기
             </SpurfyButton>
             <button
               onClick={() => {  // 컴포넌트는 유지하고 모드만 전환되는 경우!
@@ -289,23 +289,23 @@ function Profile() {
                 // setProfileImageFile(null); // ⭐ 이미지 파일 초기화
                 // setPreviewImageUrl(profile.profileImageUrl || defaultProfile); // ⭐ 이미지 미리보기 초기화
               }}
-              className="px-6 py-1 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"
+              className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"
             >
               취소
             </button>
           </>
         ) : (
-          <button
+          <SpurfyButton variant='outline'
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 text-spurfyNavy font-semibold bg-white hover:bg-gray-50 border border-gray-200 rounded-md shadow-sm transition duration-300"
+            className="px-4 py-2 shadow-sm"
           >
             프로필 수정
-          </button>
+          </SpurfyButton>
         )}
       </div>
 
       {/* 비밀번호 변경 섹션 */}
-      <div className="mt-10 pt-8 border-t border-gray-200">
+      <div className="mt-4 pt-8 border-t border-gray-200">
         <h3 className="text-xl font-bold mb-5 text-spurfyBlue">비밀번호 변경</h3>
         <div className="space-y-4">
           <div>
@@ -342,15 +342,15 @@ function Profile() {
             <p className="text-red-500 text-sm mt-2">{passwordChangeError}</p>
           )}
           <div className="flex justify-end">
-            <button
+            <SpurfyButton variant='outline'
               onClick={handleChangePassword}
-              className="px-3 py-2 text-spurfyNavy font-semibold bg-white hover:bg-gray-50 border border-gray-200 rounded-md shadow-sm transition duration-300"
+              className="px-3 py-2 shadow-sm"
             >
               비밀번호 변경
-            </button>
+            </SpurfyButton>
           </div>
           {/* 회원 탈퇴 섹션 */}
-        <div className="mt-10 pt-8 border-t border-gray-200">
+        <div className="mt-4 pt-8 border-t border-gray-200">
             <h3 className="text-xl font-bold text-gray-800 mb-5">회원 탈퇴</h3>
             <p className="text-gray-400 font-semibold mb-6">
                 회원 탈퇴 시 모든 서비스 이용이 중단되며, 회원 정보는 복구할 수 없습니다.
@@ -359,7 +359,7 @@ function Profile() {
             <div className="flex justify-end">
                 <SpurfyButton variant = "danger"
                     onClick={handleGoToWithdrawal}
-                    className="px-6 py-2 text-white rounded-md shadow-sm transition duration-300"
+                    className="px-6 py-2 shadow-sm"
                 >
                     회원 탈퇴
                 </SpurfyButton>

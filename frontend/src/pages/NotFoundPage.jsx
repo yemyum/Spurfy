@@ -35,25 +35,25 @@ function NotFoundPage() {
       flexDirection: 'column', 
       justifyContent: 'center', 
       alignItems: 'center', 
-      minHeight: '80vh', 
+      minHeight: '60vh', 
       textAlign: 'center',
-      backgroundColor: '#f8f8f8',
+      backgroundColor: 'white',
       padding: '20px',
       borderRadius: '10px',
       boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
     }}>
-      <h1 style={{ fontSize: '4rem', color: '#ff69b4', marginBottom: '20px' }}>{errorStatus}</h1>
+      <h1 style={{ fontSize: '4rem', color: '#67F3EC', marginBottom: '20px' }}>{errorStatus}</h1>
       <p style={{ fontSize: '1.5rem', color: '#333', marginBottom: '30px' }}>{errorMessage}</p>
       <button 
         onClick={() => window.location.href = '/'} // 홈으로 돌아가는 버튼
         style={{ 
           padding: '10px 20px', 
-          backgroundColor: '#ff69b4', 
+          backgroundColor: '#67F3EC', 
           color: 'white', 
           border: 'none', 
           borderRadius: '5px', 
           cursor: 'pointer', 
-          fontSize: '1rem' 
+          fontSize: '1.2rem' 
         }}
       >
         홈으로 돌아가기
