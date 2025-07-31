@@ -41,6 +41,7 @@ function MyReviewList() {
 
           <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
           <p className="mt-2 text-gray-800 truncate">{r.content}</p>
+          
           <div className="flex gap-2 mt-4">
             <SpurfyButton variant="primary"
             className="px-4 py-1 text-sm"

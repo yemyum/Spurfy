@@ -26,7 +26,7 @@ function Home() {
             <Link to="/spalist">
               <SpurfyButton
                 variant="primary"
-                className="px-4 py-2 text-2xl shadow-md font-bold"
+                className="px-4 py-2 text-2xl shadow-sm font-bold"
               >
                 예약하러 가기
               </SpurfyButton>
@@ -77,7 +77,7 @@ function Home() {
         <Link to="/dog-spa-ai" className="inline-block">
           <SpurfyButton
             variant="ai"
-            className="px-5 py-3 text-2xl shadow-md"
+            className="px-5 py-3 text-2xl shadow-sm"
           >
             추천받으러 가기
           </SpurfyButton>

@@ -42,17 +42,17 @@ function SpaDetail() {
           : 0
       );
     } catch (e) {
-      console.error(e);
-    }
-  })();
+        console.error("데이터 로딩 중 에러 발생:", e);
+      } 
+    })();
 
-  return () => { mounted = false; };
-}, []);
+    return () => { mounted = false; };
+  }, [spaSlug]); // spaSlug가 변경될 때마다 useEffect 재실행되도록 의존성 배열에 추가
 
   // [예약하기]는 결제페이지로 정보만 넘김!
   const handleReservation = () => {
     if (!selectedDogId || !date || !time) {
-      alert("강아지, 날짜, 시간을 모두 선택해주세요! 🐶");
+      alert("강아지, 날짜, 시간을 모두 선택해주세요!");
       return;
     }
     navigate('/payment', {
@@ -68,9 +68,9 @@ function SpaDetail() {
     });
   };
 
-  if (!spa) return <div>로딩중…</div>;
-  if (!Array.isArray(dogList)) return null;
-  if (!Array.isArray(reviews)) return null;
+  if (!spa) {
+    return null;
+  }
 
   return (
     <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-6">

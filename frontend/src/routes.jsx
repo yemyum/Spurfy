@@ -12,6 +12,7 @@ import MypageLayout from './pages/MypageLayout';
 import Profile from './pages/Profile';
 import MyDogs from './pages/MyDogs';
 import DogRegister from './pages/DogRegister';
+import DogDetail from './pages/DogDetail';
 import DogEdit from './pages/DogEdit';
 import MyReservationList from './pages/MyReservationList';
 import MyReviewList from './pages/MyReviewList';
@@ -24,33 +25,35 @@ import MyReservationDetail from './pages/MyReservationDetail';
 import WithdrawalPage from './pages/Withdrawal';
 import SpaReviewsPage from './pages/SpaReviewsPage';
 import DogImageAnalysisPage from './pages/DogImageAnalysisPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const router = createBrowserRouter([
   {
     path: '/', // 웹사이트의 가장 기본 경로. 모든 페이지가 이 RootLayout 안에 들어갈 거
     element: <RootLayout />,
+    errorElement: <NotFoundPage />,
     children: [ 
-      { path: '/', element: <Home /> },
-      { path: '/about', element: <About /> },
-      { path: '/dogs/register', element: <DogRegister /> },
-      { path: '/dogs/:dogId/edit', element: <DogEdit /> },
-      { path: '/spalist', element: <SpaList /> },
-      { path: '/spalist/slug/:spaSlug', element: <SpaDetail /> },
-      { path: '/spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
-      { path: '/mypage/withdrawal', element: <WithdrawalPage /> },
-      { path: '/dog-spa-ai', element: <DogImageAnalysisPage /> },
+      { index: true, element: <Home /> },
+      { path: 'about', element: <About /> },
+      { path: 'spalist', element: <SpaList /> },
+      { path: 'spalist/slug/:spaSlug', element: <SpaDetail /> },
+      { path: 'spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
+      { path: 'mypage/withdrawal', element: <WithdrawalPage /> },
+      { path: 'dog-spa-ai', element: <DogImageAnalysisPage /> },
       {
-        path: '/mypage',
+        path: 'mypage',
         element: <MypageLayout />,
+        errorElement: <NotFoundPage />,
         children: [
-          // 이 안의 path들은 부모의 경로(/mypage) 뒤에 붙임
           { path: 'profile', element: <Profile /> },
-          { path: 'dogs', element: <MyDogs /> }, 
+          { path: 'dogs', element: <MyDogs /> },
+          { path: 'dogs/register', element: <DogRegister /> },
+          { path: 'dogs/:dogId', element: <DogDetail /> },
+          { path: 'dogs/:dogId/edit', element: <DogEdit /> },
           { path: 'reservations', element: <MyReservationList /> },
           { path: 'reservations/:reservationId', element: <MyReservationDetail /> },
           { path: 'reviews', element: <MyReviewList /> },
           { path: 'reviews/:reviewId', element: <MyReviewDetail /> },
-          // { path: 'mypage/withdrawal', element: <WithdrawalPage /> },
         ],
       },
     ],
@@ -60,6 +63,8 @@ const router = createBrowserRouter([
   { path: '/payment', element: <PaymentPage /> },
   { path: '/payment/:reservationId', element: <PaymentPage /> },
   { path: '/review/write', element: <ReviewWrite /> },
+
+  { path: '*', element: <NotFoundPage /> }
 ]);
 
 export default router;

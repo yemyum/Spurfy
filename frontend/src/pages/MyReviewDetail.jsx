@@ -7,14 +7,10 @@ import api from '../api/axios';
 function MyReviewDetail() {
   const { reviewId } = useParams();
   const navigate = useNavigate();
-  const location = useLocation(); // ⭐ useLocation 훅 사용! ⭐
+  const location = useLocation();
 
   const [reviewDetail, setReviewDetail] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  // ⭐⭐ isEditing 초기값을 location.state에서 가져오도록 수정! ⭐⭐
-  // `state`가 없거나 `isEditing`이 없으면 기본값 `false`
   const [isEditing, setIsEditing] = useState(location.state?.isEditing || false); 
 
   const [editedRating, setEditedRating] = useState(0);
@@ -22,11 +18,11 @@ function MyReviewDetail() {
   const [editedImageUrl, setEditedImageUrl] = useState('');
 
   useEffect(() => {
-    if (reviewId) {
+    if (!reviewId) { // reviewId가 없으면 바로 리턴 (에러나 로딩 처리 필요 없음)
+      return;
+    }
       const fetchReviewDetail = async () => {
         try {
-          setLoading(true);
-          setError(null);
           const response = await api.get(`/reviews/${reviewId}`);
           if (response.data.code === 'S001') {
             const data = response.data.data;
@@ -36,15 +32,15 @@ function MyReviewDetail() {
             setEditedImageUrl(data.imageUrl || '');
           } else {
             setError(response.data.message || '리뷰 상세 정보를 불러오는데 실패했습니다.');
+            setReviewDetail(null); // 실패 시 데이터 비움
           }
         } catch (err) {
-          setError(err.response?.data?.message || '네트워크 오류가 발생했습니다.');
-        } finally {
-          setLoading(false);
+          setError(err.response?.data?.message || '리뷰 정보를 불러오지 못했습니다.');
+          console.error('리뷰 상세 조회 실패:', err);
+          setReviewDetail(null); // 에러 발생 시 데이터 비움
         }
       };
       fetchReviewDetail();
-    }
   }, [reviewId]);
 
   const handleDelete = async () => {
@@ -64,12 +60,14 @@ function MyReviewDetail() {
   };
 
   const handleCancelEdit = () => {
+    // 수정 취소 시 원래 리뷰 내용으로 되돌리고 수정 모드 종료
     if (reviewDetail) {
       setEditedRating(reviewDetail.rating);
       setEditedContent(reviewDetail.content);
       setEditedImageUrl(reviewDetail.imageUrl || '');
     }
     setIsEditing(false);
+    navigate('/mypage/reviews');
   };
 
   const handleUpdateSubmit = async () => {
@@ -96,29 +94,12 @@ function MyReviewDetail() {
       }
     } catch (err) {
       alert(err.response?.data?.message || "리뷰 수정에 실패했습니다.");
+      console.error("리뷰 수정 실패:", err);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-5 max-w-2xl mx-auto">
-        <div className="border rounded p-6 shadow-md bg-white">로딩 중...</div>
-      </div>
-    );
-  }
-  if (error) {
-    return (
-      <div className="p-5 max-w-2xl mx-auto">
-        <div className="border rounded p-6 shadow-md bg-white text-red-600">에러 발생: {error}</div>
-      </div>
-    );
-  }
   if (!reviewDetail) {
-    return (
-      <div className="p-5 max-w-2xl mx-auto">
-        <div className="border rounded p-6 shadow-md bg-white">리뷰 정보를 찾을 수 없습니다.</div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -198,13 +179,13 @@ function MyReviewDetail() {
         <div className="mt-6 flex justify-end gap-2 px-6">
           {isEditing ? (
             <>
-              <SpurfyButton variant = "primary" onClick={handleUpdateSubmit} className="px-4 py-2 font-semibold transition duration-200">저장하기</SpurfyButton>
+              <SpurfyButton variant = "primary" onClick={handleUpdateSubmit} className="px-4 py-2">저장하기</SpurfyButton>
               <button onClick={handleCancelEdit} className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300">취소</button>
             </>
           ) : (
             <>
-              <SpurfyButton variant = "danger" onClick={handleDelete} className="px-4 py-2 text-sm font-semibold transition duration-200">삭제하기</SpurfyButton>
-              <SpurfyButton variant = "ai" onClick={handleEditMode} className="px-4 py-2 text-sm font-semibold transition duration-200">수정하기</SpurfyButton>
+              <SpurfyButton variant = "danger" onClick={handleDelete} className="px-4 py-2 text-sm">삭제하기</SpurfyButton>
+              <SpurfyButton variant = "primary" onClick={handleEditMode} className="px-4 py-2 text-sm">수정하기</SpurfyButton>
             </>
           )}
         </div>

@@ -8,7 +8,6 @@ import SpurfyButton from '../components/Common/SpurfyButton';
 function Profile() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null); // 현재 조회된 사용자 프로필
-  const [loading, setLoading] = useState(true); // 로딩 상태
 
   // 수정 모드 관련 상태
   const [isEditing, setIsEditing] = useState(false); // 수정 모드 여부
@@ -18,7 +17,7 @@ function Profile() {
   // const [profileImageFile, setProfileImageFile] = useState(null); // ⭐ 이미지 파일 상태 (추후 업로드 시 사용)
   // const [previewImageUrl, setPreviewImageUrl] = useState(''); // ⭐ 이미지 미리보기 URL (추후 업로드 시 사용)
 
-  // ⭐⭐⭐ 닉네임 중복 확인 관련 상태 추가 ⭐⭐⭐
+  // 닉네임 중복 확인 관련 상태
   const [nicknameCheckMessage, setNicknameCheckMessage] = useState(''); // 중복 확인 결과 메시지 (예: "사용 가능", "중복")
   const [isNicknameAvailable, setIsNicknameAvailable] = useState(false); // 닉네임 사용 가능한지 여부 (boolean)
   const [isNicknameChecked, setIsNicknameChecked] = useState(false); // '중복 확인' 버튼을 눌렀는지 여부
@@ -33,7 +32,6 @@ function Profile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        setLoading(true);
         const res = await api.get('/mypage/profile');
         if (res.data.code === 'S001') {
           const fetchedProfile = res.data.data;
@@ -56,8 +54,7 @@ function Profile() {
       } catch (err) {
         console.error('프로필 조회 실패:', err);
         alert(err.response?.data?.message || '프로필을 불러오지 못했어요 😢');
-      } finally {
-        setLoading(false);
+        setProfile(null); // 에러 발생 시에도 profile을 null로 유지
       }
     };
 
@@ -198,21 +195,8 @@ function Profile() {
     setIsNicknameChecked(false); // 다시 중복 확인 필요
   };
 
-  if (loading) {
-    return (
-      <div className="p-5 max-w-2xl mx-auto">
-        <div className="border rounded p-6 shadow-md bg-white">로딩 중...</div>
-      </div>
-    );
-  }
   if (!profile) {
-    return (
-      <div className="p-5 max-w-2xl mx-auto">
-        <div className="border rounded p-6 shadow-md bg-white text-red-600">
-          프로필 정보를 불러올 수 없습니다. 다시 시도해주세요.
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -226,7 +210,7 @@ function Profile() {
           {/* profile.profileImageUrl 또는 previewImageUrl 사용 */}
           {/* 예시: <img src={previewImageUrl || defaultProfile} alt="프로필 이미지" className="w-full h-full object-cover" /> */}
         </div>
-        <button className="w-50 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border border-gray-200">
+        <button className="w-50 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border border-gray-200 bg-white hover:bg-gray-50">
           <FontAwesomeIcon icon={faCamera} /> 사진 편집하기
         </button>
         {/* ⭐ 이미지 파일 선택 input (hidden으로 만들고 버튼 클릭 시 트리거) ⭐ */}
@@ -256,7 +240,7 @@ function Profile() {
               />
               <button
                 onClick={handleCheckNickname}
-                className="whitespace-nowrap px-4 py-2 text-spurfyNavy font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300 text-sm"
+                className="whitespace-nowrap px-4 py-2 text-spurfyNavy bg-white hover:bg-gray-50 font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300 text-sm"
               >
                 중복 확인
               </button>
@@ -297,9 +281,8 @@ function Profile() {
               저장
             </SpurfyButton>
             <button
-              onClick={() => {
+              onClick={() => {  // 컴포넌트는 유지하고 모드만 전환되는 경우!
                 setIsEditing(false);
-                // 수정 취소 시 원래 값으로 되돌리기
                 setEditedNickname(profile.nickname);
                 setEditedName(profile.name);
                 setEditedPhone(profile.phone);
@@ -314,7 +297,7 @@ function Profile() {
         ) : (
           <button
             onClick={() => setIsEditing(true)}
-            className="px-4 py-2 text-spurfyNavy font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300"
+            className="px-4 py-2 text-spurfyNavy font-semibold bg-white hover:bg-gray-50 border border-gray-200 rounded-md shadow-sm transition duration-300"
           >
             프로필 수정
           </button>
@@ -361,7 +344,7 @@ function Profile() {
           <div className="flex justify-end">
             <button
               onClick={handleChangePassword}
-              className="px-3 py-2 text-spurfyNavy font-semibold border border-gray-200 rounded-md shadow-sm transition duration-300"
+              className="px-3 py-2 text-spurfyNavy font-semibold bg-white hover:bg-gray-50 border border-gray-200 rounded-md shadow-sm transition duration-300"
             >
               비밀번호 변경
             </button>

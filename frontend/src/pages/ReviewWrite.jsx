@@ -8,38 +8,22 @@ function ReviewWrite() {
   const location = useLocation();
   const navigate = useNavigate();
   const [reservationData, setReservationData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
 
    useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const reservationId = params.get('reservationId');
+    const stateData = location.state;
     
-    console.log("💬 ReviewWrite에 들어온 reservationId 확인:", reservationId);
+    console.log("💬 ReviewWrite에 location.state로 들어온 데이터 확인:", stateData);
 
-    if (!reservationId) {
-      setError(new Error("리뷰를 작성할 예약 ID가 필요합니다."));
-      setLoading(false);
+    if (!stateData || !stateData.reservationId) {
+      alert("리뷰를 작성할 예약 정보가 부족합니다. 다시 시도해주세요.");
+      navigate('/mypage/reservations'); // 예약 목록으로 돌려보내기
       return;
     }
 
-    const fetchReservationDetails = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get(`/reservation/${reservationId}`);
-        setReservationData(response.data.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("예약 정보를 불러오는데 실패했습니다:", err);
-        setError(new Error("예약 정보를 불러오는데 실패했습니다. 오류: " + (err.response?.data?.message || err.message)));
-        setLoading(false);
-      }
-    };
+    // API 호출 없이 바로 stateData를 reservationData에 저장
+    setReservationData(stateData); 
 
-    fetchReservationDetails();
-
-  }, [location.search]); // location.search가 변경될 때마다 재실행
+  }, [location.state, navigate]); // location.search가 변경될 때마다 재실행
 
   const [form, setForm] = useState({
     rating: 5,
@@ -77,20 +61,12 @@ function ReviewWrite() {
     }
   };
 
-    const handleRatingChange = (newRating) => {
+  const handleRatingChange = (newRating) => {
     setForm({ ...form, rating: newRating });
   };
 
-  if (loading) {
-    return <div className="max-w-2xl mx-auto mt-10 p-6 text-center">예약 정보를 불러오는 중입니다...</div>;
-  }
-
-  if (error) {
-    return <div className="max-w-2xl mx-auto mt-10 p-6 text-center text-red-500">오류: {error.message}</div>;
-  }
-
   if (!reservationData) {
-    return <div className="max-w-2xl mx-auto mt-10 p-6 text-center">리뷰를 작성할 예약 정보를 찾을 수 없습니다.</div>;
+    return null; // 데이터 없으면 아무것도 렌더링하지 않음
   }
 
   return (

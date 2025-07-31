@@ -5,7 +5,7 @@ import SpurfyButton from '../components/Common/SpurfyButton';
 
 function MyReservationList() {
   const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
   const navigate = useNavigate();
 
   const statusLabel = {
@@ -27,11 +27,15 @@ function MyReservationList() {
     api.get("/reservation/mypage/reservations")
       .then(res => {
         setReservations(res.data.data || []);
-        setLoading(false);
       })
       .catch(err => {
         console.error("예약 조회 실패:", err);
-        setLoading(false);
+        // 에러가 났을 때도 사용자에게 "내역 없음"을 보여주기 위해 빈 배열로 설정
+        setReservations([]);
+        alert("예약 목록을 불러오는데 실패했습니다."); // 사용자에게 에러 알림
+      })
+      .finally(() => {
+        setHasFetched(true); // API 요청이 끝나면 '불러왔다'고 표시
       });
   }, []);
 
@@ -62,7 +66,7 @@ function MyReservationList() {
         // 2. 취소 사유를 입력받음 (window.prompt 사용)
         //    사용자가 '취소'를 누를 경우 null이 반환됨
         //    사용자가 '확인'을 누르고 빈 값을 입력하면 빈 문자열이 반환됨
-        const cancelReasonInput = window.prompt("예약을 취소하는 이유를 입력해주세요 (선택 사항):", "");
+        const cancelReasonInput = window.prompt("취소 사유를 입력해주세요. (선택 사항):", "");
 
         // 사용자가 프롬프트에서 '취소'를 눌렀다면 함수 종료
         if (cancelReasonInput === null) {
@@ -85,9 +89,28 @@ function MyReservationList() {
             console.error("예약 취소 오류:", err);
         }
     };
+  
+  {/* 1. 아직 데이터를 불러오지 않았다면 (API 요청 중) 아무것도 렌더링하지 않음 */}
+  if (!hasFetched) {
+    return null;
+  }
 
-  if (loading) return <div className="p-6">로딩 중...</div>;
-  if (reservations.length === 0) return <div className="p-6">예약 내역이 없습니다 🐶</div>;
+  {/* 2. 데이터를 불러왔는데 예약 내역이 없으면 해당 메시지를 보여줌 */}
+  if (reservations.length === 0) {
+    return (
+      <div className="mx-auto p-8 mb-6 text-center text-gray-500">
+        <p className="text-lg font-semibold">아직 예약 내역이 없습니다.</p>
+        <p className="mt-2 text-sm">새로운 서비스를 예약하고 즐거운 경험을 시작해보세요!</p>
+        <SpurfyButton
+          onClick={() => navigate('/spalist')} // 서비스 목록 페이지로 이동하는 버튼 추가
+          className="mt-6 px-6 py-2 text-lg"
+          variant="primary"
+        >
+          서비스 예약하러 가기
+        </SpurfyButton>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto p-8 select-none">
