@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 "/api/images/**",
                                 "/api/users/check-email",
                                 "/api/mypage/check-nickname",
-                                "/api/spa/**"
+                                "/api/spa-services/**"
                         ).permitAll() // 허용
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
