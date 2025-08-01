@@ -154,7 +154,7 @@ function MyReservationList() {
           e.stopPropagation();
           handleCancel(r);
         }}
-        className="px-2 py-1 font-semibold text-sm"
+        className="px-2 py-1 text-sm"
       >
         예약취소
       </SpurfyButton>
@@ -166,7 +166,7 @@ function MyReservationList() {
           e.stopPropagation();
           handleReviewWrite(r);
         }}
-        className="px-2 py-1 font-semibold text-sm"
+        className="px-2 py-1 text-sm"
       >
         리뷰작성
       </SpurfyButton>

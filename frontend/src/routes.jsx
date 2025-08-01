@@ -1,7 +1,7 @@
 // src/routes.jsx
 import React from 'react';
-import { createBrowserRouter } from 'react-router-dom'; // ⭐ createBrowserRouter 임포트 확인 ⭐
-import RootLayout from './layouts/RootLayout'; // ⭐ RootLayout 임포트 확인 ⭐
+import { createBrowserRouter } from 'react-router-dom';
+import RootLayout from './layouts/RootLayout';
 
 // 모든 페이지 컴포넌트들을 임포트 (네 기존 코드에서 가져옴)
 import Home from './pages/Home';

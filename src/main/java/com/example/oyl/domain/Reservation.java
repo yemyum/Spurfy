@@ -59,6 +59,10 @@ public class Reservation {
     private LocalDateTime refundedAt;
     private LocalDateTime createdAt;
 
+    // 예약이 삭제되면 리뷰도 같이 삭제!, 더이상 참조 하지 않는다면 자동으로 삭제!
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Review review;
+
     public void setReservationStatus(ReservationStatus reservationStatus) {
         this.reservationStatus = reservationStatus;
     }

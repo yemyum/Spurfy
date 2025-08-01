@@ -75,4 +75,10 @@ public class UserServiceImpl implements UserService{
         return JwtUtil.createToken(user.getEmail()); // JWT 발급
     }
 
+    @Override
+    @Transactional(readOnly = true) // 읽기 전용 작업이므로 readOnly = true
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 }

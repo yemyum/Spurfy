@@ -25,7 +25,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (API용)
                 .cors(cors -> {}) // CORS 활성화!
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/images/**" ).permitAll() // 회원가입/로그인 열어주기
+                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/images/**", "/api/users/check-email", "/api/mypage/check-nickname" ).permitAll() // 회원가입/로그인 열어주기
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
                 .addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class)

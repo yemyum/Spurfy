@@ -20,4 +20,6 @@ public interface UserService {
 
     String login(UserLoginRequestDTO requestDTO);
 
+    boolean existsByEmail(String email);
+
 }

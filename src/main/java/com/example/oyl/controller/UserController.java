@@ -45,5 +45,11 @@ public class UserController {
         );
     }
 
+    @GetMapping("/check-email")
+    public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam String email) {
+        boolean isDuplicate = userService.existsByEmail(email);
+        return ResponseEntity.ok(isDuplicate);
+    }
+
 }
 

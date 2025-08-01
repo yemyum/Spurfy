@@ -1,5 +1,6 @@
 import React from 'react';
 import { useRouteError, isRouteErrorResponse } from 'react-router-dom'; // 에러 정보를 가져올 때 사용
+import SpurfyButton from '../components/Common/SpurfyButton';
 
 function NotFoundPage() {
   const error = useRouteError(); // 라우터 에러 정보를 가져옴
@@ -30,35 +31,20 @@ function NotFoundPage() {
 
 
   return (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      justifyContent: 'center', 
-      alignItems: 'center', 
-      minHeight: '60vh', 
-      textAlign: 'center',
-      backgroundColor: 'white',
-      padding: '20px',
-      borderRadius: '10px',
-      boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
-    }}>
-      <h1 style={{ fontSize: '4rem', color: '#67F3EC', marginBottom: '20px' }}>{errorStatus}</h1>
-      <p style={{ fontSize: '1.5rem', color: '#333', marginBottom: '30px' }}>{errorMessage}</p>
-      <button 
+    <div className='bg-gradient-to-br from-white to-[#BAE5FF] min-h-screen'>
+      <div className="min-h-screen flex flex-col justify-center">
+    <div className="flex flex-col items-center border border-gray-200 rounded-xl shadow-md bg-white/60 mx-auto -mt-40 p-28">
+      <h1 className="text-[#67F3EC] font-logo text-[60px] mb-8">{errorStatus}</h1>
+      <p className="font-semibold text-gray-500 text-2xl mb-12">{errorMessage}</p>
+      <SpurfyButton variant='ai' 
         onClick={() => window.location.href = '/'} // 홈으로 돌아가는 버튼
-        style={{ 
-          padding: '10px 20px', 
-          backgroundColor: '#67F3EC', 
-          color: 'white', 
-          border: 'none', 
-          borderRadius: '5px', 
-          cursor: 'pointer', 
-          fontSize: '1.2rem' 
-        }}
+        className='px-6 py-2 text-xl shadow-sm'
       >
         홈으로 돌아가기
-      </button>
+      </SpurfyButton>
     </div>
+  </div>
+</div>
   );
 }
 

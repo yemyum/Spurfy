@@ -117,7 +117,7 @@ function MyReservationDetail() {
   // 예약 취소 가능 여부 (예약 상태가 "RESERVED"일 때만)
   const canCancel = reservation.reservationStatus === "RESERVED";
   // 리뷰 작성 가능 여부 (예약 상태가 "COMPLETED"일 때만)
-  const canWriteReview = reservation.reservationStatus === "COMPLETED";
+  const canWriteReview = reservation.reservationStatus === "COMPLETED" && !reservation.hasReview;
 
     return (
         <div className="mx-auto p-8 mb-6 select-none">

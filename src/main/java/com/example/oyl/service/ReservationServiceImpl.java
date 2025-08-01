@@ -193,7 +193,9 @@ public class ReservationServiceImpl implements ReservationService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_RESERVATION);
         }
 
-        return ReservationResponseDTO.from(reservation, false); // 새로 생성된 리뷰가 없다면 false!
+        boolean actualHasReview = reservation.getReview() != null;
+
+        return ReservationResponseDTO.from(reservation, actualHasReview); // 새로 생성된 리뷰가 없다면 false!
     }
 
     // ======= private 검증 함수들 반드시 필요! =======

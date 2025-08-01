@@ -1,5 +1,3 @@
-// src/main.jsx (네가 사용하는 엔트리 파일)
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { RouterProvider } from 'react-router-dom'; // ⭐ BrowserRouter 대신 RouterProvider를 임포트! ⭐

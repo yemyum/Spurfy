@@ -22,7 +22,7 @@ public class ReservationResponseDTO {
     private ReservationStatus reservationStatus;
     private Long price;
     private Long amount;           // 실제 결제 금액
-    private String paymentMethod;  // 결제 수단]
+    private String paymentMethod;  // 결제 수단
     private RefundStatus refundStatus;
     private RefundType refundType;
     private String cancelReason;
