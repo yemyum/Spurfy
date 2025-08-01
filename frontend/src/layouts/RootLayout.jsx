@@ -62,7 +62,7 @@ const handleLogout = () => {
             <div className="flex space-x-4">
               <button
                 onClick={() => navigate('/login')}
-                className="hover:underline"
+                className="hover:underline text-spurfyBlue"
               >
                 로그인
               </button>

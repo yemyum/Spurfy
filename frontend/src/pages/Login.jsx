@@ -52,7 +52,7 @@ function Login() {
           <p><span className="text-spurfyBlue">힐링 스파</span> 입니다.</p>
         </div>
 
-    <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-xs">
+    <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-sm">
       <h2 className="font-logo text-[#9EC5FF] text-2xl mt-4 mb-10">Sing in</h2>
       <form onSubmit={handleSubmit}>
         <input
