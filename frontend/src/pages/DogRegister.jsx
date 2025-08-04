@@ -68,7 +68,7 @@ function DogRegister() {
               className="w-50 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border border-gray-200 bg-white hover:bg-gray-50 transition duration-200"
               onClick={() => console.log('사진 편집 기능 구현 예정! (모달 사용 권장)')} // alert 대신 콘솔 로그
             >
-              <FontAwesomeIcon icon={faCamera} /> 사진 선택하기 {/* 등록이니까 '사진 선택하기'로 바꿨어! */}
+              <FontAwesomeIcon icon={faCamera} /> 사진 선택하기
             </button>
           </div>
 

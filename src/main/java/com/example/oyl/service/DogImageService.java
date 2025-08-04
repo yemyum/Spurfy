@@ -256,8 +256,12 @@ public class DogImageService {
                     .errorMessage(null)
                     .build();
 
-            aiRecommendHistoryRepository.save(history);
+            AiRecommendHistory savedHistory = aiRecommendHistoryRepository.save(history); // DB에 저장하고, 저장된 객체를 받아오기!
             log.info("AI 추천 기록 DB 저장 완료 → user={}, breed={}", userEmail, detectedBreed);
+
+            // ⭐⭐⭐ 저장된 history 객체에서 id와 createdAt을 꺼내서 spaRecommendationDto에 넣어줌! ⭐⭐⭐
+            spaRecommendationDto.setId(savedHistory.getId());
+            spaRecommendationDto.setCreatedAt(savedHistory.getCreatedAt());
         } catch (Exception e) {
             log.warn("AI 추천 기록 저장 실패 → {}", e.getMessage());
         }

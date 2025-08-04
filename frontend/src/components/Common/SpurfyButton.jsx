@@ -17,6 +17,7 @@ function SpurfyButton({
     primary: 'bg-[#9EC5FF] text-white hover:bg-[#7fb5ff]',
     danger: 'bg-[#575757] text-white hover:bg-[#444]',
     ai: 'bg-[#67F3EC] text-white hover:bg-[#42e3db]',
+    chat: 'bg-[#67F3EC] text-black hover:bg-[#42e3db]',
     outline: 'bg-white text-[#7FA3DA] hover:bg-gray-50 border border-gray-200',
   };
 

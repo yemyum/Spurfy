@@ -19,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mypage")
-@PreAuthorize("isAuthenticated()")
 public class MypageController {
 
     private final MypageService mypageService;
 
     @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<UserProfileResponseDTO>> getMyProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         UserProfileResponseDTO profile = mypageService.getMyProfile(email);
@@ -38,6 +38,7 @@ public class MypageController {
     }
 
     @PutMapping("/profile") // PUT 요청을 처리하도록 매핑
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<UserProfileResponseDTO>> updateMyProfile(
             @RequestBody UserUpdateRequestDTO updateRequest
     ) {
@@ -70,6 +71,7 @@ public class MypageController {
 
     // 비밀번호 변경
     @PutMapping("/password")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Void>> changePassword(@RequestBody PasswordChangeRequestDTO request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         mypageService.changePassword(email, request);
@@ -83,6 +85,7 @@ public class MypageController {
 
     // 회원 탈퇴 엔드포인트
     @DeleteMapping("/withdrawal")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<Void>> withdrawUser(@RequestBody @Valid WithdrawalRequestDTO request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         mypageService.withdrawUser(email, request);

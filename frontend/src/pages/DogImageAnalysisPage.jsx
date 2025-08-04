@@ -1,248 +1,321 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import api from '../api/axios';
 import ChecklistForm from "../components/Common/ChecklistForm";
-import HistoryItem from "../components/Common/HistoryItem";
+import MessageBubble from "../components/Common/MessageBubble";
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import SpurfyButton from "../components/Common/SpurfyButton";
 
-function DogImageAnalysisPage() {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [checklistData, setChecklistData] = useState(null);
-  const [freeTextQuestion, setFreeTextQuestion] = useState('');
-  const [recommendationResult, setRecommendationResult] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(''); // 에러 메시지 전용 상태
-  const [historyList, setHistoryList] = useState([]);   // 이전 기록들을 저장할 배열
+const DogImageAnalysisPage = () => {
+    const navigate = useNavigate();
+    const chatContainerRef = useRef(null);
 
-  const navigate = useNavigate();
+    const [chatMessages, setChatMessages] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [checklistData, setChecklistData] = useState(null);
+    const [freeTextQuestion, setFreeTextQuestion] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
 
-   // 컴포넌트 마운트 시 (페이지 로드 시) 기록 불러오기
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const response = await api.get('/recommendations/history');
+    // 로컬 스토리지와 서버에서 메시지를 불러오는 로직
+    useEffect(() => {
+        const loadAndMergeMessages = async () => {
+            console.log('⭐ [Load Start] 로컬 & 서버 메시지 불러오기 시작...');
 
-        if (response.data && response.data.data) {
-          setHistoryList(response.data.data); // 받아온 기록들을 상태에 저장
-        } else {
-          console.warn('이전 기록을 불러왔으나 데이터 형식이 올바르지 않습니다.');
+            let serverAiMessages = [];
+            try {
+                const response = await api.get('/recommendations/history');
+                if (response.data && response.data.data) {
+                    serverAiMessages = response.data.data.map(item => {
+                        let aiMessageText = '';
+                        aiMessageText += `${item.intro || ''}\n`;
+                        aiMessageText += `${item.compliment || ''}\n`;
+                        if (item.recommendationHeader) {
+                            aiMessageText += `${item.recommendationHeader}\n`;
+                        }
+                        if (item.spaName) {
+                            aiMessageText += `${item.spaName.replace(/<\/?b>/g, '')}\n`;
+                        }
+                        if (item.spaDescription && item.spaDescription.length > 0) {
+                            aiMessageText += item.spaDescription.join('\n');
+                        }
+                        aiMessageText += `\n${item.closing || ''}`;
+
+                        const finalSpaSlug = item.spaSlug === "null" ? null : item.spaSlug;
+
+                        return {
+                            id: item.id,
+                            text: aiMessageText,
+                            isUser: false,
+                            spaSlug: finalSpaSlug,
+                            timestamp: new Date(item.createdAt).getTime()
+                        };
+                    });
+                }
+            } catch (error) {
+                console.error('❌ 이전 AI 기록 불러오기 실패:', error);
+            }
+            console.log('⭐ [Load Step 1] 서버에서 불러온 AI 메시지:', serverAiMessages);
+
+            // ⭐⭐⭐ [수정]: 로컬 스토리지에서 모든 메시지 불러오기! ⭐⭐⭐
+            const savedLocalMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
+            console.log('⭐ [Load Step 2] 로컬 스토리지에서 불러온 모든 메시지:', savedLocalMessages);
+
+            // 로컬에 있는 메시지 중 서버 AI 메시지와 중복되지 않는 메시지만 필터링
+            // (서버 메시지가 더 최신/정확하다고 가정)
+            // ID를 기준으로 중복 제거 (서버 메시지는 ID가 있고, 로컬 사용자 메시지는 Date.now()로 생성되므로 겹칠 일 없음)
+            const uniqueLocalMessages = savedLocalMessages.filter(localMsg => 
+                localMsg.isUser || !serverAiMessages.some(serverMsg => serverMsg.id === localMsg.id)
+            );
+            console.log('⭐ [Load Step 3] 로컬에서 필터링한 중복 제거 메시지:', uniqueLocalMessages);
+
+
+            const combinedMessages = [...uniqueLocalMessages, ...serverAiMessages];
+            
+            // ⭐⭐⭐ [수정]: 메시지 중복 제거 후 최종 병합 및 정렬 (최신 timestamp가 가장 아래로 오도록) ⭐⭐⭐
+            const finalMessagesMap = new Map();
+            combinedMessages.forEach(msg => {
+                // ID가 없는 사용자 메시지나, ID가 있는 AI 메시지를 추가
+                // 같은 ID의 메시지가 여러개라면, 나중에 추가된 메시지가 덮어쓰도록 함 (최신 데이터 유지)
+                finalMessagesMap.set(msg.id, msg); 
+            });
+
+            const sortedFinalMessages = Array.from(finalMessagesMap.values()).sort((a, b) => a.timestamp - b.timestamp);
+            
+            setChatMessages(sortedFinalMessages);
+            console.log('⭐ [Load End] 최종 합쳐진 메시지 (정렬 및 중복 제거 완료):', sortedFinalMessages);
+        };
+
+        loadAndMergeMessages();
+    }, []); // 초기 로드 시에만 실행되도록 빈 배열 유지
+
+    // chatMessages 상태가 변경될 때마다 로컬 스토리지에 저장
+    // ⭐⭐⭐ [수정]: 이 useEffect는 필요 없음! 메시지 추가 함수에서 직접 저장하도록 변경함. ⭐⭐⭐
+    // useEffect(() => {
+    //     console.log('⭐ [Save] localStorage에 현재 chatMessages 저장:', chatMessages);
+    //     localStorage.setItem("chatMessages", JSON.stringify(chatMessages));
+    // }, [chatMessages]);
+
+    // 채팅창 스크롤 로직
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
-      } catch (error) {
-        console.error('이전 기록 불러오기 실패:', error);
-      }
+    }, [chatMessages]);
+
+    const handleFileChange = (event) => {
+        if (event.target.files && event.target.files[0]) {
+            setSelectedFile(event.target.files[0]);
+            setErrorMessage('');
+        } else {
+            setSelectedFile(null);
+            setErrorMessage('파일을 선택하지 않았습니다.');
+        }
     };
 
-    fetchHistory(); // 함수 호출!
-  }, []); // 빈 배열: 컴포넌트가 처음 마운트될 때 한 번만 실행!
+    const handleChecklistSubmit = (data) => {
+        console.log("사용자가 선택한 체크리스트 값:", data);
+        setChecklistData(data);
+    };
 
+    // 메시지 추가 로직
+    const addMessage = (text, isUser, spaSlug = null, id = Date.now(), timestamp = Date.now()) => { // id와 timestamp 인자 추가
+        setChatMessages((prevMessages) => {
+            const newMessage = {
+                id, // 전달받은 id 사용
+                text,
+                isUser,
+                spaSlug,
+                timestamp // 전달받은 timestamp 사용
+            };
+            console.log('⭐ [Add] 새로운 메시지 추가:', newMessage);
+            const newMessages = [...prevMessages, newMessage];
+            // ⭐⭐⭐ [수정] 메시지를 추가한 후 즉시 로컬 스토리지에 저장! ⭐⭐⭐
+            localStorage.setItem("chatMessages", JSON.stringify(newMessages));
+            return newMessages;
+        });
+    };
 
-  // 파일 선택 핸들러
-  const handleFileChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-      setErrorMessage(''); // 파일 선택 시 에러 메시지 초기화
-      setRecommendationResult(null); // 새로운 파일 선택 시 이전 결과 초기화
-    } else {
-      setSelectedFile(null);
-      setErrorMessage('파일을 선택하지 않았습니다.');
-    }
-  };
+    const handleImageAnalysis = async (event) => {
+        event.preventDefault();
 
-  // 사용자 체크리스트 작성 (ChecklistForm에서 데이터가 넘어옴)
-  const handleChecklistSubmit = (data) => {
-    console.log("사용자가 선택한 체크리스트 값:", data);
-    setChecklistData(data); // ChecklistForm에서 받은 데이터를 checklistData에 저장
-  };
+        if (!selectedFile) {
+            setErrorMessage('사진은 필수입니다. 파일을 선택해주세요!');
+            return;
+        }
 
+        setLoading(true);
+        setErrorMessage('');
 
-  // 파일 업로드 + 분석 요청
-  const handleImageAnalysis = async () => {
-    if (!selectedFile) {
-      setErrorMessage('오류: 사진은 필수입니다. 파일을 선택해주세요!');
-      return;
-    }
+        let userMessageText = '';
+        if (selectedFile) userMessageText += `파일 선택: ${selectedFile.name}`;
+        if (checklistData) userMessageText += `\n체크리스트: ${JSON.stringify(checklistData)}`;
+        if (freeTextQuestion) userMessageText += `\n나의 질문: ${freeTextQuestion}`;
+        
+        // 사용자 메시지를 먼저 추가!
+        // ⭐⭐⭐ [수정]: addMessage 함수를 사용하여 로컬 스토리지 자동 저장! ⭐⭐⭐
+        addMessage(userMessageText, true);
 
-    setLoading(true);
-    setErrorMessage(''); // 새로운 요청 시 에러 메시지 초기화
-    setRecommendationResult(null); // 새로운 요청 시 이전 결과 초기화
+        try {
+            const formData = new FormData();
+            formData.append('dogImageFile', selectedFile);
 
-    const formData = new FormData();
-    formData.append('dogImageFile', selectedFile);  // 사용자가 고른 이미지
+            if (checklistData) formData.append('checklist', JSON.stringify(checklistData));
+            if (freeTextQuestion) formData.append('question', freeTextQuestion);
 
-    // ChecklistForm에서 넘어오는 data가 객체일 경우 JSON.stringify로 문자열화
-    if (checklistData) {
-      formData.append('checklist', JSON.stringify(checklistData));
-    }
+            const response = await api.post('/dog-image', formData, {
+                headers: { 'Content-Type': 'multipart/form-ocata' }
+            });
 
-    if (freeTextQuestion) {
-      formData.append('question', freeTextQuestion);
-    }
+            if (response.data && response.data.data) {
+                const aiResult = response.data.data;
+                let aiMessageText = '';
+                aiMessageText += `${aiResult.intro || ''}\n`;
+                aiMessageText += `${aiResult.compliment || ''}\n`;
+                if (aiResult.recommendationHeader) { 
+                    aiMessageText += `${aiResult.recommendationHeader}\n`;
+                }
+                if (aiResult.spaName) {
+                    aiMessageText += `${aiResult.spaName.replace(/<\/?b>/g, '')}\n`;
+                }
+                if (aiResult.spaDescription && aiResult.spaDescription.length > 0) {
+                    aiMessageText += aiResult.spaDescription.join('\n');
+                }
+                aiMessageText += `\n${aiResult.closing || ''}`;
 
-    try {
-      const response = await api.post('/dog-image', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+                const finalSpaSlug = aiResult.spaSlug === "null" ? null : aiResult.spaSlug;
 
-      // GPT 추천 내용만 표시
-      if (response.data && response.data.data) {
-        setRecommendationResult(response.data.data); // DTO 객체를 그대로 저장
-        setErrorMessage(''); // 성공했으니 에러 메시지 초기화
-      } else {
-        setErrorMessage('이미지 분석은 성공했지만 응답 형식이 이상합니다!');
-      }
-      setSelectedFile(null);
-      setChecklistData(null);
-      setFreeTextQuestion('');
-    } catch (error) {
-      let msg = '이미지 분석 요청 중 오류가 발생했습니다!';
-      if (error.response?.data?.message) {
-        msg = `오류: ${error.response.data.message} (${error.response.data.code})`;
-      } else if (error.message) {
-        msg = `오류: ${error.message}`;
-      }
-      setErrorMessage(msg);
-      setRecommendationResult(null); // 에러 발생 시 결과 초기화
-    } finally {
-      setLoading(false);
-    }
-  };
+                // ⭐⭐⭐ [수정]: addMessage 함수를 사용하여 로컬 스토리지 자동 저장! ⭐⭐⭐
+                // 서버에서 받은 ID와 createdAt을 사용하여 메시지 추가
+                addMessage(aiMessageText, false, finalSpaSlug, aiResult.id, new Date(aiResult.createdAt).getTime());
 
-  // 스파 예약하러 가기 버튼 클릭 핸들러
-  const handleGoToSpaDetail = (spaSlug) => {
-    if (spaSlug) {
-      navigate(`/spalist/slug/${spaSlug}`);
-    } else {
-      alert('스파 상세 페이지로 이동할 수 없습니다. 정보가 부족해요.');
-    }
-  };
+                setErrorMessage('');
+            } else {
+                setErrorMessage('이미지 분석은 성공했지만 응답 형식이 이상합니다!');
+            }
 
-  // 메시지 배경 스타일 (에러 메시지 전용)
-  const messageBg = errorMessage.startsWith('오류:')
-    ? "bg-red-50 border-red-400 text-red-700"
-    : ""; // 에러가 아니면 배경색 없음
+            setSelectedFile(null);
+            setChecklistData(null);
+            setFreeTextQuestion('');
+        } catch (error) {
+            let msg = '이미지 분석 요청 중 오류가 발생했습니다!';
+            if (error.response?.data?.message) {
+                msg = `오류: ${error.response.data.message} (${error.response.data.code})`;
+            } else if (error.message) {
+                msg = `오류: ${error.message}`;
+            }
+            setErrorMessage(msg);
+            // ⭐⭐⭐ [수정]: 에러 메시지도 addMessage로 추가해서 로컬 스토리지에 저장되도록! ⭐⭐⭐
+            addMessage(`❌ AI 요청 실패: ${msg}`, false);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    const handleGoToSpaDetail = (spaSlug) => {
+        if (spaSlug) {
+            navigate(`/spalist/slug/${spaSlug}`);
+        }
+    };
+    
+    const messageBg = errorMessage ? "bg-red-50 text-red-600" : "";
 
-  return (
-    <div className="max-w-lg mx-auto mt-16 p-8 bg-white rounded-2xl shadow-lg border border-gray-100">
-      <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
-        스퍼피 AI 봇
-      </h2>
-      <p className="text-center text-gray-500 mb-6 text-sm">
-        분석할 강아지 사진을 업로드해주세요.
-      </p>
+    return (
+        <div className="w-full h-full mx-auto select-none bg-white mt-10 mb-10 overflow-hidden">
+            <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center">
+                <h2 className="text-2xl font-bold text-spurfyAI">
+                    Spurfy AI Chat
+                </h2>
+            </div>
+            
+            <div className="flex-1 relative bg-gray-50 pt-10">
+                <div
+                    ref={chatContainerRef}
+                    className="flex-1 bg-gray-50 overflow-y-auto p-6 pb-24 flex flex-col space-y-2"
+                >
+                    {chatMessages.length > 0 ? (
+                        chatMessages.map((msg, i) => (
+                            <div key={msg.id || i}>
+                                <MessageBubble
+                                    message={msg.text}
+                                    isUser={msg.isUser}
+                                    spaSlug={msg.spaSlug}
+                                    onGoToSpaDetail={handleGoToSpaDetail}
+                                />
+                                {i === chatMessages.length - 1 && errorMessage && (
+                                    <div className={`py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold ${messageBg} text-sm mt-6`}>
+                                        {errorMessage}
+                                    </div>
+                                )}
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
+                    )}
+                </div>
 
-      <label
-        htmlFor="dogImageFileInput"
-        className="block w-full text-center mb-3"
-      >
-        <input
-          type="file"
-          id="dogImageFileInput"
-          accept="image/*"
-          onChange={handleFileChange}
-          disabled={loading}
-          className="file:mr-3 file:py-2 file:px-4
-                     file:rounded-full file:border-0
-                     file:text-sm file:font-semibold
-                     file:bg-green-100 file:text-green-700
-                     hover:file:bg-green-200
-                     border border-gray-200 rounded-lg py-2 px-3 w-full text-gray-700 cursor-pointer"
-        />
-      </label>
+                <form 
+                    onSubmit={handleImageAnalysis} 
+                    className="absolute bottom-0 left-0 right-0 z-40 w-full flex items-center gap-4 p-4 bg-gray-100"
+                >
+                    <label htmlFor="dogImageFileInput" className="cursor-pointer">
+                        <input
+                            type="file"
+                            id="dogImageFileInput"
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            disabled={loading}
+                            className="hidden"
+                        />
+                        <span className="p-2 rounded-full bg-[#67F3EC] text-black hover:bg-[#42e3db] transition">
+                            <FontAwesomeIcon icon={faCamera} />
+                        </span>
+                    </label>
 
-      {selectedFile && (
-        <p className="text-center text-gray-600 text-sm mb-2">
-          <span className="font-medium">선택된 파일:</span>{" "}
-          <span className="font-semibold text-green-700">{selectedFile.name}</span>
-          <span className="ml-2 text-xs text-gray-400">
-            ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-          </span>
-        </p>
-      )}
+                    {selectedFile && (
+                        <span className="text-xs text-gray-400 truncate max-w-[80px]">
+                            {selectedFile.name}
+                        </span>
+                    )}
 
-    <div className="mt-10">
-      <p className="mb-4">🧼 스파 추천 체크리스트</p>
-      <ChecklistForm onSubmit={handleChecklistSubmit} />
-    </div>
+                    <textarea
+                        id="freeTextQuestion"
+                        rows="1"
+                        value={freeTextQuestion}
+                        onChange={(e) => setFreeTextQuestion(e.target.value)}
+                        placeholder="우리 강아지에 대해 궁금한 점이 있나요?"
+                        className="flex-1 p-2 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-200 transition duration-200 resize-none overflow-hidden"
+                        disabled={loading}
+                        onInput={(e) => {
+                            e.target.style.height = 'auto';
+                            e.target.style.height = e.target.scrollHeight + 'px';
+                        }}
+                    ></textarea>
 
-    <div className="mt-6">
-          <label htmlFor="freeTextQuestion" className="block text-gray-700 font-semibold mb-2">
-              🐶 우리 강아지에 대해 궁금한 점이 있나요? (선택 사항)
-          </label>
-          <textarea
-              id="freeTextQuestion"
-              rows="3"
-              value={freeTextQuestion}
-              onChange={(e) => setFreeTextQuestion(e.target.value)}
-              placeholder="예: 우리 강아지는 피부가 민감한데, 어떤 스파가 좋을까요?"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-300 transition duration-200"
-              disabled={loading}
-          ></textarea>
-      </div>
+                    <SpurfyButton variant="chat"
+                        type="submit"
+                        disabled={loading}
+                        className={`py-2 px-4 text-sm font-semibold
+                            ${loading ? "cursor-not-allowed" : " "}`}
+                    >
+                        {loading ? '전송 중' : '전송'}
+                    </SpurfyButton>
+                </form>
+            </div>
 
-      <button
-        type="button"
-        onClick={handleImageAnalysis}
-        // loading 상태일 때만 disabled로 만들고,
-        // selectedFile 유무와 상관없이 클릭 가능하게!
-        disabled={loading}
-        className={`w-full mt-6 py-3 rounded-xl shadow
-          text-lg font-bold transition
-          ${loading
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-green-500 text-white hover:bg-green-600 active:scale-95"}`}
-      >
-        {loading ? '분석 중...' : '추천 받기'}
-      </button>
-
-      {recommendationResult && (
-        <div className="mt-7 py-4 px-4 border-l-4 rounded-lg font-semibold shadow-sm bg-green-50 border-green-400 text-green-800">
-          <p>{recommendationResult.intro}</p>
-          <p>{recommendationResult.compliment}</p>
-          <p>{recommendationResult.recommendationHeader}</p>
-          <p dangerouslySetInnerHTML={{ __html: recommendationResult.spaName }}></p> {/* 마크다운 렌더링 */}
-          {recommendationResult.spaDescription && recommendationResult.spaDescription.map((desc, index) => (
-            <p key={index}>{desc}</p>
-          ))}
-          <p>{recommendationResult.closing}</p>
-
-          {recommendationResult.spaSlug && (
-            <button
-              onClick={() => handleGoToSpaDetail(recommendationResult.spaSlug)}
-              className="mt-4 w-full py-2 px-4 bg-blue-500 text-white font-bold rounded-xl shadow hover:bg-blue-600 transition active:scale-95"
-            >
-              추천받은 스파로 예약하러 가기 →
-            </button>
-          )}
+            <div className="mt-2 p-6">
+                <div className="flex items-center mb-6">
+                    <div className="flex-grow border-b border-gray-300"></div>
+                    <p className="text-gray-400 mx-4 whitespace-nowrap">
+                        체크리스트를 작성하시면 더 정확한 결과를 얻으실 수 있습니다.
+                    </p>
+                    <div className="flex-grow border-b border-gray-300"></div>
+                </div>
+                <ChecklistForm onSubmit={handleChecklistSubmit} />
+            </div>
         </div>
-      )}
-
-      {/* 에러 메시지 표시 */}
-      {errorMessage && (
-        <div
-          className={`mt-7 py-4 px-4 border-l-4 rounded-lg text-center whitespace-pre-wrap font-semibold shadow-sm ${messageBg}`}
-        >
-          {errorMessage}
-        </div>
-      )}
-
-      {/* 이전 AI 추천 기록 섹션*/}
-      <div className="mt-10 p-5 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg shadow-inner max-h-96 overflow-y-auto">
-        <h3 className="text-xl font-bold text-purple-800 mb-4 sticky top-0 bg-white p-2 z-10 rounded-t-lg">추천 내역들 🐾</h3>
-        {historyList.length > 0 ? (
-          historyList
-            .map((item) => (
-              <HistoryItem
-                key={item.id}
-                data={item}
-                onGoToSpaDetail={handleGoToSpaDetail}
-              />
-            ))
-        ) : (
-          <p className="text-center text-gray-500">아직 AI 추천 기록이 없어요.</p>
-        )}
-      </div>
-    </div>
-  );
+    );
 }
 
 export default DogImageAnalysisPage;

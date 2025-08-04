@@ -39,7 +39,6 @@ const router = createBrowserRouter([
       { path: 'spalist/slug/:spaSlug', element: <SpaDetail /> },
       { path: 'spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
       { path: 'mypage/withdrawal', element: <WithdrawalPage /> },
-      { path: 'dog-spa-ai', element: <DogImageAnalysisPage /> },
       {
         path: 'mypage',
         element: <MypageLayout />,
@@ -63,6 +62,7 @@ const router = createBrowserRouter([
   { path: '/payment', element: <PaymentPage /> },
   { path: '/payment/:reservationId', element: <PaymentPage /> },
   { path: '/review/write', element: <ReviewWrite /> },
+  { path: '/dog-spa-ai', element: <DogImageAnalysisPage /> },
 
   { path: '*', element: <NotFoundPage /> }
 ]);
