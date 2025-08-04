@@ -25,7 +25,7 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 |------|------|
 | 백엔드 | Spring Boot 3, Spring Security, JPA+MyBatis |
 | 프론트 | React (Vite), TailwindCSS |
-| 챗봇 연동 예정 | GPT API, LangChain / FastAPI 등 |
+| 챗봇 연동 | GPT API, Google Vision API 등 |
 | 데이터베이스 | MySQL |
 | 기타 도구 | Postman, Notion, Miro |
 
