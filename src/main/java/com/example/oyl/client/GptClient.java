@@ -69,13 +69,13 @@ public class GptClient {
         promptBuilder.append("- \"견종: 알 수 없는 ~\" 문장 절대 금지\n");
         promptBuilder.append("- \"추천 스파: ~\" 문장 절대 금지\n");
         promptBuilder.append("- 요약 형식(~~: ~~) 문장 절대 금지\n");
-        promptBuilder.append(String.format("- 제일 첫 문장은 \"사진 속의 아이는 \"%s\"로 보이네요!\"와 비슷한 흐름으로 시작할 것 (예: 사진속의 아이는 말티즈로 보이는군요!) -> 이것을 'intro' 필드에 넣어줘.\n", dto.getBreed()));
+        promptBuilder.append("- 제일 첫 문장은 '사진 속의 아이는 **[견종]**(으)로 보이네요!' 형식으로, 견종이 인식되지 않으면 '사진 속 아이의 견종을 인식하지 못했어요..!'로 시작할 것 -> 이것을 'intro' 필드에 넣어줘.\n");
         promptBuilder.append("- 절대 강아지에게 존댓말 쓰지 마. 보호자에게만 존댓말!\n");
         promptBuilder.append("- \"성견이신 것 같아요\", \"알 수 없는 견종의 강아지\", \"주요 라벨\" 등 표현은 금지 (예: \"입력된 정보에 따르면\" 등도 금지)\n");
         promptBuilder.append("- 사용자 프롬프트 문장을 그대로 따라하지 마, 규칙을 지키는 선에서 자연스럽게 작성할 것\n");
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");
-        promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 민감견 저자극 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
+        promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 카밍 스킨 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
         promptBuilder.append("- 'spaName'에 해당하는 스파의 URL 친화적인 슬러그(slug) 값을 영어 소문자, 하이픈(-)으로만 구성하여 'spaSlug' 필드에 넣어줘. (예: '웰컴 스파' -> 'welcome-spa', '프리미엄 브러싱 스파' -> 'premium-brushing-spa', '릴렉싱 테라피 스파' -> 'relaxing-therapy-spa', '카밍 스킨 스파' -> 'calming-skin-spa')\n");
         promptBuilder.append("- 문장은 총 4~6줄 내외, 다정하지만 과장된 감성 멘트는 자제\n\n");
 
@@ -84,23 +84,41 @@ public class GptClient {
         promptBuilder.append("2. 🌸 프리미엄 브러싱 스파 – 고급 브러싱과 섬세한 손길로 보호자 만족도 최고!, 일상 속 색다른 스파용으로 추천\n");
         promptBuilder.append("3. 🧘‍♀️ 릴렉싱 테라피 스파 – 관절과 근육 이완, 활동성이 많은 아이들의 회복에 최고, 편안한 휴식이 필요한 아이에게 추천\n");
         promptBuilder.append("4. 🌿 카밍 스킨 스파 – 예민한 피부를 위한 순한 진정 스파, 저자극 제품 사용!\n\n");
+        promptBuilder.append("※ 반드시 위 네 가지 스파 중에서 보호자님 강아지에게 가장 적합한 하나를 선택해서 \"spaName\"에 사용하고, 이모지와 이름을 정확히 복붙해서 써줘야 해. 새로운 이름을 만들어내면 안 돼!\n");
 
-        promptBuilder.append("[문장 구조 규칙] (JSON 형식으로만 응답할 것! 다른 텍스트는 절대 포함하지 마!)\n");
+        promptBuilder.append("[문장 구조 규칙] 반드시 아래와 같은 JSON 형태로만 응답할 것! 다른 텍스트는 절대 포함하지 마!\n");
+        promptBuilder.append("모든 값에는 줄바꿈(\\n)을 직접 넣어서 실제 화면 출력이 아래 예시처럼 나오도록 맞춰줘.\n");
         promptBuilder.append("{\n");
-        promptBuilder.append("  \"intro\": \"첫 번째 줄: 사진 속의 아이는 \\\"%s\\\"로 보이네요! (예: 사진속의 아이는 말티즈로 보이는군요!)\",\n".formatted(dto.getBreed()));
-        promptBuilder.append("  \"compliment\": \"두 번째 줄: 강아지에 대한 담백한 칭찬 (예: 사진 속 강아지의 생기 넘치는 모습이 인상 깊었어요!)\",\n");
-        promptBuilder.append("  \"recommendationHeader\": \"세 번째 줄: 이 아이에게 추천하는 스파는: (고정멘트)\",\n");
-        promptBuilder.append("  \"spaName\": \"네 번째 줄: 이모지 포함 마크다운 굵은 글씨로 스파 이름만 강조 (예: **\\\"🌸 프리미엄 브러싱 스파\\\"**에요!)\",\n");
+        promptBuilder.append("  \"intro\": \"사진 속의 아이는 **%s**(으)로 보이네요! (예: 사진 속의 아이는 **말티즈**(으)로 보이는군요!)\\n\",\n".formatted(dto.getBreed()));
+        promptBuilder.append("  \"compliment\": \"(두 번째 줄) 강아지에 대한 담백한 칭찬 한 줄만 작성!\\n\\n\",\n");
+        promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
+        promptBuilder.append("  \"spaName\": \"**%s**(이)에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
         promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
         promptBuilder.append("  \"spaDescription\": [\n");
-        promptBuilder.append("    \"다섯~여섯 번째 줄: 해당 스파에 대한 간단한 설명 (줄바꿈 포함, \\\"-\\-\\\" 형식으로 시작, 최대 2개까지 가능, 예: - 섬세한 브러싱과 고급 케어가 잘 어울릴 것 같아요.)\"\n");
+        promptBuilder.append("    \"- 첫 번째 설명 (줄바꿈 포함)\",\n");
+        promptBuilder.append("    \"- 두 번째 설명 (최대 2개, 줄바꿈 포함)\"\n");
         promptBuilder.append("  ],\n");
-        promptBuilder.append("  \"closing\": \"마지막 줄: 다음 세 가지 중 하나를 정확히 선택해서 작성해줘: \\\"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\\\" OR \\\"소중한 반려견과 함께, 특별한 스파 시간을 보내보세요 💙\\\" OR \\\"우리 아이를 위한 힐링타임, 스퍼피가 함께할게요! 보호자님과 강아지 모두 편안한 시간이 되길 바라요 🐾\\\"\"\n");
+        promptBuilder.append("  \"closing\": \"마지막 줄: 다음 세 가지 중 하나를 선택해서 정확히 작성해줘: \\\"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\\\" OR \\\"소중한 반려견과 함께, 특별한 스파 시간을 보내보세요 💙\\\" OR \\\"우리 아이를 위한 힐링타임, 스퍼피가 함께할게요! 보호자님과 강아지 모두 편안한 시간이 되길 바라요 🐾\\\"\"\n");
         promptBuilder.append("}\n");
-        promptBuilder.append("※ 예시 멘트는 참고용이며, 절대 그대로 베끼지 말고 규칙을 지키는 선에서 자연스럽게 바꿔서 작성해줘.\n");
-        promptBuilder.append("※ 'spaDescription'은 리스트 형태로 1개 또는 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
-        promptBuilder.append("※ 'intro' 필드에는 '사진 속의 아이는 \"[견종]\"으로 보이네요!' 형식으로, 견종이 인식되지 않으면 '사진 속 아이의 견종을 인식하지 못했어요..!'로 시작해야 해.\n");
-        promptBuilder.append("※ 'spaName' 필드는 이모지와 마크다운 굵은 글씨를 포함해야 해.\n");
+
+        promptBuilder.append("※ 아래 멘트는 참고용이며, 절대 그대로 베끼지 말고 규칙을 지키는 선에서 자연스럽게 새로 작성해줘.\n");
+        promptBuilder.append("※ [출력 예시]\n");
+        promptBuilder.append("{\n");
+        promptBuilder.append("  \"intro\": \"사진속의 아이는 **포메라니안**(으)로 보이네요!\\n\",\n");
+        promptBuilder.append("  \"compliment\": \"털이 복실복실해서 에너지가 느껴지는 친구네요!\\n\\n\",\n");
+        promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
+        promptBuilder.append("  \"spaName\": \"**‍🧘‍♀️ 릴렉싱 테라피 스파**(이)에요!\\n\\n\",\n");
+        promptBuilder.append("  \"spaSlug\": \"relaxing-therapy-spa\",\n");
+        promptBuilder.append("  \"spaDescription\": [\n");
+        promptBuilder.append("    \"- 활동성이 많은 포메라니안에게 편안한 휴식을 제공해 주는 테라피 스파에요.\",\n");
+        promptBuilder.append("    \"- 관절과 근육 이완을 위한 최적의 스파 서비스가 여기 있답니다.\"\n");
+        promptBuilder.append("  ],\n");
+        promptBuilder.append("  \"closing\": \"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\"\n");
+        promptBuilder.append("}\n");
+
+        promptBuilder.append("※ 'spaDescription'은 리스트 형태로 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
+        promptBuilder.append("※ 'intro' 필드에는 '사진 속의 아이는 **[견종]** (으)로 보이네요!' 형식으로 시작해야 해.\n");
+        promptBuilder.append("※ 'spaName' 필드는 이모지 포함 마크다운 굵은 글씨로 스파 이름과 '(이)에요!' 문장을 함께 작성해야 해. (예: **🌸 프리미엄 브러싱 스파**(이)에요!)\n");
         promptBuilder.append("※ 'closing' 필드는 위에서 명시된 세 가지 문장 중 하나와 **정확히 일치**해야 해.\n");
 
         GptRequestDTO.Message message = new GptRequestDTO.Message();
@@ -171,12 +189,12 @@ public class GptClient {
         promptBuilder.append("- \"견종: 알 수 없는 ~\" 문장 절대 금지\n");
         promptBuilder.append("- \"추천 스파: ~\" 문장 절대 금지\n");
         promptBuilder.append("- 요약 형식(~~: ~~) 문장 절대 금지\n");
-        promptBuilder.append("- 제일 첫 문장은 \"사진 속 아이의 견종을 인식하지 못했어요..! 하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!\"로 시작하거나, 보호자님이 견종을 알려주셨다면 '보호자님이 알려주신 견종은 \\\"%s\\\"이군요! 다음 정보들을 참고해서 스파를 추천해드릴게요!'와 비슷한 흐름으로 시작할 것 -> 이것을 'intro' 필드에 넣어줘.\n".formatted(dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed()) ? dto.getBreed() : ""));
+        promptBuilder.append("- 제일 첫 문장은 \"사진 속 아이의 견종을 인식하지 못했어요..! 하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!\"로 시작하거나, 보호자님이 견종을 알려주셨다면 '보호자님이 알려주신 견종은 **%s**이군요! 다음 정보들을 참고해서 스파를 추천해드릴게요!'로 시작할 것 -> 이것을 'intro' 필드에 넣어줘.\n".formatted(dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed()) ? dto.getBreed() : ""));
         promptBuilder.append("- 절대 강아지에게 존댓말 쓰지 마. 보호자에게만 존댓말!\n");
         promptBuilder.append("- \"성견이신 것 같아요\", \"알 수 없는 견종의 강아지\", \"주요 라벨\" 등 표현은 금지 (예: \"입력된 정보에 따르면\" 등도 금지)\n");
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");
-        promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 민감견 저자극 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
+        promptBuilder.append("- 스파 이름은 **아래 목록 중에서만** 골라서, 이모지 + 마크다운 굵게로 출력할 것 (예: **\"🌿 카밍 스킨 스파\"**) -> 이것을 'spaName' 필드에 넣어줘.\n");
         promptBuilder.append("- 'spaName'에 해당하는 스파의 URL 친화적인 슬러그(slug) 값을 영어 소문자, 하이픈(-)으로만 구성하여 'spaSlug' 필드에 넣어줘. (예: '웰컴 스파' -> 'welcome-spa', '프리미엄 브러싱 스파' -> 'premium-brushing-spa', '릴렉싱 테라피 스파' -> 'relaxing-therapy-spa', '카밍 스킨 스파' -> 'calming-skin-spa')\n");
         promptBuilder.append("- 문장은 총 4~6줄 내외, 다정하지만 과장된 감성 멘트는 자제\n\n");
 
@@ -185,27 +203,45 @@ public class GptClient {
         promptBuilder.append("2. 🌸 프리미엄 브러싱 스파 – 고급 브러싱과 섬세한 손길로 보호자 만족도 최고!, 일상 속 색다른 스파용으로 추천\n");
         promptBuilder.append("3. 🧘‍♀️ 릴렉싱 테라피 스파 – 관절과 근육 이완, 활동성이 많은 아이들의 회복에 최고, 편안한 휴식이 필요한 아이에게 추천\n");
         promptBuilder.append("4. 🌿 카밍 스킨 스파 – 예민한 피부를 위한 순한 진정 스파, 저자극 제품 사용!\n\n");
+        promptBuilder.append("※ 반드시 위 네 가지 스파 중에서 보호자님 강아지에게 가장 적합한 하나를 선택해서 \"spaName\"에 사용하고, 이모지와 이름을 정확히 복붙해서 써줘야 해. 새로운 이름을 만들어내면 안 돼!\n");
 
         promptBuilder.append("[문장 구조 규칙] (JSON 형식으로만 응답할 것! 다른 텍스트는 절대 포함하지 마!)\n");
+        promptBuilder.append("모든 값에는 줄바꿈(\\n)을 직접 넣어서 아래 예시처럼 화면에 띄워질 형태로 맞춰줘.\n");
         promptBuilder.append("{\n");
         promptBuilder.append("  \"intro\": \"%s\",\n".formatted(
                 dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed())
-                        ? "보호자님이 알려주신 견종은 \\\"%s\\\"이군요! 다음 정보들을 참고해서 스파를 추천해드릴게요!".formatted(dto.getBreed())
-                        : "사진 속 아이의 견종을 인식하지 못했어요..! 하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!"
+                        ? "보호자님이 알려주신 견종은 **%s**(이)군요!\\n다음 정보들을 참고해서 스파를 추천해드릴게요!\\n".formatted(dto.getBreed())
+                        : "사진 속 아이의 견종을 인식하지 못했어요..!\\n하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!\\n"
         ));
-        promptBuilder.append("  \"compliment\": \"두 번째 줄: 강아지에 대한 담백한 칭찬 (예: 사진 속 강아지의 생기 넘치는 모습이 인상 깊었어요!)\",\n");
-        promptBuilder.append("  \"recommendationHeader\": \"세 번째 줄: 이 아이에게 추천하는 스파는: (고정멘트)\",\n");
-        promptBuilder.append("  \"spaName\": \"네 번째 줄: 이모지 포함 마크다운 굵은 글씨로 스파 이름만 강조 (예: **\\\"🌸 프리미엄 브러싱 스파\\\"**에요!)\",\n");
+        promptBuilder.append("  \"compliment\": \"(두 번째 줄) 강아지에 대한 칭찬 멘트, 이 줄에만 작성!\\n\\n\",\n");
+        promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
+        promptBuilder.append("  \"spaName\": \"**%s**(이)에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
         promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
         promptBuilder.append("  \"spaDescription\": [\n");
-        promptBuilder.append("    \"다섯~여섯 번째 줄: 해당 스파에 대한 간단한 설명 (줄바꿈 포함, \\\"-\\-\\\" 형식으로 시작, 최대 2개까지 가능, 예: - 섬세한 브러싱과 고급 케어가 잘 어울릴 것 같아요.)\"\n");
+        promptBuilder.append("    \"- 첫 번째 설명 (줄바꿈 포함)\",\n");
+        promptBuilder.append("    \"- 두 번째 설명 (최대 1~2개, 줄바꿈 포함)\"\n");
         promptBuilder.append("  ],\n");
-        promptBuilder.append("  \"closing\": \"마지막 줄: 다음 세 가지 중 하나를 정확히 선택해서 작성해줘: \\\"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\\\" OR \\\"소중한 반려견과 함께, 특별한 스파 시간을 보내보세요 💙\\\" OR \\\"우리 아이를 위한 힐링타임, 스퍼피가 함께할게요! 보호자님과 강아지 모두 편안한 시간이 되길 바라요 🐾\\\"\"\n");
+        promptBuilder.append("  \"closing\": \"마지막 줄: 다음 세 가지 중 하나를 선택해서 정확하게 작성해줘: \\\"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\\\" OR \\\"소중한 반려견과 함께, 특별한 스파 시간을 보내보세요 💙\\\" OR \\\"우리 아이를 위한 힐링타임, 스퍼피가 함께할게요! 보호자님과 강아지 모두 편안한 시간이 되길 바라요 🐾\\\"\"\n");
         promptBuilder.append("}\n");
-        promptBuilder.append("※ 예시 멘트는 참고용이며, 절대 그대로 베끼지 말고 규칙을 지키는 선에서 자연스럽게 바꿔서 작성해줘.\n");
-        promptBuilder.append("※ 'spaDescription'은 리스트 형태로 1개 또는 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
-        promptBuilder.append("※ 'intro' 필드에는 '사진 속 아이의 견종을 인식하지 못했어요..!'로 시작해야 해.\n");
-        promptBuilder.append("※ 'spaName' 필드는 이모지와 마크다운 굵은 글씨를 포함해야 해.\n");
+
+        promptBuilder.append("※ 아래 멘트는 참고용이며, 절대 그대로 베끼지 말고 규칙을 지키는 선에서 자연스럽게 새로 작성해줘.\n");
+        promptBuilder.append("※ [출력 예시]\n");
+        promptBuilder.append("{\n");
+        promptBuilder.append("  \"intro\": \"보호자님이 알려주신 견종은 **포메라니안**(이)군요!\\n\",\n");
+        promptBuilder.append("  \"compliment\": \"털이 복실복실해서 에너지가 느껴지는 친구네요!\\n\\n\",\n");
+        promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
+        promptBuilder.append("  \"spaName\": \"**‍🧘‍♀️ 릴렉싱 테라피 스파**(이)에요!\\n\\n\",\n");
+        promptBuilder.append("  \"spaSlug\": \"relaxing-therapy-spa\",\n");
+        promptBuilder.append("  \"spaDescription\": [\n");
+        promptBuilder.append("    \"- 활동성이 많은 포메라니안에게 편안한 휴식을 제공해 주는 테라피 스파에요.\",\n");
+        promptBuilder.append("    \"- 관절과 근육 이완을 위한 최적의 스파 서비스가 여기 있답니다.\"\n");
+        promptBuilder.append("  ],\n");
+        promptBuilder.append("  \"closing\": \"저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\"\n");
+        promptBuilder.append("}\n");
+
+        promptBuilder.append("※ 'spaDescription'은 리스트 형태로 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
+        promptBuilder.append("※ 'intro' 필드는 견종이 인식되면 '보호자님이 알려주신 견종은 **[견종]**(이)군요!'로 시작하고, 인식되지 않으면 '사진 속 아이의 견종을 인식하지 못했어요..!'로 시작해야 해.\n");
+        promptBuilder.append("※ 'spaName' 필드는 이모지 포함 마크다운 굵은 글씨로 스파 이름과 '(이)에요!' 문장을 함께 작성해야 해. (예: **🌸 프리미엄 브러싱 스파**(이)에요!)\n");
         promptBuilder.append("※ 'closing' 필드는 위에서 명시된 세 가지 문장 중 하나와 **정확히 일치**해야 해.\n");
 
         GptRequestDTO.Message message = new GptRequestDTO.Message();

@@ -18,6 +18,39 @@ const DogImageAnalysisPage = () => {
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
+    // 줄바꿈 변환 유틸 (백엔드에서 온 개행을 통일)
+    const normalizeNewLines = (text) => {
+      if (!text) return '';
+      return text
+        .replace(/\\n/g, '\n')  // JSON 이스케이프된 개행 처리
+        .replace(/\r\n/g, '\n') // 윈도우 개행 처리
+        .trim();
+    };
+
+  // 공통 AI 응답 포맷터
+  const formatAiMessage = (result) => {
+  const intro = normalizeNewLines(result.intro);
+  const compliment = normalizeNewLines(result.compliment);
+  const recommendationHeader = normalizeNewLines(result.recommendationHeader);
+  const spaName = normalizeNewLines(result.spaName);
+  const closing = normalizeNewLines(result.closing);
+
+  const spaDescription = (result.spaDescription && result.spaDescription.length > 0)
+    ? result.spaDescription
+        .map(line => `- ${normalizeNewLines(line).replace(/^- /, '')}`) // 항상 - 로 시작
+        .join('\n')
+    : '';
+
+  const finalSpaSlug = result.spaSlug === "null" ? null : result.spaSlug;
+
+  return {
+    text: `${intro}\n\n${compliment}\n\n${recommendationHeader}\n\n${spaName}\n\n${spaDescription}\n\n${closing}`, // 깔끔한 Markdown 포맷
+    spaSlug: finalSpaSlug,
+    id: result.id,
+    timestamp: new Date(result.createdAt).getTime()
+  };
+};
+
     // 로컬 스토리지와 서버에서 메시지를 불러오는 로직
     useEffect(() => {
         const loadAndMergeMessages = async () => {
@@ -27,75 +60,49 @@ const DogImageAnalysisPage = () => {
             try {
                 const response = await api.get('/recommendations/history');
                 if (response.data && response.data.data) {
-                    serverAiMessages = response.data.data.map(item => {
-                        let aiMessageText = '';
-                        aiMessageText += `${item.intro || ''}\n`;
-                        aiMessageText += `${item.compliment || ''}\n`;
-                        if (item.recommendationHeader) {
-                            aiMessageText += `${item.recommendationHeader}\n`;
-                        }
-                        if (item.spaName) {
-                            aiMessageText += `${item.spaName.replace(/<\/?b>/g, '')}\n`;
-                        }
-                        if (item.spaDescription && item.spaDescription.length > 0) {
-                            aiMessageText += item.spaDescription.join('\n');
-                        }
-                        aiMessageText += `\n${item.closing || ''}`;
-
-                        const finalSpaSlug = item.spaSlug === "null" ? null : item.spaSlug;
-
-                        return {
-                            id: item.id,
-                            text: aiMessageText,
-                            isUser: false,
-                            spaSlug: finalSpaSlug,
-                            timestamp: new Date(item.createdAt).getTime()
-                        };
-                    });
+                    serverAiMessages = response.data.data.map(item => ({
+                        ...formatAiMessage(item),
+                        isUser: false
+                    }));
                 }
             } catch (error) {
                 console.error('❌ 이전 AI 기록 불러오기 실패:', error);
             }
             console.log('⭐ [Load Step 1] 서버에서 불러온 AI 메시지:', serverAiMessages);
 
-            // ⭐⭐⭐ [수정]: 로컬 스토리지에서 모든 메시지 불러오기! ⭐⭐⭐
             const savedLocalMessages = JSON.parse(localStorage.getItem("chatMessages")) || [];
             console.log('⭐ [Load Step 2] 로컬 스토리지에서 불러온 모든 메시지:', savedLocalMessages);
 
-            // 로컬에 있는 메시지 중 서버 AI 메시지와 중복되지 않는 메시지만 필터링
-            // (서버 메시지가 더 최신/정확하다고 가정)
-            // ID를 기준으로 중복 제거 (서버 메시지는 ID가 있고, 로컬 사용자 메시지는 Date.now()로 생성되므로 겹칠 일 없음)
-            const uniqueLocalMessages = savedLocalMessages.filter(localMsg => 
-                localMsg.isUser || !serverAiMessages.some(serverMsg => serverMsg.id === localMsg.id)
-            );
-            console.log('⭐ [Load Step 3] 로컬에서 필터링한 중복 제거 메시지:', uniqueLocalMessages);
+            const localMessagesWithBase64 = await Promise.all(savedLocalMessages.map(async msg => {
+                if (!msg.text && msg.message) {
+                    msg.text = msg.message;
+                    delete msg.message;            
+                }
+                if (msg.isUser && msg.imageUrl && msg.imageUrl.startsWith("blob:")) {
+                    return { ...msg, imageUrl: null };
+                }
+                return msg;
+            }));
 
+            const uniqueLocalMessages = localMessagesWithBase64.filter(localMsg => localMsg.isUser);
+
+            console.log('⭐ [Load Step 3] 로컬에서 필터링한 중복 제거 메시지:', uniqueLocalMessages);
 
             const combinedMessages = [...uniqueLocalMessages, ...serverAiMessages];
             
-            // ⭐⭐⭐ [수정]: 메시지 중복 제거 후 최종 병합 및 정렬 (최신 timestamp가 가장 아래로 오도록) ⭐⭐⭐
             const finalMessagesMap = new Map();
             combinedMessages.forEach(msg => {
-                // ID가 없는 사용자 메시지나, ID가 있는 AI 메시지를 추가
-                // 같은 ID의 메시지가 여러개라면, 나중에 추가된 메시지가 덮어쓰도록 함 (최신 데이터 유지)
                 finalMessagesMap.set(msg.id, msg); 
             });
 
             const sortedFinalMessages = Array.from(finalMessagesMap.values()).sort((a, b) => a.timestamp - b.timestamp);
             
             setChatMessages(sortedFinalMessages);
-            console.log('⭐ [Load End] 최종 합쳐진 메시지 (정렬 및 중복 제거 완료):', sortedFinalMessages);
+            console.log('⭐ [Load End] 최종 합쳐진 메시지:', sortedFinalMessages);
         };
 
         loadAndMergeMessages();
-    }, []); // 초기 로드 시에만 실행되도록 빈 배열 유지
-
-    // chatMessages 상태가 변경될 때마다 로컬 스토리지에 저장
-    // ⭐⭐⭐ [수정]: 이 useEffect는 필요 없음! 메시지 추가 함수에서 직접 저장하도록 변경함. ⭐⭐⭐
-    // useEffect(() => {
-    //     console.log('⭐ [Save] localStorage에 현재 chatMessages 저장:', chatMessages);
-    //     localStorage.setItem("chatMessages", JSON.stringify(chatMessages));
-    // }, [chatMessages]);
+    }, []);
 
     // 채팅창 스크롤 로직
     useEffect(() => {
@@ -119,21 +126,30 @@ const DogImageAnalysisPage = () => {
         setChecklistData(data);
     };
 
-    // 메시지 추가 로직
-    const addMessage = (text, isUser, spaSlug = null, id = Date.now(), timestamp = Date.now()) => { // id와 timestamp 인자 추가
+    // addMessage 개선 (기존 ID 유지)
+    const addMessage = (newMessageObj) => { 
         setChatMessages((prevMessages) => {
             const newMessage = {
-                id, // 전달받은 id 사용
-                text,
-                isUser,
-                spaSlug,
-                timestamp // 전달받은 timestamp 사용
+                id: newMessageObj.id || Date.now(),
+                timestamp: newMessageObj.timestamp || Date.now(),
+                ...newMessageObj,
             };
-            console.log('⭐ [Add] 새로운 메시지 추가:', newMessage);
+            if (!newMessage.text && newMessage.message) {
+                newMessage.text = newMessage.message;
+                delete newMessage.message;
+            }
             const newMessages = [...prevMessages, newMessage];
-            // ⭐⭐⭐ [수정] 메시지를 추가한 후 즉시 로컬 스토리지에 저장! ⭐⭐⭐
             localStorage.setItem("chatMessages", JSON.stringify(newMessages));
             return newMessages;
+        });
+    };
+
+    const getBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
         });
     };
 
@@ -148,47 +164,38 @@ const DogImageAnalysisPage = () => {
         setLoading(true);
         setErrorMessage('');
 
-        let userMessageText = '';
-        if (selectedFile) userMessageText += `파일 선택: ${selectedFile.name}`;
-        if (checklistData) userMessageText += `\n체크리스트: ${JSON.stringify(checklistData)}`;
-        if (freeTextQuestion) userMessageText += `\n나의 질문: ${freeTextQuestion}`;
-        
-        // 사용자 메시지를 먼저 추가!
-        // ⭐⭐⭐ [수정]: addMessage 함수를 사용하여 로컬 스토리지 자동 저장! ⭐⭐⭐
-        addMessage(userMessageText, true);
+        const userImageUrl = await getBase64(selectedFile);
+        const userMessageId = Date.now();
+
+        addMessage({ 
+            id: userMessageId,
+            text: freeTextQuestion,
+            isUser: true, 
+            imageUrl: userImageUrl,
+            checklist: checklistData,
+        });
 
         try {
             const formData = new FormData();
             formData.append('dogImageFile', selectedFile);
-
             if (checklistData) formData.append('checklist', JSON.stringify(checklistData));
             if (freeTextQuestion) formData.append('question', freeTextQuestion);
 
             const response = await api.post('/dog-image', formData, {
-                headers: { 'Content-Type': 'multipart/form-ocata' }
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
 
             if (response.data && response.data.data) {
                 const aiResult = response.data.data;
-                let aiMessageText = '';
-                aiMessageText += `${aiResult.intro || ''}\n`;
-                aiMessageText += `${aiResult.compliment || ''}\n`;
-                if (aiResult.recommendationHeader) { 
-                    aiMessageText += `${aiResult.recommendationHeader}\n`;
-                }
-                if (aiResult.spaName) {
-                    aiMessageText += `${aiResult.spaName.replace(/<\/?b>/g, '')}\n`;
-                }
-                if (aiResult.spaDescription && aiResult.spaDescription.length > 0) {
-                    aiMessageText += aiResult.spaDescription.join('\n');
-                }
-                aiMessageText += `\n${aiResult.closing || ''}`;
+                const formattedMessage = formatAiMessage(aiResult);
 
-                const finalSpaSlug = aiResult.spaSlug === "null" ? null : aiResult.spaSlug;
-
-                // ⭐⭐⭐ [수정]: addMessage 함수를 사용하여 로컬 스토리지 자동 저장! ⭐⭐⭐
-                // 서버에서 받은 ID와 createdAt을 사용하여 메시지 추가
-                addMessage(aiMessageText, false, finalSpaSlug, aiResult.id, new Date(aiResult.createdAt).getTime());
+                addMessage({
+                    text: formattedMessage.text,   // 여기 text는 '\n' 포함
+                    isUser: false,
+                    spaSlug: formattedMessage.spaSlug,
+                    id: formattedMessage.id,
+                    timestamp: formattedMessage.timestamp
+                });
 
                 setErrorMessage('');
             } else {
@@ -206,8 +213,10 @@ const DogImageAnalysisPage = () => {
                 msg = `오류: ${error.message}`;
             }
             setErrorMessage(msg);
-            // ⭐⭐⭐ [수정]: 에러 메시지도 addMessage로 추가해서 로컬 스토리지에 저장되도록! ⭐⭐⭐
-            addMessage(`❌ AI 요청 실패: ${msg}`, false);
+            addMessage({
+                text: `❌ AI 요청 실패: ${msg}`,
+                isUser: false,
+            });
         } finally {
             setLoading(false);
         }
@@ -222,7 +231,7 @@ const DogImageAnalysisPage = () => {
     const messageBg = errorMessage ? "bg-red-50 text-red-600" : "";
 
     return (
-        <div className="w-full h-full mx-auto select-none bg-white mt-10 mb-10 overflow-hidden">
+        <div className="w-full h-full mx-auto bg-white mt-10 mb-10 overflow-hidden">
             <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center">
                 <h2 className="text-2xl font-bold text-spurfyAI">
                     Spurfy AI Chat
@@ -236,22 +245,25 @@ const DogImageAnalysisPage = () => {
                 >
                     {chatMessages.length > 0 ? (
                         chatMessages.map((msg, i) => (
-                            <div key={msg.id || i}>
-                                <MessageBubble
-                                    message={msg.text}
-                                    isUser={msg.isUser}
-                                    spaSlug={msg.spaSlug}
-                                    onGoToSpaDetail={handleGoToSpaDetail}
-                                />
-                                {i === chatMessages.length - 1 && errorMessage && (
-                                    <div className={`py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold ${messageBg} text-sm mt-6`}>
-                                        {errorMessage}
-                                    </div>
-                                )}
-                            </div>
+                            <MessageBubble
+                                key={msg.id || i}
+                                text={msg.text}
+                                isUser={msg.isUser}
+                                imageUrl={msg.imageUrl}
+                                checklist={msg.checklist}
+                                spaSlug={msg.spaSlug}
+                                onGoToSpaDetail={handleGoToSpaDetail}
+                            />
                         ))
                     ) : (
                         <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
+                    )}
+
+                    {/* 에러 메시지 항상 출력 */}
+                    {errorMessage && (
+                        <div className={`py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold ${messageBg} text-sm mt-6`}>
+                            {errorMessage}
+                        </div>
                     )}
                 </div>
 
@@ -284,7 +296,7 @@ const DogImageAnalysisPage = () => {
                         rows="1"
                         value={freeTextQuestion}
                         onChange={(e) => setFreeTextQuestion(e.target.value)}
-                        placeholder="우리 강아지에 대해 궁금한 점이 있나요?"
+                        placeholder="우리 반려견에 대해 궁금한 점이 있나요?"
                         className="flex-1 p-2 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-200 transition duration-200 resize-none overflow-hidden"
                         disabled={loading}
                         onInput={(e) => {

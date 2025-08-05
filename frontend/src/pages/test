@@ -1,0 +1,18 @@
+{/* ⭐⭐ 1. 이미지를 먼저 띄우기 ⭐⭐ */}
+          {imageUrl && (
+            <div className="w-48 h-48 mb-4 overflow-hidden rounded-md">
+              <img
+                src={imageUrl}
+                alt="사용자가 첨부한 사진"
+                className="w-full h-full object-cover"
+                onError={(e) => { // 이미지가 없을 때
+                  e.target.style.display = 'none'; // 이미지를 숨김
+                  e.target.nextElementSibling.style.display = 'block'; // 회색 네모 보여주기
+                }}
+              />
+              <div 
+                className="w-full h-full object-cover" 
+                style={{ display: imageUrl ? 'none' : 'block' }} // 이미지가 없을 때만 보이도록
+              ></div>
+            </div>
+          )}

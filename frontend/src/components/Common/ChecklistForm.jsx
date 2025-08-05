@@ -42,7 +42,7 @@ function ChecklistForm({ onSubmit }) {
             name="breed"
             value={selectedBreed}
             onChange={(e) => setSelectedBreed(e.target.value)}
-            className="w-1/4 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
+            className="w-1/3 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
           >
             {breedOptions.map((option) => (
               <option key={option} value={option === "선택 안 함" ? "" : option}>
