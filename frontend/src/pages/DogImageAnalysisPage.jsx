@@ -27,29 +27,37 @@ const DogImageAnalysisPage = () => {
         .trim();
     };
 
-  // 공통 AI 응답 포맷터
-  const formatAiMessage = (result) => {
-  const intro = normalizeNewLines(result.intro);
-  const compliment = normalizeNewLines(result.compliment);
-  const recommendationHeader = normalizeNewLines(result.recommendationHeader);
-  const spaName = normalizeNewLines(result.spaName);
-  const closing = normalizeNewLines(result.closing);
+    // 공통 AI 응답 포맷터
+const formatAiMessage = (result) => {
+    const intro = normalizeNewLines(result.intro);
+    const compliment = normalizeNewLines(result.compliment);
+    const recommendationHeader = normalizeNewLines(result.recommendationHeader);
+    const spaName = normalizeNewLines(result.spaName);
+    const closing = normalizeNewLines(result.closing);
 
-  const spaDescription = (result.spaDescription && result.spaDescription.length > 0)
-    ? result.spaDescription
-        .map(line => `- ${normalizeNewLines(line).replace(/^- /, '')}`) // 항상 - 로 시작
-        .join('\n')
-    : '';
+    const spaDescription = (result.spaDescription && result.spaDescription.length > 0)
+      ? result.spaDescription.map(line => `- ${normalizeNewLines(line).replace(/^- /, '')}`).join('\n')
+      : '';
 
-  const finalSpaSlug = result.spaSlug === "null" ? null : result.spaSlug;
+    const finalSpaSlug = result.spaSlug === "null" ? null : result.spaSlug;
 
-  return {
-    text: `${intro}\n\n${compliment}\n\n${recommendationHeader}\n\n${spaName}\n\n${spaDescription}\n\n${closing}`, // 깔끔한 Markdown 포맷
-    spaSlug: finalSpaSlug,
-    id: result.id,
-    timestamp: new Date(result.createdAt).getTime()
-  };
+    return {
+      text: [
+        intro,
+        compliment,
+        recommendationHeader,
+        spaName,
+        spaDescription,
+        closing
+      ] 
+       .filter(Boolean)
+       .join('\n\n'),
+      spaSlug: finalSpaSlug,
+      id: result.id,
+      timestamp: new Date(result.createdAt).getTime()
+     };
 };
+
 
     // 로컬 스토리지와 서버에서 메시지를 불러오는 로직
     useEffect(() => {
@@ -80,6 +88,9 @@ const DogImageAnalysisPage = () => {
                 }
                 if (msg.isUser && msg.imageUrl && msg.imageUrl.startsWith("blob:")) {
                     return { ...msg, imageUrl: null };
+                }
+                if (!msg.isUser) {
+                    return { ...formatAiMessage(msg), isUser: false };
                 }
                 return msg;
             }));
@@ -244,17 +255,20 @@ const DogImageAnalysisPage = () => {
                     className="flex-1 bg-gray-50 overflow-y-auto p-6 pb-24 flex flex-col space-y-2"
                 >
                     {chatMessages.length > 0 ? (
-                        chatMessages.map((msg, i) => (
+                        chatMessages.map((msg, i) => {
+                            const normalizedText = normalizeNewLines(msg.text);
+                            return (
                             <MessageBubble
                                 key={msg.id || i}
-                                text={msg.text}
+                                text={normalizedText}
                                 isUser={msg.isUser}
                                 imageUrl={msg.imageUrl}
                                 checklist={msg.checklist}
                                 spaSlug={msg.spaSlug}
                                 onGoToSpaDetail={handleGoToSpaDetail}
                             />
-                        ))
+                            );
+                        })
                     ) : (
                         <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
                     )}

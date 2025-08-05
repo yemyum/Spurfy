@@ -1,16 +1,20 @@
 import SpurfyButton from "./SpurfyButton";
 import SpurfyAI from "../../assets/SpurfyAI.png";
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
 import { marked } from 'marked';
 import gfm from 'remark-gfm';
+
+marked.setOptions({
+  gfm: true,
+  breaks: true
+});
 
 function MessageBubble({ text, isUser, imageUrl, checklist, spaSlug, onGoToSpaDetail }) {
   console.log('✅ MessageBubble로 들어온 message:', text);
   const bubbleClasses = isUser
     ? "bg-[#00D8C2] text-white rounded-bl-xl rounded-tl-xl rounded-br-xl self-end" // 사용자 메시지 (오른쪽, 파란색)
     : "bg-gray-200 text-gray-800 rounded-br-xl rounded-bl-xl rounded-tr-xl self-start"; // AI 메시지 (왼쪽, 회색)
-
-    // marked로 마크다운 + 줄바꿈 강제 변환
-    const convertedHtml = text ? marked(text, { breaks: true }) : '';
 
   if (isUser) {
     return (
@@ -69,22 +73,27 @@ function MessageBubble({ text, isUser, imageUrl, checklist, spaSlug, onGoToSpaDe
         />
       )}
       {/* 말풍선 본문 */}
-      <div className={`max-w-[70%] p-4 mt-6 flex flex-col ${bubbleClasses} relative`}>
+   <div className={`max-w-[70%] p-6 mt-6 flex flex-col ${bubbleClasses} relative`}>
         {text && (
-            <div
-            className="prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: convertedHtml }}
-          />
-        )}
-        {spaSlug && onGoToSpaDetail && !isUser && (
-          <SpurfyButton variant="primary"
-            onClick={() => onGoToSpaDetail(spaSlug)}
-            className="mt-2 py-2 px-3 text-sm self-start"
-          >
-            해당 스파로 예약하러 가기 →
-          </SpurfyButton>
-        )}
-      </div>
+    <ReactMarkdown
+      remarkPlugins={[gfm, remarkBreaks]}
+      components={{
+        p: ({node, ...props}) => <p className="mb-4" {...props} />,
+        li: ({node, ...props}) => <li className="list-disc list-inside ml-2 mb-1 last:mb-4" {...props} />
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  )}
+  {spaSlug && onGoToSpaDetail && !isUser && (
+    <SpurfyButton variant="primary"
+      onClick={() => onGoToSpaDetail(spaSlug)}
+      className="py-2 px-3 text-sm self-start"
+    >
+      해당 스파로 예약하러 가기 →
+    </SpurfyButton>
+  )}
+</div>
     </div>
   );
 }
