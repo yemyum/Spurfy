@@ -80,7 +80,7 @@ const handleLogout = () => {
       {location.pathname === '/' && <Home />}
 
       {location.pathname !== '/' && (
-          <main className="flex-1 min-w-[700px] mx-auto">
+          <main className="flex-1 max-w-[1200px] w-full mx-auto px-4">
             <Outlet />
           </main>
         )}

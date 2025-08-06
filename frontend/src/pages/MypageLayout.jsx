@@ -13,7 +13,7 @@ function MypageLayout() {
   ];
 
   return (
-  <div className="w-full min-w-[1100px] max-w-[1280px] mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 flex">
+  <div className="w-full mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 flex">
   {/* 사이드바 */}
   <aside className="w-56 border-r border-gray-200 py-6 p-3">
     <h2 className="text-xl font-bold px-6 py-2 mb-4">마이페이지</h2>

@@ -20,11 +20,11 @@ function MyReviewList() {
       {reviews.map((r) => (
         <div
           key={r.reviewId}
-          className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50"
+          className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 break-words"
           onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
         >
           <h3
-            className="font-semibold text-lg hover:underline inline-block"
+            className="font-semibold text-lg hover:underline"
             onClick={(e) => {
               e.stopPropagation();
               if (r.spaSlug) {
@@ -40,9 +40,9 @@ function MyReviewList() {
           </h3>
 
           <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
-          <p className="mt-2 text-gray-800 truncate">{r.content}</p>
+          <p className="mt-2 text-gray-800">{r.content}</p>
           
-          <div className="flex gap-2 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4">
             <SpurfyButton variant="primary"
             className="px-3 py-1 text-sm"
             onClick={(e) => {
