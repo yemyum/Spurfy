@@ -217,7 +217,7 @@ function Profile() {
         {/* <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} /> */}
       </div>
 
-            {/* 정보 리스트 또는 수정 폼 */}
+      {/* 정보 리스트 또는 수정 폼 */}
       <div className="space-y-6 mt-20">
         <h3 className="text-xl font-bold text-spurfyBlue mb-5">내 정보</h3>
         {/* 1. 이름 정보 */}
@@ -228,12 +228,12 @@ function Profile() {
 
         {/* 2. 닉네임 정보 */}
         <div className="mb-4">
-          <label className="block text-gray-800 font-semibold mb-2">닉네임</label>
+          <label className="block text-gray-800 font-semibold">닉네임</label>
           {isEditing ? ( // 수정 모드일 때
             <div className="flex items-center gap-2">
               <input
                 type="text"
-                className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+                className="appearance-none w-full text-gray-800 leading-tight focus:outline-none"
                 value={editedNickname}
                 onChange={handleNicknameChange}
                 placeholder="새 닉네임을 입력하세요."
@@ -248,10 +248,10 @@ function Profile() {
           ) : ( // 조회 모드일 때
             <p className="text-gray-900 text-lg">{profile.nickname}</p>
           )}
-          <div className="border-t-2 border-gray-200 w-full mt-2"></div>
+          <div className="border-t-2 border-gray-200 w-full"></div>
           {/* 닉네임 중복 확인 메시지 표시 */}
           {isEditing && nicknameCheckMessage && (
-            <p className={`mt-2 ${isNicknameAvailable ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`mt-2 ${isNicknameAvailable ? 'text-green-500' : 'text-red-500'}`}>
               {nicknameCheckMessage}
             </p>
           )}
@@ -312,7 +312,7 @@ function Profile() {
             <label className="block text-gray-700 font-semibold mb-2">현재 비밀번호</label>
             <input
               type="password"
-              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none"
+              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-50"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="현재 비밀번호를 입력해주세요."
@@ -322,7 +322,7 @@ function Profile() {
             <label className="block text-gray-700 font-semibold mb-2">새로운 비밀번호 (8~16자 이내)</label>
             <input
               type="password"
-              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none"
+              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-50"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="새로운 비밀번호를 입력해주세요."
@@ -332,7 +332,7 @@ function Profile() {
             <label className="block text-gray-700 font-semibold mb-2">새로운 비밀번호 확인</label>
             <input
               type="password"
-              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none"
+              className="w-full p-3 bg-gray-50 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-50"
               value={confirmNewPassword}
               onChange={(e) => setConfirmNewPassword(e.target.value)}
               placeholder="새로운 비밀번호를 한번 더 입력해주세요."
@@ -382,13 +382,13 @@ function ProfileInfoRow({ label, value, isEditing, editedValue, onEditChange, ty
       {isEditing && onEditChange ? (
         <input
           type={type}
-          className="appearance-none w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
+          className="appearance-none w-full text-gray-900 leading-tight focus:outline-none"
           value={editedValue}
           onChange={(e) => onEditChange(e.target.value)}
           readOnly={label === "이메일"} // 이메일은 readOnly로 고정
         />
       ) : (
-        <p className="text-gray-900 text-lg">{value}</p>
+        <p className={`text-lg ${label === "이메일" ? "text-gray-400" : "text-gray-900"}`}>{value}</p>
       )}
     </div>
   );

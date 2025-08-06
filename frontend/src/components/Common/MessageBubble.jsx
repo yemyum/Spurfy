@@ -69,11 +69,11 @@ function MessageBubble({ text, isUser, imageUrl, checklist, spaSlug, onGoToSpaDe
         <img
           src={SpurfyAI}
           alt="AI Profile"
-          className="w-12 h-12 object-cover flex-shrink-0 rounded-full"
+          className="w-16 h-16 object-cover flex-shrink-0 rounded-full"
         />
       )}
       {/* 말풍선 본문 */}
-   <div className={`max-w-[70%] p-6 mt-6 flex flex-col ${bubbleClasses} relative`}>
+   <div className={`max-w-[70%] p-6 mt-8 flex flex-col ${bubbleClasses} relative`}>
         {text && (
     <ReactMarkdown
       remarkPlugins={[gfm, remarkBreaks]}

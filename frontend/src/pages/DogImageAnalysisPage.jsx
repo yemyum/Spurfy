@@ -10,6 +10,7 @@ import SpurfyButton from "../components/Common/SpurfyButton";
 const DogImageAnalysisPage = () => {
     const navigate = useNavigate();
     const chatContainerRef = useRef(null);
+    const messagesEndRef = useRef(null);
 
     const [chatMessages, setChatMessages] = useState([]);
     const [selectedFile, setSelectedFile] = useState(null);
@@ -28,7 +29,7 @@ const DogImageAnalysisPage = () => {
     };
 
     // 공통 AI 응답 포맷터
-const formatAiMessage = (result) => {
+    const formatAiMessage = (result) => {
     const intro = normalizeNewLines(result.intro);
     const compliment = normalizeNewLines(result.compliment);
     const recommendationHeader = normalizeNewLines(result.recommendationHeader);
@@ -57,7 +58,6 @@ const formatAiMessage = (result) => {
       timestamp: new Date(result.createdAt).getTime()
      };
 };
-
 
     // 로컬 스토리지와 서버에서 메시지를 불러오는 로직
     useEffect(() => {
@@ -110,16 +110,17 @@ const formatAiMessage = (result) => {
             
             setChatMessages(sortedFinalMessages);
             console.log('⭐ [Load End] 최종 합쳐진 메시지:', sortedFinalMessages);
+
+            if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+            }
         };
 
         loadAndMergeMessages();
     }, []);
 
-    // 채팅창 스크롤 로직
     useEffect(() => {
-        if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-        }
+      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
     }, [chatMessages]);
 
     const handleFileChange = (event) => {
@@ -275,11 +276,12 @@ const formatAiMessage = (result) => {
 
                     {/* 에러 메시지 항상 출력 */}
                     {errorMessage && (
-                        <div className={`py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold ${messageBg} text-sm mt-6`}>
+                        <div className={`py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold ${messageBg} text-sm`}>
                             {errorMessage}
                         </div>
                     )}
-                </div>
+                    <div ref={messagesEndRef} />
+                </div >
 
                 <form 
                     onSubmit={handleImageAnalysis} 
@@ -300,9 +302,20 @@ const formatAiMessage = (result) => {
                     </label>
 
                     {selectedFile && (
-                        <span className="text-xs text-gray-400 truncate max-w-[80px]">
-                            {selectedFile.name}
-                        </span>
+                        <div className="relative w-14 h-14">
+                            <img
+                            src={URL.createObjectURL(selectedFile)}
+                            alt="미리보기"
+                            className="w-14 h-14 rounded-xl object-cover border border-gray-200 shadow-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setSelectedFile(null)}
+                          className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-black rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition"
+                        >
+                          ✕
+                        </button>
+                    </div>
                     )}
 
                     <textarea
