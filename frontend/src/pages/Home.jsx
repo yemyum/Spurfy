@@ -11,11 +11,10 @@ function Home() {
     // 컴포넌트 로드 시 로딩 시작
     document.body.classList.add("loading");
 
-    // 예시: API 호출 or 데이터 로딩 시뮬레이션
     setTimeout(() => {
-      setLoading(false);
-      document.body.classList.remove("loading");
-    }, 2000);
+    setLoading(false);
+    document.body.classList.remove("loading");
+  }, 100); 
   }, []);
 
   return (
