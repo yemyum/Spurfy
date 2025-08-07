@@ -156,7 +156,7 @@ function MyReservationDetail() {
                   <span>{reservation.serviceName}</span>
                 </p>
                 <p className="mb-2">
-                  <span className="text-gray-500 font-medium">이용약관 날짜: </span>{' '}
+                  <span className="text-gray-500 font-medium">이용 날짜: </span>{' '}
                   {reservation.reservationDate} {reservation.reservationTime}
                 </p>
                 <p className="mb-2">
