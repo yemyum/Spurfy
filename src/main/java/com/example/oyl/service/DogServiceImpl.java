@@ -10,8 +10,10 @@ import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.DogRepository;
 import com.example.oyl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,11 +26,14 @@ public class DogServiceImpl implements DogService {
 
     private final DogRepository dogRepository;
     private final UserRepository userRepository;
+    private final FileService fileService;
 
     @Override
-    public DogResponseDTO registerDog(String userEmail, DogRequestDTO dto) {
+    public DogResponseDTO registerDog(String userEmail, DogRequestDTO dto, MultipartFile dogImage) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        String imageUrl = fileService.saveFile(dogImage);
 
         String cleanNotes = dto.getNotes() == null || dto.getNotes().trim().isEmpty()
                 ? null
@@ -44,6 +49,7 @@ public class DogServiceImpl implements DogService {
                 .weight(dto.getWeight())
                 .notes(cleanNotes)
                 .createdAt(LocalDate.now())
+                .imageUrl(imageUrl)
                 .build();
 
         Dog savedDog = dogRepository.save(dog);
@@ -56,23 +62,35 @@ public class DogServiceImpl implements DogService {
                 .gender(savedDog.getGender())
                 .weight(savedDog.getWeight())
                 .notes(savedDog.getNotes())
+                .imageUrl(savedDog.getImageUrl())
                 .build();
     }
 
     @Override
-    public void updateDog(String userEmail, String dogId, DogUpdateRequestDTO dto) {
-        // 1. 사용자 찾기 (JWT 기반 이메일)
+    public void updateDog(String userEmail, String dogId, DogUpdateRequestDTO dto, MultipartFile dogImage) {
+        // 1. 사용자, 강아지 찾기
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 2. 강아지 찾기
         Dog dog = dogRepository.findById(dogId)
                 .orElseThrow(() -> new CustomException(ErrorCode.DOG_NOT_FOUND));
 
-        // 3. 본인 소유 강아지인지 확인
         if (!dog.getUser().getUserId().equals(user.getUserId())) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_DOG_ACCESS);
 
+        }
+
+        // 새로운 이미지 URL을 저장할 변수를 미리 선언
+        String finalImageUrl = dog.getImageUrl(); // 기본값은 기존 이미지 URL
+
+        // 2. 새로운 이미지 파일이 있는지 확인
+        if (dogImage != null && !dogImage.isEmpty()) {
+            // 기존 이미지가 있다면 삭제하는 로직 추가 (선택 사항)
+            // (예: File oldImage = new File("기존 이미지 경로"); oldImage.delete();)
+
+            // 새로운 이미지 저장
+            String newImageUrl = fileService.saveFile(dogImage);
+            finalImageUrl = newImageUrl; // 새로운 이미지 URL로 업데이트
         }
 
         // 4. 정보 업데이트
@@ -82,7 +100,8 @@ public class DogServiceImpl implements DogService {
                 dto.getBirthDate(),
                 dto.getGender(),
                 dto.getWeight(),
-                dto.getNotes()
+                dto.getNotes(),
+                finalImageUrl
         );
 
         dogRepository.save(dog);
@@ -126,6 +145,7 @@ public class DogServiceImpl implements DogService {
                         .gender(dog.getGender())
                         .weight(dog.getWeight())
                         .notes(dog.getNotes())
+                        .imageUrl(dog.getImageUrl())
                         .build()
         ).toList();
     }

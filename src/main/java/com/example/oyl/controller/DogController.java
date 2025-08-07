@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,11 +23,14 @@ public class DogController {
     private final DogService dogService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<DogResponseDTO>> registerDog (@RequestBody DogRequestDTO dto) {
+    public ResponseEntity<ApiResponse<DogResponseDTO>> registerDog (
+            @RequestPart(value = "dogRequestDTO") DogRequestDTO dto,
+            @RequestPart(value = "dogImage", required = false) MultipartFile dogImage // 이미지 파일을 받음
+            ) {
         String userEmail = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
 
-        DogResponseDTO response = dogService.registerDog(userEmail, dto);
+        DogResponseDTO response = dogService.registerDog(userEmail, dto, dogImage);
 
         return ResponseEntity.ok(
                 ApiResponse.<DogResponseDTO>builder()
@@ -37,16 +41,17 @@ public class DogController {
         );
     }
 
-    @PatchMapping("/{dogId}")
+    @PatchMapping(path = "/{dogId}", consumes = {"multipart/form-data"})
     public ResponseEntity<?> updateDog(
             @PathVariable String dogId,
-            @RequestBody DogUpdateRequestDTO dto
+            @RequestPart(value = "dogUpdateRequestDTO") DogUpdateRequestDTO dto,
+            @RequestPart(value = "dogImage", required = false) MultipartFile dogImage
             ) {
 
         String userEmail = SecurityContextHolder.getContext()
                 .getAuthentication().getName();
 
-        dogService.updateDog(userEmail, dogId, dto);
+        dogService.updateDog(userEmail, dogId, dto, dogImage);
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()
                         .code("S001")

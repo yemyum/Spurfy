@@ -19,6 +19,7 @@ public class DogResponseDTO {
     private String gender;
     private BigDecimal weight;
     private String notes;
+    private String imageUrl;
 
     public static DogResponseDTO fromEntity(Dog dog) {
         return DogResponseDTO.builder()
@@ -29,6 +30,7 @@ public class DogResponseDTO {
                 .gender(dog.getGender())
                 .weight(dog.getWeight())
                 .notes(dog.getNotes())
+                .imageUrl(dog.getImageUrl())
                 .build();
     }
 }

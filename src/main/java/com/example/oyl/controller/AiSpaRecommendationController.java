@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/dog-image")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
-public class DogImageUploadController {
+public class AiSpaRecommendationController {
 
     private final DogImageService dogImageService;
 

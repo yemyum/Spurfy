@@ -39,12 +39,16 @@ public class Dog {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
-    public void updateDog(String name, String breed, LocalDate birthDate, String gender, BigDecimal weight, String notes) {
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    public void updateDog(String name, String breed, LocalDate birthDate, String gender, BigDecimal weight, String notes, String imageUrl) {
         this.name = name;
         this.breed = breed;
         this.birthDate = birthDate;
         this.gender = gender;
         this.weight = weight;
         this.notes = notes;
+        this.imageUrl = imageUrl;
     }
 }

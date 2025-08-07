@@ -31,6 +31,7 @@ public class SecurityConfig {
                                 "/api/users/signup",
                                 "/api/users/login",
                                 "/api/images/**",
+                                "/dog-images/**",
                                 "/api/users/check-email",
                                 "/api/mypage/check-nickname",
                                 "/api/spa-services/**"

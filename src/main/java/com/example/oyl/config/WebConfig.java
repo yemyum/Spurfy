@@ -1,5 +1,6 @@
 package com.example.oyl.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -9,11 +10,25 @@ import java.nio.file.Paths;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
+    // application.yml에서 AI 챗봇 이미지 경로를 가져옴
+    @Value("${file.upload-dir}")
+    private String uploadDir;
+
+    // application.yml에서 강아지 이미지 경로를 가져옴
+    @Value("${dog.upload-dir}")
+    private String dogUploadDir;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        String uploadPath = Paths.get("uploads").toAbsolutePath().toUri().toString();
 
-        registry.addResourceHandler("/api/images/**") // 프론트에서 요청하는 경로
-                .addResourceLocations("file:///C:/Users/smile/IdeaProjects/Spurfy/uploads/");  // 실제 파일 경로
+        // AI 챗봇 이미지 파일 경로 매핑
+        // "/api/images/**" URL 요청을 실제 파일 시스템의 "uploads" 폴더로 연결
+        registry.addResourceHandler("/api/images/**")
+                .addResourceLocations("file:///" + uploadDir);
+
+        // 강아지 이미지 파일 경로 매핑
+        // "/dog-images/**" URL 요청을 실제 파일 시스템의 "dog_images" 폴더로 연결
+        registry.addResourceHandler("/dog-images/**")
+                .addResourceLocations("file:///" + dogUploadDir);
     }
 }
