@@ -89,8 +89,8 @@ public class GptClient {
         promptBuilder.append("[문장 구조 규칙] 반드시 아래와 같은 JSON 형태로만 응답할 것! 다른 텍스트는 절대 포함하지 마!\n");
         promptBuilder.append("모든 값에는 줄바꿈(\\n)을 직접 넣어서 실제 화면 출력이 아래 예시처럼 나오도록 맞춰줘.\n");
         promptBuilder.append("{\n");
-        promptBuilder.append("  \"intro\": \"사진 속의 아이는 **%s**(으)로 보이네요! (예: 사진 속의 아이는 **말티즈**(으)로 보이는군요!)\\n\",\n".formatted(dto.getBreed()));
-        promptBuilder.append("  \"compliment\": \"(두 번째 줄) 강아지에 대한 담백한 칭찬 한 줄만 작성!\\n\\n\",\n");
+        promptBuilder.append("  \"intro\": \"사진 속의 아이는 **%s**(으)로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사해요!\\n\",\n".formatted(dto.getBreed()));
+        promptBuilder.append("  \"compliment\": \"강아지에 대해 간략하게 칭찬 멘트 필요!\\n\\n\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
         promptBuilder.append("  \"spaName\": \"**%s**에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
         promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
@@ -104,7 +104,7 @@ public class GptClient {
         promptBuilder.append("※ 아래 멘트는 참고용이며, 절대 그대로 베끼지 말고 규칙을 지키는 선에서 자연스럽게 새로 작성해줘.\n");
         promptBuilder.append("※ [출력 예시]\n");
         promptBuilder.append("{\n");
-        promptBuilder.append("  \"intro\": \"사진속의 아이는 **포메라니안**(으)로 보이네요!\\n\",\n");
+        promptBuilder.append("  \"intro\": \"사진속의 아이는 **포메라니안**(으)로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사해요!\\n\",\n");
         promptBuilder.append("  \"compliment\": \"털이 복실복실해서 에너지가 느껴지는 친구네요!\\n\\n\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
         promptBuilder.append("  \"spaName\": \"**‍🧘‍♀️ 릴렉싱 테라피 스파**에요!\\n\\n\",\n");
@@ -215,10 +215,10 @@ public class GptClient {
         promptBuilder.append("{\n");
         promptBuilder.append("  \"intro\": \"%s\",\n".formatted(
                 dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed())
-                        ? "보호자님이 알려주신 견종은 **%s**(이)군요!\\n다음 정보들을 참고해서 스파를 추천해드릴게요!\\n".formatted(dto.getBreed())
+                        ? "보호자님이 알려주신 견종은 **%s**(이)군요!\\n소중한 반려견의 정보를 알려주셔서 감사해요!\\n".formatted(dto.getBreed())
                         : "사진 속 아이의 견종을 인식하지 못했어요..!\\n하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!\\n"
         ));
-        promptBuilder.append("  \"compliment\": \"(두 번째 줄) 강아지에 대한 칭찬 멘트, 이 줄에만 작성!\\n\\n\",\n");
+        promptBuilder.append("  \"compliment\": \"강아지에 대해 간략하게 칭찬 멘트 필요!\\n\\n\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
         promptBuilder.append("  \"spaName\": \"**%s**에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
         promptBuilder.append("  \"spaSlug\": \"스파 이름에 해당하는 슬러그 (예: welcome-spa)\",\n");
