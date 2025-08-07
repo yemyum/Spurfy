@@ -18,6 +18,7 @@ const DogImageAnalysisPage = () => {
     const [freeTextQuestion, setFreeTextQuestion] = useState('');
     const [loading, setLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
     // 줄바꿈 변환 유틸 (백엔드에서 온 개행을 통일)
     const normalizeNewLines = (text) => {
@@ -111,17 +112,22 @@ const DogImageAnalysisPage = () => {
             setChatMessages(sortedFinalMessages);
             console.log('⭐ [Load End] 최종 합쳐진 메시지:', sortedFinalMessages);
 
-            if (chatContainerRef.current) {
-            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-            }
         };
 
         loadAndMergeMessages();
     }, []);
 
+    // **⭐ 새로운 스크롤 로직:** 단 하나의 useEffect로 통합!
     useEffect(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "auto" });
-    }, [chatMessages]);
+        // 최초 로딩 시에는 `auto` 스크롤
+        if (isInitialLoad) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        } 
+        // 그 이후에는 `smooth` 스크롤
+        else {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [chatMessages, isInitialLoad]);
 
     const handleFileChange = (event) => {
         if (event.target.files && event.target.files[0]) {
