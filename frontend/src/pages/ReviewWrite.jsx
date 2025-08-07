@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import api from "../api/axios";
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from "../components/Common/SpurfyButton";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 function ReviewWrite() {
   const location = useLocation();
@@ -94,44 +96,37 @@ function ReviewWrite() {
       </div>
       </div>
 
-     <div className="pb-2 border-b border-gray-200">
+     <div className="pb-4 border-b border-gray-200">
       <label className="block text-lg font-semibold mb-2">리뷰를 작성해주세요.</label>
       <textarea
         rows="4"
-        className="border border-gray-200 p-3 rounded w-full mb-4 focus:outline-none"
+        className="border border-gray-200 p-3 rounded w-full focus:outline-none"
         placeholder="최소 30자 이상 작성해주세요."
         value={form.content}
         onChange={(e) => setForm({ ...form, content: e.target.value })}
       ></textarea>
-     </div>
-
-     <div className="pb-2">
-      <label className="block text-lg font-semibold mb-2">사진 첨부하기</label>
-      <input
-        type="text"
-        placeholder="이미지 URL 입력"
-        className="border p-2 rounded w-full"
-        value={form.imageUrl}
-        onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-      />
+      <button className="w-full px-2 py-2 mt-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white hover:bg-gray-50 transition duration-300">
+          <FontAwesomeIcon icon={faCamera} /> 사진 첨부하기
+      </button>
 
       {form.imageUrl && (
         <div className="mb-4">
           <img
             src={form.imageUrl}
             alt="리뷰 이미지 미리보기"
-            className="w-32 h-32 object-cover border rounded"
+            className="w-32 h-32 flex items-start object-cover rounded"
           />
         </div>
       )}
       </div>
-
+    <div className="flex justify-end mt-4">
       <SpurfyButton variant="primary"
         onClick={handleSubmit}
-        className="w-full py-2 font-semibold"
+        className="px-4 py-2"
       >
         등록하기
       </SpurfyButton>
+      </div>
     </div>
   );
 }

@@ -230,7 +230,7 @@ function Profile() {
         <div className="mb-4">
           <label className="block text-gray-800 font-semibold">닉네임</label>
           {isEditing ? ( // 수정 모드일 때
-            <div className="flex items-center gap-2">
+            <div className="flex justify-between">
               <input
                 type="text"
                 className="appearance-none w-full text-gray-800 leading-tight focus:outline-none"
@@ -240,7 +240,7 @@ function Profile() {
               />
               <SpurfyButton variant='outline'
                 onClick={handleCheckNickname}
-                className="whitespace-nowrap px-3 py-2 shadow-sm text-sm"
+                className="whitespace-nowrap px-3 py-2 shadow-sm text-sm mb-2"
               >
                 중복 확인
               </SpurfyButton>
@@ -271,15 +271,9 @@ function Profile() {
       </div>
 
       {/* 프로필 수정/저장/취소 버튼 */}
-      <div className="mt-8 flex justify-end gap-4">
+      <div className="mt-4 flex justify-between">
         {isEditing ? (
           <>
-            <SpurfyButton
-              onClick={handleUpdateProfile}
-              className="px-4 py-2 shadow-sm"
-            >
-              저장하기
-            </SpurfyButton>
             <button
               onClick={() => {  // 컴포넌트는 유지하고 모드만 전환되는 경우!
                 setIsEditing(false);
@@ -289,18 +283,26 @@ function Profile() {
                 // setProfileImageFile(null); // ⭐ 이미지 파일 초기화
                 // setPreviewImageUrl(profile.profileImageUrl || defaultProfile); // ⭐ 이미지 미리보기 초기화
               }}
-              className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"
+              className="px-6 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition duration-300"
             >
               취소
             </button>
+            <SpurfyButton
+              onClick={handleUpdateProfile}
+              className="px-4 py-2"
+            >
+              저장하기
+            </SpurfyButton>
           </>
         ) : (
+        <div className="flex justify-end w-full">
           <SpurfyButton variant='outline'
             onClick={() => setIsEditing(true)}
             className="px-4 py-2 shadow-sm"
           >
             프로필 수정
           </SpurfyButton>
+          </div>
         )}
       </div>
 
@@ -382,7 +384,7 @@ function ProfileInfoRow({ label, value, isEditing, editedValue, onEditChange, ty
       {isEditing && onEditChange ? (
         <input
           type={type}
-          className="appearance-none w-full text-gray-900 leading-tight focus:outline-none"
+          className="appearance-none w-full text-gray-900 leading-tight focus:outline-none mb-2"
           value={editedValue}
           onChange={(e) => onEditChange(e.target.value)}
           readOnly={label === "이메일"} // 이메일은 readOnly로 고정

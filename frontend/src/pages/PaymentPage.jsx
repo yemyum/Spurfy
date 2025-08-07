@@ -17,7 +17,7 @@ function PaymentPage() {
   useEffect(() => {
     api.get('/mypage/profile')
       .then((res) => setUser(res.data.data))
-      .catch(() => alert('유저 정보 불러오기 실패 🐽'));
+      .catch(() => alert('유저 정보 불러오기 실패'));
   }, []);
 
   // 💡 결제 완료 시 상세 조회
@@ -25,14 +25,14 @@ function PaymentPage() {
     if (reservationId) {
       api.get(`/reservation/${reservationId}`)
         .then((res) => setReservation(res.data.data))
-        .catch(() => alert('예약 상세 조회 실패 🐶💥'));
+        .catch(() => alert('예약 상세 조회 실패'));
     }
   }, [reservationId]);
 
   // 💳 결제 및 예약 등록
   const handlePayment = async () => {
     if (!state?.dogId || !state?.serviceId || !state?.date || !state?.time) {
-      alert("예약 정보가 누락되었습니다. 🐽");
+      alert("예약 정보가 누락되었습니다.");
       return;
     }
     try {
@@ -51,12 +51,12 @@ function PaymentPage() {
       });
 
       const newId = res.data.data.reservationId;
-      alert("✅ 결제 및 예약 완료! (돼지코 뽁🐽)");
+      alert("결제 및 예약이 완료되었습니다!");
       navigate(`/payment/${newId}`);
     } catch (err) {
       console.error(err);
-      console.error("🐽 결제 에러:", err);
-      console.log("🔍 서버 응답:", err.response?.data);  // 이거!!
+      console.error("결제 에러:", err);
+      console.log("서버 응답:", err.response?.data);  // 이거!!
       alert('결제 실패!');
     }
   };
@@ -89,13 +89,13 @@ function PaymentPage() {
         </div>
         <div className="flex justify-center gap-4 p-8">
         <button
-        className="flex-1 bg-gray-200 py-2 font-semibold text-lg rounded-lg hover:bg-gray-300"
+        className="flex-1 bg-gray-200 py-2 text-gray-600 font-semibold text-lg rounded-lg hover:bg-gray-300 transition duration-300"
         onClick={() => navigate('/')}
         >
         확인
         </button>
         <SpurfyButton variant="primary"
-          className="flex-1 text-white py-2 text-lg rounded-lg"
+          className="flex-1 py-2 text-lg"
           onClick={() => navigate('/mypage/reservations')}
         >
           내 예약 보러가기
@@ -168,12 +168,14 @@ function PaymentPage() {
     </div>
 
     {/* 버튼 */}
+    <div className="pb-2">
     <SpurfyButton variant="primary"
-      className="w-full text-white py-3 text-xl rounded-lg"
+      className="w-full py-3 text-xl"
       onClick={handlePayment}
     >
       결제하기
     </SpurfyButton>
+    </div>
     </div>
   </div>
   );

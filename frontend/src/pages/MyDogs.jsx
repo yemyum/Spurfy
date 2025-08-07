@@ -7,17 +7,18 @@ function MyDogs() {
   const navigate = useNavigate();
   const [dogs, setDogs] = useState([]);
 
-  useEffect(() => {
-    const fetchDogs = async () => {
-      try {
-        const res = await api.get('/dogs'); // 토큰 자동 실림
-        setDogs(res.data.data);
-      } catch (err) {
-        console.error('강아지 목록 조회 실패:', err);
-        alert('불러오기를 실패하였습니다.');
-      }
-    };
+  const fetchDogs = async () => {
+    try {
+      const res = await api.get('/dogs'); // 토큰 자동 실림
+      console.log("🐶 강아지 리스트:", res.data.data);
+      setDogs(res.data.data);
+    } catch (err) {
+      console.error('강아지 목록 조회 실패:', err);
+      // alert('불러오기를 실패하였습니다.');
+    }
+  };
 
+  useEffect(() => {
     fetchDogs();
   }, []);
 
@@ -56,8 +57,16 @@ function MyDogs() {
                 className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex flex-col gap-4">
                 {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
                 <div className="flex items-stretch gap-4">
-                <div className="w-24 h-24 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    <span className="text-gray-500 text-sm">이미지</span>
+                <div className="w-28 h-28 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+                    {dog.imageUrl ? (
+                    <img 
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`} 
+                      alt={`${dog.name}의 사진`} 
+                      className="w-full h-full object-cover" 
+                    />
+                  ) : (
+                    <span className="text-gray-500 text-sm">이미지 없음</span>
+                  )}
                 </div>
 
                 {/* ⭐ 2. 중간: 강아지 정보 영역 - flex-grow로 남은 공간 다 차지 ⭐ */}

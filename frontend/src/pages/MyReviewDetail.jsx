@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import api from '../api/axios';
 
 function MyReviewDetail() {
@@ -138,14 +140,10 @@ function MyReviewDetail() {
 
         {/* 이미지 URL 입력 */}
         {isEditing && (
-          <div className="mt-4">
-            <input
-              type="text"
-              className="w-full p-2 border rounded"
-              value={editedImageUrl}
-              onChange={(e) => setEditedImageUrl(e.target.value)}
-              placeholder="이미지 URL을 입력하세요 (선택 사항)"
-            />
+          <div className="mt-2 mb-2">
+            <button className="w-full px-2 py-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white hover:bg-gray-50 transition duration-300">
+              <FontAwesomeIcon icon={faCamera} /> 사진 첨부하기
+            </button>
           </div>
         )}
         </div>
@@ -176,11 +174,11 @@ function MyReviewDetail() {
         )}
 
         {/* 버튼 */}
-        <div className="mt-6 flex justify-end gap-2 px-6">
+        <div className="mt-6 flex justify-between px-6">
           {isEditing ? (
             <>
-              <SpurfyButton variant = "primary" onClick={handleUpdateSubmit} className="px-4 py-2">저장하기</SpurfyButton>
               <button onClick={handleCancelEdit} className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300">취소</button>
+              <SpurfyButton variant = "primary" onClick={handleUpdateSubmit} className="px-4 py-2">저장하기</SpurfyButton>
             </>
           ) : (
             <>
