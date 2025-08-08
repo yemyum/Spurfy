@@ -36,7 +36,7 @@ function SpaDetail() {
 
       setDogList(dogRes.data?.data || []);
       
-      const fetchedReviews = reviewRes.data?.data || [];
+      const fetchedReviews = reviewRes.data.data?.content || []; 
       setReviews(fetchedReviews);
       setAverageRating(
         fetchedReviews.length
@@ -242,14 +242,12 @@ function SpaDetail() {
           </div>
         ))}
       </div>
-        {reviews.length > 3 && ( // 4개보다 리뷰가 많을 때만 "더보기" 버튼 생성!
             <div
                 onClick={() => navigate(`/spa-reviews/slug/${spaSlug}`)} // 새로운 리뷰 상세 페이지로 이동!
-                className="w-full text-center text-sm text-gray-500 font-semibold mt-4 cursor-pointer hover:underline"
+                className="w-full text-center text-gray-400 mt-10 cursor-pointer hover:underline"
             >
                 더보기 ({reviews.length}개)
             </div>
-        )}
       </div>
     </div>
     </div>
