@@ -108,7 +108,7 @@ function MyReviewDetail() {
     <div className="mx-auto p-8 mb-6 select-none">
       <div className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 관리</div>
 
-      <div className="border border-gray-200 py-6 rounded-md shadow-sm bg-white mb-6">
+      <div className="border border-gray-200 py-5 rounded-md shadow-sm bg-white mb-6">
         <div className="pb-4 mb-4 border-b border-gray-200 px-6">
         <h3 className='text-xl font-semibold'>{reviewDetail.serviceName}</h3>
         <p className='text-lg font-semibold'>{reviewDetail.price}원</p>

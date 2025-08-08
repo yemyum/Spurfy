@@ -57,7 +57,7 @@ function MyDogs() {
                 className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex flex-col gap-4">
                 {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
                 <div className="flex items-stretch gap-4">
-                <div className="w-28 h-28 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                     {dog.imageUrl ? (
                     <img 
                       src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`} 
@@ -79,15 +79,6 @@ function MyDogs() {
 
               {/* ⭐ 3. 오른쪽: 수정/삭제 버튼 영역 - 강아지 정보 영역 내부에 배치 ⭐ */}
               <div className="flex gap-2 self-start">
-                <SpurfyButton variant="primary"
-                    className="px-3 py-1 text-sm"
-                    onClick={(e) => {
-                    e.stopPropagation(); // 이벤트 버블링 방지!
-                    navigate(`/mypage/dogs/${dog.dogId}/edit`);
-                }}
-                >
-                수정
-                </SpurfyButton>
                 <SpurfyButton variant="danger"
                     className="px-3 py-1 text-sm"
                     onClick={(e) => {
@@ -96,6 +87,15 @@ function MyDogs() {
                    }}
                 >
                   삭제
+                </SpurfyButton>
+                <SpurfyButton variant="primary"
+                    className="px-3 py-1 text-sm"
+                    onClick={(e) => {
+                    e.stopPropagation(); // 이벤트 버블링 방지!
+                    navigate(`/mypage/dogs/${dog.dogId}/edit`);
+                }}
+                >
+                수정
                 </SpurfyButton>
               </div>
             </li>

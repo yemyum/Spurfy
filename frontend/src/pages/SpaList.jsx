@@ -9,7 +9,7 @@ function SpaList() {
   useEffect(() => {
     api.get('/spa-services')
       .then((res) => setList(res.data.data))
-      .catch(() => alert('목록 불러오기 실패🐽'));
+      .catch(() => alert('목록 불러오기 실패'));
   }, []);
 
   return (
@@ -33,14 +33,14 @@ function SpaList() {
               <p className="text-gray-800">가격: {spa.price.toLocaleString()} 원 ~</p>
             </div>
 
-            {/* 태그 영역 (임시) */}
+            {/* 태그 영역 */}
             <div className="flex flex-wrap gap-1 my-2">
-              {spa.tags?.map((tag, index) => (
-                <span key={index} className="text-xs bg-blue-50 text-blue-500 px-2 py-1 rounded-full">
-                  #{tag}
-                </span>
-              ))}
-            </div>
+              {spa.tagNames?.map((tagName, index) => (
+                <span key={index} className="text-sm font-semibold bg-blue-50 text-blue-300 px-2 py-1 rounded-full">
+                  #{tagName}
+                </span>
+              ))}
+            </div>
 
             {/* 예약 버튼 */}
             <Link to={`/spalist/slug/${spa.slug}`}>

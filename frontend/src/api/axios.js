@@ -51,29 +51,23 @@ api.interceptors.response.use(
     const status = err.response?.status;
     const data = err.response?.data;
 
-    // JWT 토큰 만료 처리
-    if (status === 401) {
-      const msg =
-        typeof data === 'string'
-          ? data
-          : data?.message || data?.error || '';
+// JWT 토큰 만료 처리
+if (status === 401 || status === 403) {
+  const msg =
+    typeof data === 'string'
+      ? data
+      : data?.message || data?.error || '';
 
-      if (msg.includes('Token Expired')) {
-        alert('로그인 세션이 만료되었습니다. 다시 로그인 해주세요!');
-      } else {
-        alert('로그인 정보가 잘못되었습니다. 다시 로그인 해주세요!');
-      }
+  // 메시지 내용 관계없이 처리 (안 보내줄 수도 있으니까)
+  alert('세션이 만료되었거나 접근 권한이 없습니다. 다시 로그인해주세요!');
 
-      setTimeout(() => {
-        localStorage.removeItem('token');
-        window.location.href = '/login'; // 또는 SPA 방식이라면 useNavigate 사용
-      }, 100);
+  setTimeout(() => {
+    localStorage.removeItem('token');
+    window.location.href = '/login'; // 또는 navigate('/login');
+  }, 100);
 
-      return Promise.reject(err);
-    }
-
-    // 그 외 에러는 그대로 전달
-    return Promise.reject(err);
+  return Promise.reject(err);
+}
   }
 );
 

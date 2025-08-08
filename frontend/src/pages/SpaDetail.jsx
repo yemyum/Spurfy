@@ -15,6 +15,7 @@ function SpaDetail() {
   const [time, setTime] = useState('');
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0); 
+  const [serviceInfos, setServiceInfos] = useState([]);
 
   useEffect(() => {
   let mounted = true;
@@ -50,6 +51,19 @@ function SpaDetail() {
     return () => { mounted = false; };
   }, [spaSlug]); // spaSlug가 변경될 때마다 useEffect 재실행되도록 의존성 배열에 추가
 
+  useEffect(() => {
+  const fetchServiceInfos = async () => {
+    try {
+      const res = await api.get('/service-info'); // 카테고리 없이 전체 요청
+      setServiceInfos(res.data);
+    } catch (e) {
+      console.error("이용 안내 데이터 불러오기 실패:", e);
+    }
+  };
+
+  fetchServiceInfos();
+}, []);
+
   // [예약하기]는 결제페이지로 정보만 넘김!
   const handleReservation = () => {
     if (!selectedDogId || !date || !time) {
@@ -78,7 +92,7 @@ function SpaDetail() {
     <div className="flex flex-col space-y-4">
     {/* 1. 스파 사진 영역 (임시) */}
     <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-      스파 이미지 (임시)
+      이미지 준비중
     </div>
 
     {/* 2. 스파 설명 */}
@@ -100,15 +114,46 @@ function SpaDetail() {
       </p>
     </div>
 
-    {/* 3. 이용 전 안내 (임시) */}
-    <div className="border-t border-gray-200 pt-4">
-      <h3 className="font-semibold mb-2">이용 전 안내</h3>
-      <p className="text-sm text-gray-500">※ 실제 안내 문구는 추후 추가 예정</p>
-    </div>
+    {/* 이용 전 안내 */}
+<div className="border-t border-gray-200 pt-4">
+  {serviceInfos.length === 0 ? (
+    <p className="text-sm text-gray-500">준비 중.</p>
+  ) : (
+    <ul className="space-y-4">
+  {serviceInfos.map((info, idx) => {
+    // title 기준으로 이모지 + 스타일 다르게 적용
+    let emoji = '';
+
+    switch (info.title) {
+      case '이용 시간 안내':
+        emoji = '🕒';
+        break;
+      case '이용 전 안내':
+        emoji = '📌';
+        break;
+      case '스파 서비스 소개':
+        emoji = '🛁';
+        break;
+      default:
+        emoji = '📄';
+    }
+
+    return (
+      <li key={idx}>
+        <h4 className={`font-semibold mb-1`}>
+          {emoji} {info.title}
+        </h4>
+        <p className="text-sm text-gray-500 whitespace-pre-wrap">{info.content}</p>
+      </li>
+    );
+  })}
+</ul>
+  )}
+</div>
 
     {/* 4. 날짜 선택 */}
     <div className="border-t border-gray-200 pt-4">
-      <h3 className="font-semibold mb-2">날짜 선택</h3>
+      <h3 className="font-semibold mb-2">이용 날짜 선택</h3>
       <input
         type="date"
         value={date}
@@ -165,12 +210,12 @@ function SpaDetail() {
     </div>
 
     {/* 9. 리뷰 영역 */}
-    <div className="border-t border-gray-200 pt-4">
-      <h3 className="text-xl font-bold mb-4">리뷰 ({reviews.length}개)</h3>
+    <div className="border-t border-gray-200 pt-2 pb-4">
+      <h3 className="text-lg font-semibold mb-2">리뷰 ({reviews.length}개)</h3>
       
     {/* 평균 별점 표시 */}
       {reviews.length > 0 && (
-        <div className="flex items-center font-semibold text-lg mb-4">
+        <div className="flex items-center font-semibold text-lg mb-2">
           <span className="text-spurfyBlue text-xl mr-1">★</span>
           <span>{averageRating.toFixed(1)}</span>
         </div>
@@ -180,7 +225,7 @@ function SpaDetail() {
       <div className="space-y-4">
         {reviews.slice(0, 3).map((r) => (
           <div key={r.reviewId} className="border rounded-lg p-4">
-            <div className="font-semibold mb-2">{r.userNickname}</div>
+            <div className="font-semibold mb-1">{r.userNickname}</div>
             <div className="flex items-center gap-2 mb-2">
               <StarRating rating={r.rating} readOnly={true} size="small" />
               <span className="text-sm text-gray-400">{r.createdAt?.slice(0, 10)}</span>
