@@ -62,6 +62,13 @@ public class SpaServiceServiceImpl implements SpaServiceService {
                                 ? List.of()
                                 : List.of(entity.getAvailableTimes().split(","))
                 )
+                .tagNames(
+                        entity.getTags() == null
+                                ? List.of()
+                                : entity.getTags().stream()
+                                .map(tag -> tag.getTagName())
+                                .toList()
+                )
                 .build();
     }
 
@@ -73,6 +80,13 @@ public class SpaServiceServiceImpl implements SpaServiceService {
                 .price(entity.getPrice())
                 .durationMinutes(entity.getDurationMinutes())
                 .slug(entity.getSlug())
+                .tagNames(
+                        entity.getTags() == null
+                                ? List.of()
+                                : entity.getTags().stream()
+                                .map(tag -> tag.getTagName())
+                                .toList()
+                )
                 .build();
     }
 

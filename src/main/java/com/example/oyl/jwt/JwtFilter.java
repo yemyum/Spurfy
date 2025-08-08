@@ -12,6 +12,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -56,29 +57,28 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 // DB에서 사용자 조회
                 User user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+                        .orElse(null);
 
-                // 권한 문자열 얻기 ("ROLE_USER" 또는 "ROLE_ADMIN")
-                String role = UserRole.fromCode(user.getUserRole());
+                if (user != null) {
+                    String role = UserRole.fromCode(user.getUserRole());
 
-                // 인증 객체 만들 때 권한 넣기!
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(email, null, List.of(() -> role));
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(email, null, List.of(() -> role));
 
-                SecurityContextHolder.getContext().setAuthentication(authentication); // 인증된 사용자라고 알려주는 역할
-
-                request.setAttribute("username", email);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                    request.setAttribute("username", email);
+                }
 
             } catch (ExpiredJwtException e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token Expired");
-                return;
-
+                logger.warn("JWT expired", e);
+                SecurityContextHolder.clearContext();
             } catch (Exception e) {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid Token");
-                return;
+                logger.warn("Invalid JWT", e);
+                SecurityContextHolder.clearContext();
             }
         }
 
+        // 무조건 다음 필터로 넘기기
         filterChain.doFilter(request, response);
     }
 }

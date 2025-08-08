@@ -21,4 +21,6 @@ public class SpaServiceDTO {
     private List<String> availableTimes;
     private String slug;
 
+    private List<String> tagNames;
+
 }

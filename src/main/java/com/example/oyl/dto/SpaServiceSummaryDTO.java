@@ -2,6 +2,8 @@ package com.example.oyl.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder // 여러 필드 매핑할 땐 빌더가 가독성 good!
@@ -14,5 +16,7 @@ public class SpaServiceSummaryDTO {
     private Long price;
     private int durationMinutes;
     private String slug;
+
+    private List<String> tagNames;
 
 }
