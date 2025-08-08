@@ -7,6 +7,9 @@ import com.example.oyl.dto.ReviewRequestDTO;
 import com.example.oyl.dto.ReviewUpdateDTO;
 import com.example.oyl.service.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -80,18 +83,6 @@ public class ReviewController {
         );
     }
 
-    @GetMapping("/public/{serviceId}")
-    public ResponseEntity<ApiResponse<List<ReviewPublicDTO>>> getReviewsByService(@PathVariable String serviceId) {
-        List<ReviewPublicDTO> reviews = reviewService.getReviewsByService(serviceId);
-        return ResponseEntity.ok(
-                ApiResponse.<List<ReviewPublicDTO>>builder()
-                        .code("S001")
-                        .message("서비스별 리뷰 목록 조회 성공!")
-                        .data(reviews)
-                        .build()
-        );
-    }
-
     @GetMapping("/{reviewId}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<ReviewMyPageDTO>> getReviewDetail(@PathVariable String reviewId) {
@@ -109,11 +100,15 @@ public class ReviewController {
     }
 
     @GetMapping("/public/slug/{spaSlug}")
-    public ResponseEntity<ApiResponse<List<ReviewPublicDTO>>> getReviewsBySpaSlug(@PathVariable String spaSlug) {
-        List<ReviewPublicDTO> reviews = reviewService.getReviewsBySpaSlug(spaSlug);
+    public ResponseEntity<ApiResponse<Page<ReviewPublicDTO>>> getReviewsBySpaSlug(
+            @PathVariable String spaSlug,
+            @PageableDefault(page = 0, size = 5) Pageable pageable) {
+
+        // 서비스 메서드에 pageable 객체 전달
+        Page<ReviewPublicDTO> reviews = reviewService.getReviewsBySpaSlug(spaSlug, pageable);
 
         return ResponseEntity.ok(
-                ApiResponse.<List<ReviewPublicDTO>>builder()
+                ApiResponse.<Page<ReviewPublicDTO>>builder()
                         .code("S001")
                         .message("슬러그 기반 스파 리뷰 목록 조회 성공!")
                         .data(reviews)

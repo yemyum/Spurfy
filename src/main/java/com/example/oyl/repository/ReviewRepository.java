@@ -2,6 +2,8 @@ package com.example.oyl.repository;
 
 import com.example.oyl.domain.Review;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -19,8 +21,6 @@ public interface ReviewRepository extends JpaRepository<Review, String> {
     @Query("SELECT r FROM Review r JOIN FETCH r.dog d JOIN FETCH r.reservation res JOIN FETCH res.spaService WHERE r.user.userId = :userId ORDER BY r.createdAt DESC")
     List<Review> findAllWithDogAndServiceByUserId(@Param("userId") String userId);
 
-    // Reservation을 통해 SpaService의 slug로 Review를 찾아오는 쿼리
-    @Query("SELECT r FROM Review r JOIN r.reservation res JOIN res.spaService ss WHERE ss.slug = :spaSlug")
-    List<Review> findBySpaServiceSlug(@Param("spaSlug") String spaSlug);
-
+    @Query("SELECT r FROM Review r JOIN FETCH r.reservation res JOIN FETCH res.spaService ss JOIN FETCH r.user u JOIN FETCH r.dog d WHERE ss.slug = :spaSlug ORDER BY r.createdAt DESC")
+    Page<Review> findBySpaServiceSlug(@Param("spaSlug") String spaSlug, Pageable pageable); // Pageable 파라미터 추가
 }

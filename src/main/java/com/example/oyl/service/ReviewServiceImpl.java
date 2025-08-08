@@ -9,6 +9,8 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -145,26 +147,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewPublicDTO> getReviewsByService(String serviceId) {
-        List<Review> reviews = reviewRepository.findAllWithUserAndDogByServiceId(serviceId);
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
-        return reviews.stream()
-                .map(r -> ReviewPublicDTO.builder()
-                        .reviewId(r.getReviewId())
-                        .userNickname(r.getUser().getNickname())
-                        .dogName(r.getDog().getName())
-                        .rating(r.getRating())
-                        .content(r.getContent())
-                        .imageUrl(r.getImageUrl())
-                        .createdAt(r.getCreatedAt().format(formatter))
-                        .build())
-                .toList();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public ReviewMyPageDTO getReviewDetailForMypage(String reviewId, String userEmail) {
 
         // 1. 현재 로그인한 사용자 정보 조회
@@ -200,22 +182,22 @@ public class ReviewServiceImpl implements ReviewService {
                     .build();
     }
 
-    public List<ReviewPublicDTO> getReviewsBySpaSlug(String spaSlug) {
-        // 1. ReviewRepository를 사용해서 해당 슬러그를 가진 스파의 리뷰들을 가져옴
-        List<Review> reviews = reviewRepository.findBySpaServiceSlug(spaSlug);
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReviewPublicDTO> getReviewsBySpaSlug(String spaSlug, Pageable pageable) {
+        // 1. ReviewRepository에 pageable 객체를 전달하여 페이징된 리뷰 엔티티들을 가져옴
+        Page<Review> reviewsPage = reviewRepository.findBySpaServiceSlug(spaSlug, pageable);
 
-        // 2. 가져온 Review 엔티티들을 ReviewPublicDTO로 변환해서 반환
-        return reviews.stream()
-                .map(r -> ReviewPublicDTO.builder()
-                        .reviewId(r.getReviewId())
-                        .userNickname(r.getUser() != null ? r.getUser().getNickname() : "알 수 없음") // User에서 닉네임 가져옴
-                        .content(r.getContent())
-                        .rating(r.getRating())
-                        .imageUrl(r.getImageUrl())
-                        .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) : null)
-                        .build())
-                .collect(Collectors.toList());
+        // 2. 가져온 Page<Review>를 Page<ReviewPublicDTO>로 변환해서 반환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        return reviewsPage.map(r -> ReviewPublicDTO.builder()
+                .reviewId(r.getReviewId())
+                .userNickname(r.getUser() != null ? r.getUser().getNickname() : "알 수 없음")
+                .content(r.getContent())
+                .rating(r.getRating())
+                .imageUrl(r.getImageUrl())
+                .createdAt(r.getCreatedAt() != null ? r.getCreatedAt().format(formatter) : null)
+                .build());
     }
-
-
 }
