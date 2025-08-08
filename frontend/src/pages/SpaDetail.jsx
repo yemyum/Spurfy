@@ -114,41 +114,50 @@ function SpaDetail() {
       </p>
     </div>
 
-    {/* 이용 전 안내 */}
+ {/* 이용 전 안내 */}
 <div className="border-t border-gray-200 pt-4">
-  {serviceInfos.length === 0 ? (
-    <p className="text-sm text-gray-500">준비 중.</p>
-  ) : (
-    <ul className="space-y-4">
-  {serviceInfos.map((info, idx) => {
-    // title 기준으로 이모지 + 스타일 다르게 적용
-    let emoji = '';
+    {serviceInfos.length === 0 ? (
+        <p className="text-sm text-gray-500">준비 중.</p>
+    ) : (
+        <ul className="space-y-4">
+            {serviceInfos.map((info, idx) => {
+                let emoji = '';
 
-    switch (info.title) {
-      case '이용 시간 안내':
-        emoji = '🕒';
-        break;
-      case '이용 전 안내':
-        emoji = '📌';
-        break;
-      case '스파 서비스 소개':
-        emoji = '🛁';
-        break;
-      default:
-        emoji = '📄';
-    }
+                switch (info.title) {
+                    case '이용 시간 안내':
+                        emoji = '🕒';
+                        break;
+                    case '이용 전 안내':
+                        emoji = '📌';
+                        break;
+                    case '스파 서비스 소개':
+                        emoji = '🛁';
+                        break;
+                    default:
+                        emoji = '📄';
+                }
 
-    return (
-      <li key={idx}>
-        <h4 className={`font-semibold mb-1`}>
-          {emoji} {info.title}
-        </h4>
-        <p className="text-sm text-gray-500 whitespace-pre-wrap">{info.content}</p>
-      </li>
-    );
-  })}
-</ul>
-  )}
+                // ⭐ li 태그로 감싸고, key를 li에 추가 ⭐
+                return (
+                    <li key={idx}>
+                        <h4 className={`font-semibold text-gray-700 mb-2`}>
+                            {emoji} {info.title}
+                        </h4>
+                        
+                        {/* ⭐ info.content를 점리스트로 ⭐ */}
+                        <ul className="list-disc list-inside space-y-2">
+                            {info.content.split('\n').map((item, i) => (
+                                <li key={i} className="text-base text-gray-500">{item}</li>
+                            ))}
+                        </ul>
+                    </li>
+                );
+            })}
+        </ul>
+    )}
+    <p className="mt-4 text-sm font-semibold text-gray-400 whitespace-pre-wrap">
+        ※ 피부 질환이나 심장 질환, 만성 질병이 있는 경우에는 반려견의 안전을 위해 전문가와 상담 후 이용해주시길 권장드립니다.
+    </p>
 </div>
 
     {/* 4. 날짜 선택 */}
