@@ -16,4 +16,6 @@ public class GptSpaRecommendationResponseDTO {
     private String spaSlug; // 스파 상세 페이지 이동을 위한 URL 슬러그
     private Long id; // AI 추천 기록의 고유 ID (저장될 때 부여되는 ID)
     private LocalDateTime createdAt; // AI 추천 기록이 생성된 시간
+
+    private String imageUrl;
 }

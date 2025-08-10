@@ -246,6 +246,8 @@ public class DogImageService {
         try {
             String imageUrlForHistory = "/api/images/" + savedFileName;
 
+            spaRecommendationDto.setImageUrl(imageUrlForHistory); // 프론트로 보낼 URL
+
             AiRecommendHistory history = AiRecommendHistory.builder()
                     .userId(userEmail)
                     .imageUrl(imageUrlForHistory)
