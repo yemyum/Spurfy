@@ -155,7 +155,7 @@ function SpaDetail() {
             })}
         </ul>
     )}
-    <p className="mt-4 text-sm font-semibold text-gray-400 whitespace-pre-wrap">
+    <p className="mt-4 text-sm font-semibold text-gray-500 whitespace-pre-wrap">
         ※ 피부 질환이나 심장 질환, 만성 질병이 있는 경우에는 반려견의 안전을 위해 전문가와 상담 후 이용해주시길 권장드립니다.
     </p>
 </div>
