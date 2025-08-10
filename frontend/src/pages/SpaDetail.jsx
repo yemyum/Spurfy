@@ -155,7 +155,7 @@ function SpaDetail() {
             })}
         </ul>
     )}
-    <p className="mt-4 text-sm font-semibold text-gray-500 whitespace-pre-wrap">
+    <p className="mt-6 text-sm font-semibold text-gray-500 whitespace-pre-wrap">
         ※ 피부 질환이나 심장 질환, 만성 질병이 있는 경우에는 반려견의 안전을 위해 전문가와 상담 후 이용해주시길 권장드립니다.
     </p>
 </div>
@@ -167,7 +167,7 @@ function SpaDetail() {
         type="date"
         value={date}
         onChange={(e) => setDate(e.target.value)}
-        className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
+        className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2 mb-2"
       />
     </div>
 
@@ -177,7 +177,7 @@ function SpaDetail() {
       <select
         value={time}
         onChange={e => setTime(e.target.value)}
-        className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
+        className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2 mb-2"
       >
         <option value="">시간 선택</option>
         {Array.isArray(spa.availableTimes) && spa.availableTimes.length > 0 ? (
@@ -193,7 +193,7 @@ function SpaDetail() {
     {/* 6. 강아지 선택 */}
     <div className="border-t border-gray-200 pt-4">
       <h3 className="font-semibold">반려견 선택</h3>
-      <p className="text-sm text-gray-500 mb-2">
+      <p className="text-sm text-gray-400 mb-2">
         (반려견을 등록하셔야 예약이 가능하며, 등록하신 정보를 토대로 진행됩니다.)
       </p>
       <select
@@ -212,14 +212,14 @@ function SpaDetail() {
     <div className="pt-6">
     <SpurfyButton variant="primary"
       onClick={handleReservation}
-      className="w-full text-white py-3 rounded font-semibold"
+      className="w-full text-white py-3 rounded font-semibold mb-2"
     >
       예약하기
     </SpurfyButton>
     </div>
 
     {/* 9. 리뷰 영역 */}
-    <div className="border-t border-gray-200 pt-2 pb-4">
+    <div className="border-t border-gray-200 pt-4">
       <h3 className="text-lg font-semibold mb-2">리뷰 ({reviews.length}개)</h3>
       
     {/* 평균 별점 표시 */}
@@ -253,7 +253,7 @@ function SpaDetail() {
       </div>
             <div
                 onClick={() => navigate(`/spa-reviews/slug/${spaSlug}`)} // 새로운 리뷰 상세 페이지로 이동!
-                className="w-full text-center text-gray-400 mt-10 cursor-pointer hover:underline"
+                className="w-full text-center text-gray-400 mt-10 mb-2 cursor-pointer hover:underline"
             >
                 더보기 ({reviews.length}개)
             </div>
