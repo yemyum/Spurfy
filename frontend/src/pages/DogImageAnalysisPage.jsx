@@ -186,7 +186,7 @@ const syncChecklistToRef = () => {
     try {
       const formData = new FormData();
       formData.append('dogImageFile', selectedFile);
-      
+
       if (checklistDataRef.current) {
         formData.append('checklist', JSON.stringify(checklistDataRef.current));
       }
@@ -235,7 +235,7 @@ const syncChecklistToRef = () => {
   }, [navigate]);
 
   return (
-    <div className="w-full h-full mx-auto bg-white mt-10 mb-10 overflow-hidden">
+    <div className="w-full h-full mx-auto bg-white flex flex-col">
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center">
         <h2 className="text-2xl font-bold text-spurfyAI">Spurfy AI Chat</h2>
         {/* 오른쪽 끝 이모지 버튼 */}
@@ -253,7 +253,7 @@ const syncChecklistToRef = () => {
         </button>
       </div>
 
-      <div className="flex-1 relative bg-gray-50 pt-10">
+      <div className="flex-1 relative bg-gray-50 mt-[70px]">
         <div className="flex-1 bg-gray-50 overflow-y-auto p-6 pb-24 flex flex-col space-y-2">
           {chatMessages.length > 0 ? (
             chatMessages.map((msg) => (
@@ -272,8 +272,9 @@ const syncChecklistToRef = () => {
               {errorMessage}
             </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
+
+        <div ref={messagesEndRef} />
 
         <form onSubmit={handleImageAnalysis} className="absolute bottom-0 left-0 right-0 z-40 w-full flex items-center gap-4 p-4 bg-gray-100">
           <label htmlFor="dogImageFileInput" className="cursor-pointer">
