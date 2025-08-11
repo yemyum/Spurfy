@@ -26,6 +26,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -115,10 +116,10 @@ public class DogImageService {
             }
 
             // 1. 필터링 키워드(무시할 라벨) 미리 선언
-            visionLabels = visionResult.getLabels().stream()
-                    .map(label -> label.getDescription())
+            visionLabels = Optional.ofNullable(visionResult.getLabels()).orElse(List.of()).stream()
+                    .map(l -> l.getDescription())
                     .filter(desc -> BANNED_LABELS.stream().noneMatch(bad -> desc.toLowerCase().contains(bad)))
-                    .toList();
+                    .collect(Collectors.toList());
 
         } catch (CustomException e) {
             log.warn("Vision 분석 실패 → {}", e.getMessage());
@@ -192,23 +193,27 @@ public class DogImageService {
         log.info("최종적으로 GPT에 전달될 건강 문제: {}", finalHealthIssuesToUse);
 
         String finalAdjActivity = toAdjective(finalActivityLevelToUse); // "활발함" → "활발한"
+
+        // 사용자가 "모름"을 선택했다면 breedForPrompt는 "모름"
         String breedForPrompt = UNKNOWN_BREED.equals(finalBreedToUse) ? "모름" : finalBreedToUse;
+
+        // 유효한 견종이 있는지 판단 (Vision or 사용자 선택)
+        boolean hasUsableBreed = !(UNKNOWN_BREED.equals(finalBreedToUse) || "모름".equals(finalBreedToUse));
 
 
         // ✅ 결정된 값들을 바탕으로 GPT API를 호출하고 응답을 처리하는 로직 시작
         GptSpaRecommendationResponseDTO spaRecommendationDto;
         try {
-            log.info("GPT 호출 결정 - finalBreedToUse: '{}'", finalBreedToUse);
-
-            // 공통 필드 변수들을 미리 준비
-            String ageGroup = finalAgeGroupToUse;
-            List<String> healthIssues = finalHealthIssuesToUse;
             String activityLevel = finalAdjActivity;
+            String ageGroup = finalAgeGroupToUse;
+            List<String> healthIssues = (finalHealthIssuesToUse != null) ? finalHealthIssuesToUse : List.of();
+
+            log.info("GPT 호출 결정 - breedForPrompt='{}', hasUsableBreed={}, age='{}', activity='{}'",
+                    breedForPrompt, hasUsableBreed, ageGroup, activityLevel);
 
             // Vision API 결과에 따라 다른 GPT 클라이언트를 호출
-            if (UNKNOWN_BREED.equals(detectedBreed)) { // Vision이 못 맞추고 사용자도 선택 안 했을 때
+            if (!hasUsableBreed) { // ✅ 견종 확정 불가 → 라벨 기반
                 log.info("Calling gptClient.recommendSpaByLabels...");
-                // 라벨 기반 추천 DTO에 공통 필드와 특정 필드를 모두 넣어 빌드
                 SpaLabelRecommendationRequestDTO labelDto = SpaLabelRecommendationRequestDTO.builder()
                         .labels(visionLabels)
                         .ageGroup(ageGroup)
@@ -217,15 +222,14 @@ public class DogImageService {
                         .activityLevel(activityLevel)
                         .checklist(checklist)
                         .question(question)
-                        .breed(breedForPrompt)
+                        .breed(breedForPrompt) // "모름"
                         .build();
 
                 spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto); // DTO로 받음
-            } else {  // Vision이 맞추거나 사용자가 선택했을 때
+            } else {  // ✅ 견종 확정됨 → 견종 기반
                 log.info("Calling gptClient.recommendSpa...");
-                // 견종 기반 추천 DTO에 공통 필드와 특정 필드를 모두 넣어 빌드
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
-                        .breed(breedForPrompt) // 사용자 선택 견종 또는 Vision 인식 견종이 전달됨
+                        .breed(breedForPrompt) // 실제 견종명
                         .ageGroup(ageGroup)
                         .skinTypes(List.of())
                         .healthIssues(healthIssues)
@@ -238,21 +242,13 @@ public class DogImageService {
             }
 
             // ⭐⭐ GPT 응답 후 spaSlug가 null일 경우 DB에서 찾아 채워넣는 로직 추가 ⭐⭐
-            if (spaRecommendationDto != null && spaRecommendationDto.getSpaSlug() == null && spaRecommendationDto.getSpaName() != null) {
-                String cleanSpaName = spaRecommendationDto.getSpaName()
-                        .replace("**", "")
-                        .replace("🧘‍♀️ ", "")
-                        .replace("🌸 ", "")
-                        .replace("🛁 ", "")
-                        .replace("🌿 ", "")
-                        .replace("에요!", "")
-                        .trim();
+            if (spaRecommendationDto != null
+                    && spaRecommendationDto.getSpaSlug() == null
+                    && spaRecommendationDto.getSpaName() != null) {
 
-                // DB에서 스파 이름으로 SpaService 엔티티를 찾음
-                Optional<SpaService> foundSpa = spaServiceRepository.findByName(cleanSpaName);
+                String cleanSpaName = normalizeSpaName(spaRecommendationDto.getSpaName());
 
-                // 찾았다면 해당 스파의 slug를 DTO에 설정
-                foundSpa.ifPresent(spaService -> {
+                spaServiceRepository.findByName(cleanSpaName).ifPresent(spaService -> {
                     spaRecommendationDto.setSpaSlug(spaService.getSlug());
                     log.info("DB에서 spaSlug 찾아서 채워넣음: {}", spaService.getSlug());
                 });
@@ -265,10 +261,11 @@ public class DogImageService {
                 spaRecommendationDto.setRecommendationHeader(dedupeKo(spaRecommendationDto.getRecommendationHeader()));
                 spaRecommendationDto.setSpaName(dedupeKo(spaRecommendationDto.getSpaName()));
                 if (spaRecommendationDto.getSpaDescription() != null) {
-                    List<String> cleaned = spaRecommendationDto.getSpaDescription().stream()
-                            .map(this::dedupeKo)
-                            .toList();
-                    spaRecommendationDto.setSpaDescription(cleaned);
+                    spaRecommendationDto.setSpaDescription(
+                            spaRecommendationDto.getSpaDescription().stream()
+                                    .map(this::dedupeKo)
+                                    .collect(Collectors.toList())
+                    );
                 }
                 spaRecommendationDto.setClosing(dedupeKo(spaRecommendationDto.getClosing()));
             }
@@ -323,6 +320,14 @@ public class DogImageService {
         text = text.replaceAll("([가-힣]+)\\s*하고\\s*\\1\\b", "$1");
         text = text.replaceAll("(\\b[가-힣]+)\\s+\\1(한|인|함)?", "$1$2");
         return text;
+    }
+
+    // spaName 정리: 마크다운/이모지/따옴표/끝맺음 표현/여러 공백 제거
+    private String normalizeSpaName(String raw) {
+        if (raw == null) return null;
+        return raw.replaceAll("(\\*\\*|[🧘‍♀️🌸🛁🌿]|\"|에?요!?)", "")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
 }
