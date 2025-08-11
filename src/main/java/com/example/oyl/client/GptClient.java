@@ -213,7 +213,7 @@ public class GptClient {
         promptBuilder.append("※ 예시는 제공하지 않으며, 구조와 지침만을 참고하여 응답 구성할 것.\n");
 
         promptBuilder.append("※ 'spaDescription'은 리스트 형태로 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
-        promptBuilder.append("※ 'intro' 필드는 견종이 인식되면 '보호자님이 알려주신 견종은 **[견종]**(이)군요!'로 시작하고, 인식되지 않으면 '사진 속 아이의 견종을 인식하지 못했어요..!'로 시작해야 해.\n");
+        promptBuilder.append("※ 'intro' 필드는 견종이 인식되면 '보호자님이 알려주신 견종은 **[견종]**(이)군요!'로 시작하고, 인식되지 않으면 '우리 아이의 견종을 정확하게 파악하긴 어려웠지만,'으로 시작해야 해.\n");
         promptBuilder.append("※ 'spaName' 필드는 이모지 포함 마크다운 굵은 글씨로 스파 이름과 '에요!' 문장을 함께 작성해야 해. (예: **🌸 프리미엄 브러싱 스파**에요!)\n");
         promptBuilder.append("마지막 줄(closing 필드)은 반드시 아래 3가지 중 하나를 정확히 선택해 그대로 출력할 것:\n");
         promptBuilder.append("- 저희 스퍼피에서 보호자님의 소중한 반려견과 함께 하는 스파 시간을 기다리고 있을게요 💙\n");
