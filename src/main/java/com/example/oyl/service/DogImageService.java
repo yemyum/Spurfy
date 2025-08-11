@@ -38,6 +38,14 @@ public class DogImageService {
     private final SpaServiceRepository spaServiceRepository;
     private final ObjectMapper objectMapper;
 
+    private static final String UPLOAD_DIRECTORY = "uploads";
+    private static final String UNKNOWN_BREED = "알 수 없는 견종의 강아지";
+    private static final String DEFAULT_AGE_GROUP = "성견";
+    private static final String DEFAULT_ACTIVITY_LEVEL = "보통";
+    private static final String CHECKLIST_NOT_SELECTED_BREED = "선택 안 함";
+    private static final List<String> BANNED_LABELS = List.of("clothes", "costume", "pet supply", "clothing", "supply");
+    private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
+
     private static final int MAX_DAILY_AI_CALLS = 10;  // 실제 서비스는 5번 이하로 수정해두기
 
     // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
@@ -53,13 +61,14 @@ public class DogImageService {
         long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetween(userEmail, startOfDay, endOfDay);
 
         if (todayCount >= MAX_DAILY_AI_CALLS) {
-            log.warn("AI 대화 횟수 제한 초과! 현재 호출 횟수: {}, 최대 허용: {}", todayCount, MAX_DAILY_AI_CALLS);
+            log.warn("DogImageService.analyzeAndRecommendSpa - AI 대화 횟수 제한 초과! 현재 호출 횟수: {}, 최대 허용: {}", todayCount, MAX_DAILY_AI_CALLS);
             throw new CustomException(ErrorCode.CONVERSATION_LIMIT_EXCEEDED,
                     "하루 AI 대화 횟수(" + MAX_DAILY_AI_CALLS + "회)를 초과했습니다. 내일 다시 시도해주세요.");
         }
 
-        String uploadDir = "uploads";
-        Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+        // ✅ 이미지 파일을 서버에 저장하는 로직 시작
+        Path uploadPath = Paths.get(UPLOAD_DIRECTORY).toAbsolutePath().normalize();
         String savedFileName;
 
         try {
@@ -77,7 +86,7 @@ public class DogImageService {
             }
 
             savedFileName = originalFileName + "_" +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS")) + fileExtension;
+                    LocalDateTime.now().format(DateTimeFormatter.ofPattern(IMAGE_FILE_NAME_FORMAT)) + fileExtension;
 
             Path filePath = uploadPath.resolve(savedFileName);
             Files.copy(dogImageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
@@ -88,8 +97,10 @@ public class DogImageService {
             throw new CustomException(ErrorCode.INTERNAL_ERROR, "파일 저장 중 오류 발생: " + e.getMessage());
         }
 
+
+        // ✅ Google Vision API를 호출하여 이미지 분석하는 로직 시작
         VisionAnalysisResult visionResult;
-        String detectedBreed = "알 수 없는 견종의 강아지"; // 기본값 설정
+        String detectedBreed = UNKNOWN_BREED; // 기본값 설정
         List<String> visionLabels = new ArrayList<>(); // Vision API 라벨 (초기화)
 
         try {
@@ -104,10 +115,9 @@ public class DogImageService {
             }
 
             // 1. 필터링 키워드(무시할 라벨) 미리 선언
-            List<String> bannedLabels = List.of("clothes", "costume", "pet supply", "clothing", "supply");
             visionLabels = visionResult.getLabels().stream()
                     .map(label -> label.getDescription())
-                    .filter(desc -> bannedLabels.stream().noneMatch(bad -> desc.toLowerCase().contains(bad)))
+                    .filter(desc -> BANNED_LABELS.stream().noneMatch(bad -> desc.toLowerCase().contains(bad)))
                     .toList();
 
         } catch (CustomException e) {
@@ -119,10 +129,12 @@ public class DogImageService {
 
         log.info("Vision 분석 완료 → {}", detectedBreed);
 
+
+        // ✅ 사용자 체크리스트를 파싱하고 GPT에 전달할 최종 값 결정하는 로직 시작
         // Checklist에서 파싱할 정보들
         String userSelectedBreed = null;
-        String userSelectedAgeGroup = "성견"; // 기본값
-        String userSelectedActivityLevel = "보통"; // 기본값
+        String userSelectedAgeGroup = DEFAULT_AGE_GROUP; // "성견"을 상수로 대체
+        String userSelectedActivityLevel = DEFAULT_ACTIVITY_LEVEL; // "보통"을 상수로 대체
         List<String> userSelectedHealthIssues = new ArrayList<>(); // 사용자 선택 건강 문제
 
         log.info("Received raw checklist string from frontend: {}", checklist);
@@ -149,22 +161,20 @@ public class DogImageService {
         }
 
         // 최종적으로 GPT에 전달할 견종, 연령대, 활동 수준 결정
-        String finalBreedToUse = detectedBreed; // Vision API 결과가 1순위
-        if (userSelectedBreed != null && !userSelectedBreed.isEmpty() && !"선택 안 함".equals(userSelectedBreed)) {
-            finalBreedToUse = userSelectedBreed; // 사용자가 선택했으면 사용자 선택이 2순위
+        String finalBreedToUse = detectedBreed;
+        // "선택 안 함"을 상수로 대체
+        if (userSelectedBreed != null && !userSelectedBreed.isEmpty() && !CHECKLIST_NOT_SELECTED_BREED.equals(userSelectedBreed)) {
+            finalBreedToUse = userSelectedBreed;
             log.info("사용자 선택 견종 ({})이 Vision API 결과 ({})보다 우선 적용됩니다.", userSelectedBreed, detectedBreed);
         }
 
-        String finalAgeGroupToUse = userSelectedAgeGroup; // 사용자 선택이 1순위 (선택 안 하면 빈 문자열)
-        String finalActivityLevelToUse = userSelectedActivityLevel; // 사용자 선택이 1순위 (선택 안 하면 빈 문자열)
+        String finalAgeGroupToUse = userSelectedAgeGroup;
+        String finalActivityLevelToUse = userSelectedActivityLevel;
 
         log.info("최종적으로 GPT에 전달될 견종: '{}', 연령대: '{}', 활동 수준: '{}'", finalBreedToUse, finalAgeGroupToUse, finalActivityLevelToUse);
 
         // Vision API 라벨과 사용자 선택 건강 문제를 결합 (중복 제거)
         HashSet<String> combinedHealthIssuesSet = new HashSet<>(userSelectedHealthIssues);
-
-        // Vision API 라벨 중 건강 관련 키워드를 healthIssues로 추가 (예시)
-        // 실제 Vision API 라벨이 어떤 식으로 오는지 확인 후 매핑 규칙을 정교하게 다듬어야 함
         for (String label : visionLabels) {
             String lowerCaseLabel = label.toLowerCase();
             if (lowerCaseLabel.contains("skin") || lowerCaseLabel.contains("dermatitis") || lowerCaseLabel.contains("itchy")) {
@@ -181,33 +191,45 @@ public class DogImageService {
         List<String> finalHealthIssuesToUse = new ArrayList<>(combinedHealthIssuesSet);
         log.info("최종적으로 GPT에 전달될 건강 문제: {}", finalHealthIssuesToUse);
 
+        String finalAdjActivity = toAdjective(finalActivityLevelToUse); // "활발함" → "활발한"
+        String breedForPrompt = UNKNOWN_BREED.equals(finalBreedToUse) ? "모름" : finalBreedToUse;
+
+
+        // ✅ 결정된 값들을 바탕으로 GPT API를 호출하고 응답을 처리하는 로직 시작
         GptSpaRecommendationResponseDTO spaRecommendationDto;
         try {
             log.info("GPT 호출 결정 - finalBreedToUse: '{}'", finalBreedToUse);
-            // 이 조건문은 GPT에 어떤 DTO를 보낼지 결정하는 중요한 부분
-            if ("알 수 없는 견종의 강아지".equals(detectedBreed)) { // Vision이 못 맞추고 사용자도 선택 안 했을 때
+
+            // 공통 필드 변수들을 미리 준비
+            String ageGroup = finalAgeGroupToUse;
+            List<String> healthIssues = finalHealthIssuesToUse;
+            String activityLevel = finalAdjActivity;
+
+            // Vision API 결과에 따라 다른 GPT 클라이언트를 호출
+            if (UNKNOWN_BREED.equals(detectedBreed)) { // Vision이 못 맞추고 사용자도 선택 안 했을 때
                 log.info("Calling gptClient.recommendSpaByLabels...");
-                // 라벨 기반 추천으로 fallback!
+                // 라벨 기반 추천 DTO에 공통 필드와 특정 필드를 모두 넣어 빌드
                 SpaLabelRecommendationRequestDTO labelDto = SpaLabelRecommendationRequestDTO.builder()
                         .labels(visionLabels)
-                        .ageGroup(finalAgeGroupToUse)
+                        .ageGroup(ageGroup)
                         .skinTypes(List.of())
-                        .healthIssues(finalHealthIssuesToUse)
-                        .activityLevel(finalActivityLevelToUse)
+                        .healthIssues(healthIssues)
+                        .activityLevel(activityLevel)
                         .checklist(checklist)
                         .question(question)
-                        .breed(finalBreedToUse) // "알 수 없는 견종의 강아지"가 전달됨
+                        .breed(breedForPrompt)
                         .build();
 
                 spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto); // DTO로 받음
-            } else {  // Vision이 맞추거나 사용자가 선택했을 때 (이 경우 recommendSpa 호출)
+            } else {  // Vision이 맞추거나 사용자가 선택했을 때
                 log.info("Calling gptClient.recommendSpa...");
+                // 견종 기반 추천 DTO에 공통 필드와 특정 필드를 모두 넣어 빌드
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
-                        .breed(finalBreedToUse)  // 사용자 선택 견종 또는 Vision 인식 견종이 전달됨
-                        .ageGroup(finalAgeGroupToUse)
-                        .skinTypes(List.of())   // TODO: skinTypes도 Checklist에 있다면 파싱하여 적용 필요
-                        .healthIssues(finalHealthIssuesToUse)
-                        .activityLevel(finalActivityLevelToUse)
+                        .breed(breedForPrompt) // 사용자 선택 견종 또는 Vision 인식 견종이 전달됨
+                        .ageGroup(ageGroup)
+                        .skinTypes(List.of())
+                        .healthIssues(healthIssues)
+                        .activityLevel(activityLevel)
                         .checklist(checklist)
                         .question(question)
                         .build();
@@ -236,6 +258,21 @@ public class DogImageService {
                 });
             }
 
+            // 최종 출력 문구 중복 수식어 방지 (LLM이 실수해도 한 번 더 정리)
+            if (spaRecommendationDto != null) {
+                spaRecommendationDto.setIntro(dedupeKo(spaRecommendationDto.getIntro()));
+                spaRecommendationDto.setCompliment(dedupeKo(spaRecommendationDto.getCompliment()));
+                spaRecommendationDto.setRecommendationHeader(dedupeKo(spaRecommendationDto.getRecommendationHeader()));
+                spaRecommendationDto.setSpaName(dedupeKo(spaRecommendationDto.getSpaName()));
+                if (spaRecommendationDto.getSpaDescription() != null) {
+                    List<String> cleaned = spaRecommendationDto.getSpaDescription().stream()
+                            .map(this::dedupeKo)
+                            .toList();
+                    spaRecommendationDto.setSpaDescription(cleaned);
+                }
+                spaRecommendationDto.setClosing(dedupeKo(spaRecommendationDto.getClosing()));
+            }
+
         } catch (Exception e) {
             log.error("GPT 호출 실패", e);
             throw new CustomException(ErrorCode.GPT_RECOMMENDATION_FAILED, "스파 추천 실패: " + e.getMessage());
@@ -243,6 +280,8 @@ public class DogImageService {
 
         log.info("GPT 추천 DTO 완료 → {}", spaRecommendationDto);
 
+
+        // ✅ AI 추천 기록을 DB에 저장하는 로직 시작
         try {
             String imageUrlForHistory = "/api/images/" + savedFileName;
 
@@ -269,6 +308,21 @@ public class DogImageService {
         }
 
         return spaRecommendationDto; // DTO 객체를 그대로 반환
+    }
+
+    // 활동성 어미 정규화: 활발함→활발한, 차분함→차분한
+    private String toAdjective(String s) {
+        if (s == null) return "";
+        return s.replaceAll("함$", "한");
+    }
+
+    // 한국어 중복 수식어 제거: "활발하고 활발한" → "활발한"
+    private String dedupeKo(String text) {
+        if (text == null) return null;
+        text = text.replaceAll("([가-힣]+)\\s*하고\\s*\\1(한|인|함)", "$1$2");
+        text = text.replaceAll("([가-힣]+)\\s*하고\\s*\\1\\b", "$1");
+        text = text.replaceAll("(\\b[가-힣]+)\\s+\\1(한|인|함)?", "$1$2");
+        return text;
     }
 
 }

@@ -96,6 +96,8 @@ public class GptClient {
 
         promptBuilder.append("※ 견종명이 존재하지 않는 경우에도 보호자에게 따뜻하게 스파를 추천해야 함.\n");
         promptBuilder.append("※ 예시는 제공하지 않으며, 구조와 지침만을 참고하여 응답 구성할 것.\n");
+        promptBuilder.append("※ 활동성 수식어는 최대 1회만 사용, 같은 의미의 형용사를 반복하지 말 것. 예) “활발하고 활발한” 금지.\n");
+        promptBuilder.append("※ 체크리스트의 활동성(예: 활발함/보통/차분함)과 품종 기본 성향이 같다면 반드시 하나만 사용할 것.\n");
 
         promptBuilder.append("※ 'spaDescription'은 리스트 형태로 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
         promptBuilder.append("※ 'intro' 필드에는 '사진 속의 아이는 **[견종]** (으)로 보이네요!' 형식으로 시작해야 해.\n");
@@ -211,6 +213,8 @@ public class GptClient {
 
         promptBuilder.append("※ 견종명이 존재하지 않는 경우에도 보호자에게 따뜻하게 스파를 추천해야 함.\n");
         promptBuilder.append("※ 예시는 제공하지 않으며, 구조와 지침만을 참고하여 응답 구성할 것.\n");
+        promptBuilder.append("※ 활동성 수식어는 최대 1회만 사용, 같은 의미의 형용사를 반복하지 말 것. 예) “활발하고 활발한” 금지.\n");
+        promptBuilder.append("※ 체크리스트의 활동성(예: 활발함/보통/차분함)과 품종 기본 성향이 같다면 반드시 하나만 사용할 것.\n");
 
         promptBuilder.append("※ 'spaDescription'은 리스트 형태로 2개의 설명을 포함해야 해. 각 설명은 '-'로 시작해야 해.\n");
         promptBuilder.append("※ 'intro' 필드는 견종이 인식되면 '보호자님이 알려주신 견종은 **[견종]**(이)군요!'로 시작하고, 인식되지 않으면 '우리 아이의 견종을 정확하게 파악하긴 어려웠지만,'으로 시작해야 해.\n");
