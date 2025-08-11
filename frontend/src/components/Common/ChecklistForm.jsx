@@ -33,7 +33,7 @@ function ChecklistForm({ onSubmit }) {
   };
 
   return (
-    <form className="p-12 rounded-xl border-2 border-teal-200 bg-[#EFFFFE] space-y-6">
+    <form className="p-8 rounded-xl border-2 border-teal-200 bg-[#EFFFFE] space-y-6">
 
         {/* 견종 */}
         <div>
@@ -42,10 +42,10 @@ function ChecklistForm({ onSubmit }) {
             name="breed"
             value={selectedBreed}
             onChange={(e) => setSelectedBreed(e.target.value)}
-            className="w-1/3 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
+            className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
           >
             {breedOptions.map((option) => (
-              <option key={option} value={option === "선택 안 함" ? "" : option}>
+              <option key={option} value={option === "선택 안 함" ? "모름" : option}>
                 {option}
               </option>
             ))}
