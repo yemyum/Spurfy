@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import SpurfyDog from '../assets/SpurfyDog.png';
 import SpurfyCA from '../assets/SpurfyCA.png';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
 function Home() {
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 컴포넌트 로드 시 로딩 시작
@@ -16,6 +17,17 @@ function Home() {
     document.body.classList.remove("loading");
   }, 100); 
   }, []);
+
+  // 추천받으러 가기 클릭 핸들러
+  const handleGoAI = () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('로그인 후 이용 가능합니다.');
+    navigate('/login');
+    return;
+  }
+  navigate('/dog-spa-ai');
+};
 
   return (
   <div className="w-full flex flex-col items-center mt-10 mb-10">
@@ -87,11 +99,11 @@ function Home() {
         </div>
       </div>
 
-      <Link to="/dog-spa-ai">
-        <button className="px-4 py-2 text-2xl shadow-sm font-bold hover:shadow-md bg-gradient-to-r from-[#90F9BF] to-[#67F3EC] rounded-lg text-white hover:shadow-md">
+        <button 
+          onClick={handleGoAI}
+          className="px-4 py-2 text-2xl shadow-sm font-bold hover:shadow-md bg-gradient-to-r from-[#90F9BF] to-[#67F3EC] rounded-lg text-white hover:shadow-md">
           추천받으러 가기
         </button>
-      </Link>
     </div>
 
     {/* 오른쪽 이미지 */}

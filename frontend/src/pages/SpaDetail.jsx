@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
@@ -7,7 +7,9 @@ import { formatDuration } from '../constants/formatDuration';
 
 function SpaDetail() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { spaSlug } = useParams();
+
   const [spa, setSpa] = useState(null);
   const [dogList, setDogList] = useState([]);
   const [selectedDogId, setSelectedDogId] = useState('');
@@ -22,29 +24,42 @@ function SpaDetail() {
 
   (async () => {
     try {
-      const [spaRes, dogRes, reviewRes] = await Promise.all([
-        api.get(`/spa-services/slug/${spaSlug}`),
-        api.get('/dogs'),
-        api.get(`/reviews/public/slug/${spaSlug}`)
-      ]);
+      // 1) 공개 API 먼저
+        const [spaRes, reviewRes] = await Promise.all([
+          api.get(`/spa-services/slug/${spaSlug}`),
+          api.get(`/reviews/public/slug/${spaSlug}?page=0&size=5`)
+        ]);
 
       if (!mounted) return;
 
-      setSpa(spaRes.data?.data || {});
-      console.log("🔥 spa 데이터:", spaRes.data.data);
-      console.log("🔥 availableTimes:", spaRes.data.data?.availableTimes);
+      const spaData = spaRes.data?.data || {};
+        setSpa(spaData);
 
-      setDogList(dogRes.data?.data || []);
-      
-      const fetchedReviews = reviewRes.data.data?.content || []; 
-      setReviews(fetchedReviews);
-      setAverageRating(
-        fetchedReviews.length
-          ? fetchedReviews.reduce((sum, r) => sum + r.rating, 0) / fetchedReviews.length
-          : 0
-      );
-    } catch (e) {
-        console.error("데이터 로딩 중 에러 발생:", e);
+        const fetchedReviews = reviewRes.data?.data?.content || [];
+        setReviews(fetchedReviews);
+        setAverageRating(
+          fetchedReviews.length
+            ? fetchedReviews.reduce((sum, r) => sum + r.rating, 0) / fetchedReviews.length
+            : 0
+        );
+
+        // 2) 토큰 있으면 /dogs 호출 (보호 API)
+        const token = localStorage.getItem('token');
+        if (token) {
+          try {
+            const dogRes = await api.get('/dogs');
+            if (!mounted) return;
+            setDogList(dogRes.data?.data || []);
+          } catch (e) {
+            console.warn('내 강아지 목록 불러오기 실패(로그인 필요/권한 문제):', e);
+            setDogList([]); // 조용히 무시
+          }
+        } else {
+          setDogList([]); // 비로그인: 빈 배열
+        }
+
+      } catch (e) {
+        console.error("스파 상세/리뷰 로딩 에러:", e);
       } 
     })();
 
@@ -52,24 +67,34 @@ function SpaDetail() {
   }, [spaSlug]); // spaSlug가 변경될 때마다 useEffect 재실행되도록 의존성 배열에 추가
 
   useEffect(() => {
-  const fetchServiceInfos = async () => {
+  (async () => {
     try {
-      const res = await api.get('/service-info'); // 카테고리 없이 전체 요청
-      setServiceInfos(res.data);
+      const res = await api.get('/service-info');
+      setServiceInfos(Array.isArray(res.data) ? res.data : []);
     } catch (e) {
-      console.error("이용 안내 데이터 불러오기 실패:", e);
+      console.warn('이용 안내 데이터 불러오기 실패:', e);
+      setServiceInfos([]);
     }
-  };
-
-  fetchServiceInfos();
+  })();
 }, []);
 
   // [예약하기]는 결제페이지로 정보만 넘김!
   const handleReservation = () => {
-    if (!selectedDogId || !date || !time) {
-      alert("강아지, 날짜, 시간을 모두 선택해주세요!");
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('로그인 후 예약 가능합니다.');
+      // 로그인 후 돌아오도록 리다이렉트 상태 심기
+      navigate('/login', { state: { from: location.pathname } });
       return;
     }
+
+    // 2) 로그인은 됐는데 필수값 누락
+    if (!selectedDogId || !date || !time) {
+      alert('강아지, 날짜, 시간을 모두 선택해주세요!');
+      return;
+    }
+
+    // 3) 결제/예약 페이지로 이동
     navigate('/payment', {
       state: {
         dogId: selectedDogId,
@@ -155,7 +180,7 @@ function SpaDetail() {
             })}
         </ul>
     )}
-    <p className="mt-6 text-sm font-semibold text-gray-500 whitespace-pre-wrap">
+    <p className="mt-4 text-sm font-semibold text-gray-500 whitespace-pre-wrap">
         ※ 피부 질환이나 심장 질환, 만성 질병이 있는 경우에는 반려견의 안전을 위해 전문가와 상담 후 이용해주시길 권장드립니다.
     </p>
 </div>

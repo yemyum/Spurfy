@@ -14,7 +14,7 @@ function Login() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }))
   };
 
   const handleSubmit = async (e) => {
@@ -25,7 +25,8 @@ function Login() {
 
       localStorage.setItem('token', token);
       alert('로그인 성공');
-      navigate('/');
+
+      navigate('/', { replace: true });
     } catch (err) {
       console.error('로그인 실패:', err);
       alert('로그인을 실패하였습니다.');
