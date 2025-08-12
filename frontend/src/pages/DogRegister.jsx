@@ -50,28 +50,28 @@ function DogRegister() {
 
     // ⭐ 1. 백엔드 DTO에 맞는 객체를 프론트에서 생성
     const dogRequestDTO = {
-        name: form.name,
-        breed: finalBreed,
-        birthDate: form.birthDate,
-        gender: form.gender,
-        weight: parseFloat(form.weight),
-        notes: form.notes
+      name: form.name,
+      breed: finalBreed,
+      birthDate: form.birthDate,
+      gender: form.gender,
+      weight: parseFloat(form.weight),
+      notes: form.notes
     };
-    
+
     // ⭐ 2. FormData 객체 생성
     const formData = new FormData();
-    
+
     // ⭐ 3. JSON.stringify()를 이용해 DTO 객체를 문자열로 변환
     formData.append(
-        'dogRequestDTO', 
-        new Blob([JSON.stringify(dogRequestDTO)], { type: 'application/json' })
+      'dogRequestDTO',
+      new Blob([JSON.stringify(dogRequestDTO)], { type: 'application/json' })
     );
 
     // ⭐ 4. 이미지 파일을 'dogImage'라는 키로 FormData에 추가
     if (dogImage) {
       formData.append('dogImage', dogImage);
     }
-    
+
     try {
       // ⭐ 5. api.post의 두 번째 인수로 FormData를 전달
       await api.post('/dogs', formData, {

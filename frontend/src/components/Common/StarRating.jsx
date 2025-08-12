@@ -6,7 +6,7 @@ const StyledRating = styled(Rating)({
     '& .MuiRating-iconFilled': {
         color: '#7fb5ff',
     },
-    '& .MuiRating-iconHover': { 
+    '& .MuiRating-iconHover': {
         transform: 'none',
         transition: 'none',
     },

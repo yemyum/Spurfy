@@ -32,7 +32,7 @@ function SpaReviewsPage() {
             }
 
             setHasMore(page < totalPages - 1);
-        
+
         } catch (error) {
             console.error('리뷰 불러오기 실패:', error);
             setHasMore(false);
@@ -46,7 +46,7 @@ function SpaReviewsPage() {
             // 전체 리뷰 개수로 나누기!
             setAverageRating(totalRating / reviews.length);
         } else {
-           setAverageRating(0); // 리뷰가 없을 때는 0점
+            setAverageRating(0); // 리뷰가 없을 때는 0점
         }
     }, [reviews]); // reviews 배열이 바뀔 때마다 실행
 
@@ -65,66 +65,66 @@ function SpaReviewsPage() {
     useEffect(() => {
         const handleScroll = () => {
             const isAtBottom = window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 100;
-            
+
             // ⭐ 스크롤이 바닥에 닿고, 더 불러올 리뷰가 있을 때만 페이지 번호를 증가!
             if (isAtBottom && hasMore) {
                 setPage(prevPage => prevPage + 1);
             }
         };
-        
+
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, [hasMore]); // hasMore가 바뀔 때만 리스너를 업데이트
 
     return (
-    <div className="w-full h-full p-8 bg-white select-none">
-    <div className="max-w-4xl mx-auto">
-      {reviews.length > 0 && (
-        <div className="flex flex-col items-center mt-8 mb-8">
-            <h3 className="text-2xl font-bold mb-4">{spaName}</h3> 
-            
-            <div className="flex flex-col items-center gap-1">
-                <span className="font-semibold text-4xl">{averageRating.toFixed(1)} 
-                    <span className="text-gray-400 text-base"> / 5.0</span></span>
-                <StarRating rating={averageRating} readOnly={true} size="middle" />
-            </div>
-            
-            <span className="text-base text-gray-400 mt-4">총 {reviews.length} 개 후기</span>
-        </div>
-      )}
-    
-      {reviews.length === 0 && <div className="text-center text-lg font-semibold">아직 작성된 리뷰가 없습니다.</div>}
-   
-            <div className="flex items-center justify-center space-y-4">
-                {reviews.map(r => (
-                <div key={r.reviewId} className="w-full border rounded-lg shadow-sm p-4 bg-white">
-                {/* ⭐ 첫 번째 줄: 닉네임만 ⭐ */}
-                <div className="font-semibold text-lg mb-1">{r.userNickname}</div>
+        <div className="w-full h-full p-8 bg-white select-none">
+            <div className="max-w-4xl mx-auto">
+                {reviews.length > 0 && (
+                    <div className="flex flex-col items-center mt-8 mb-8">
+                        <h3 className="text-2xl font-bold mb-4">{spaName}</h3>
 
-                {/* ⭐ 두 번째 줄: 별점, 작성일! ⭐ */}
-                <div className="flex items-center gap-2 mb-4">
-                    <StarRating rating={r.rating} readOnly={true} size="middle" />
-                    <span className="text-gray-400">
-                            {r.createdAt?.slice(0, 10)}
-                    </span>
-                 </div>
+                        <div className="flex flex-col items-center gap-1">
+                            <span className="font-semibold text-4xl">{averageRating.toFixed(1)}
+                                <span className="text-gray-400 text-base"> / 5.0</span></span>
+                            <StarRating rating={averageRating} readOnly={true} size="middle" />
+                        </div>
 
-                {/* ⭐ 세 번째 줄: 리뷰 내용 ⭐ */}
-                <div className="text-gray-800">{r.content}</div>
-
-                {/* ⭐ 네 번째 줄: 리뷰 이미지 (있으면) ⭐ */}
-                {r.imageUrl && ( 
-                    <img 
-                        src={r.imageUrl} 
-                        alt="Review Image" 
-                        className="max-w-full h-auto rounded-md mb-2" 
-                    />
+                        <span className="text-base text-gray-400 mt-4">총 {reviews.length} 개 후기</span>
+                    </div>
                 )}
+
+                {reviews.length === 0 && <div className="text-center text-lg font-semibold">아직 작성된 리뷰가 없습니다.</div>}
+
+                <div className="flex items-center justify-center space-y-4">
+                    {reviews.map(r => (
+                        <div key={r.reviewId} className="w-full border rounded-lg shadow-sm p-4 bg-white">
+                            {/* ⭐ 첫 번째 줄: 닉네임만 ⭐ */}
+                            <div className="font-semibold text-lg mb-1">{r.userNickname}</div>
+
+                            {/* ⭐ 두 번째 줄: 별점, 작성일! ⭐ */}
+                            <div className="flex items-center gap-2 mb-4">
+                                <StarRating rating={r.rating} readOnly={true} size="middle" />
+                                <span className="text-gray-400">
+                                    {r.createdAt?.slice(0, 10)}
+                                </span>
+                            </div>
+
+                            {/* ⭐ 세 번째 줄: 리뷰 내용 ⭐ */}
+                            <div className="text-gray-800">{r.content}</div>
+
+                            {/* ⭐ 네 번째 줄: 리뷰 이미지 (있으면) ⭐ */}
+                            {r.imageUrl && (
+                                <img
+                                    src={r.imageUrl}
+                                    alt="Review Image"
+                                    className="max-w-full h-auto rounded-md mb-2"
+                                />
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
-            ))}
         </div>
-      </div>
-    </div>
     );
 }
 

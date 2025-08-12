@@ -17,8 +17,8 @@ function MessageBubble({ text, isUser, imageUrl, imageBase64, checklist, spaSlug
       <ReactMarkdown
         remarkPlugins={[gfm, remarkBreaks]}
         components={{
-          p: ({node, ...props}) => <p className="mb-4" {...props} />,
-          li: ({node, ...props}) => <li className="list-disc list-inside ml-2 mb-1 last:mb-4" {...props} />
+          p: ({ node, ...props }) => <p className="mb-4" {...props} />,
+          li: ({ node, ...props }) => <li className="list-disc list-inside ml-2 mb-1 last:mb-4" {...props} />
         }}
       >
         {text}
@@ -28,36 +28,36 @@ function MessageBubble({ text, isUser, imageUrl, imageBase64, checklist, spaSlug
 
   if (isUser) {
     return (
-  <div className={`flex items-start flex-row-reverse gap-2`}>
-    <div className={`max-w-[70%] p-4 flex flex-col ${bubbleClasses} relative`}>
-      {/* 사진 영역 */}
-      {(imageUrl || imageBase64) && (
-        <div className="w-52 h-52 mb-2 overflow-hidden rounded-md">
-          <img
-            src={imageUrl || imageBase64}
-            alt="사용자가 첨부한 사진"
-            className="w-full h-full object-cover" />
-        </div>
-      )}
+      <div className={`flex items-start flex-row-reverse gap-2`}>
+        <div className={`max-w-[70%] p-4 flex flex-col ${bubbleClasses} relative`}>
+          {/* 사진 영역 */}
+          {(imageUrl || imageBase64) && (
+            <div className="w-52 h-52 mb-2 overflow-hidden rounded-md">
+              <img
+                src={imageUrl || imageBase64}
+                alt="사용자가 첨부한 사진"
+                className="w-full h-full object-cover" />
+            </div>
+          )}
 
-      {/* 체크리스트 영역 */}
-      {checklist && Object.values(checklist).some(val =>
-        (Array.isArray(val) && val.length > 0) || (typeof val === 'string' && val.trim() !== '')
-      ) && (
-        <div className="bg-white/30 text-white p-3 rounded-md mb-2 text-sm">
-          {checklist.selectedBreed && checklist.selectedBreed !== '선택 안 함' && <p><strong>견종:</strong> {checklist.selectedBreed}</p>}
-          {checklist.ageGroup && checklist.ageGroup !== '' && <p><strong>나이:</strong> {checklist.ageGroup}</p>}
-          {checklist.activityLevel && checklist.activityLevel !== '' && <p><strong>활동량:</strong> {checklist.activityLevel}</p>}
-          {checklist.healthIssues && checklist.healthIssues.length > 0 && <p><strong>건강 문제:</strong> {checklist.healthIssues.join(', ')}</p>}
-        </div>
-      )}
+          {/* 체크리스트 영역 */}
+          {checklist && Object.values(checklist).some(val =>
+            (Array.isArray(val) && val.length > 0) || (typeof val === 'string' && val.trim() !== '')
+          ) && (
+              <div className="bg-white/30 text-white p-3 rounded-md mb-2 text-sm">
+                {checklist.selectedBreed && checklist.selectedBreed !== '선택 안 함' && <p><strong>견종:</strong> {checklist.selectedBreed}</p>}
+                {checklist.ageGroup && checklist.ageGroup !== '' && <p><strong>나이:</strong> {checklist.ageGroup}</p>}
+                {checklist.activityLevel && checklist.activityLevel !== '' && <p><strong>활동량:</strong> {checklist.activityLevel}</p>}
+                {checklist.healthIssues && checklist.healthIssues.length > 0 && <p><strong>건강 문제:</strong> {checklist.healthIssues.join(', ')}</p>}
+              </div>
+            )}
 
-      {/* 텍스트 영역 */}
-      {text && <div className="whitespace-pre-wrap">{text}</div>}
-    </div>
-  </div>
-);
-}
+          {/* 텍스트 영역 */}
+          {text && <div className="whitespace-pre-wrap">{text}</div>}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`flex items-start ${isUser ? "flex-row-reverse" : "flex-row"} ${!isUser ? "gap-2" : ""}`}>

@@ -35,22 +35,22 @@ function ChecklistForm({ onSubmit }) {
   return (
     <form className="p-8 rounded-xl border-2 border-teal-200 bg-[#EFFFFE] space-y-6">
 
-        {/* 견종 */}
-        <div>
-          <h2 className="font-bold text-xl mb-2">견종</h2>
-          <select
-            name="breed"
-            value={selectedBreed}
-            onChange={(e) => setSelectedBreed(e.target.value)}
-            className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
-          >
-            {breedOptions.map((option) => (
-              <option key={option} value={option === "선택 안 함" ? "모름" : option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* 견종 */}
+      <div>
+        <h2 className="font-bold text-xl mb-2">견종</h2>
+        <select
+          name="breed"
+          value={selectedBreed}
+          onChange={(e) => setSelectedBreed(e.target.value)}
+          className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
+        >
+          {breedOptions.map((option) => (
+            <option key={option} value={option === "선택 안 함" ? "모름" : option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <div className="border-b-2 border-teal-100 my-4"></div>
 
@@ -97,7 +97,7 @@ function ChecklistForm({ onSubmit }) {
         </div>
       </div>
 
-    <div className="border-b-2 border-teal-100 my-4"></div>
+      <div className="border-b-2 border-teal-100 my-4"></div>
 
       <div>
         <h2 className="font-bold text-xl mb-2 space-y-2">건강 상태/특징</h2>

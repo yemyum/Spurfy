@@ -5,29 +5,29 @@ import Logo from '../assets/Logo.png';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
 function Signup() {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    name: '',
-    nickname: '',
-    phone: '',
-  });
+    const [form, setForm] = useState({
+        email: '',
+        password: '',
+        name: '',
+        nickname: '',
+        phone: '',
+    });
 
-  // 중복 체크 상태 및 메시지 관리
-  const [emailError, setEmailError] = useState(''); // 이메일 에러 메시지
-  const [nicknameError, setNicknameError] = useState(''); // 닉네임 에러 메시지
-  const [isNicknameChecked, setIsNicknameChecked] = useState(false); // 닉네임 중복 확인 했는지 여부 (true/false)
-  const [isNicknameAvailable, setIsNicknameAvailable] = useState(false); // 닉네임 사용 가능한지 여부 (true/false)
-  const [isEmailChecked, setIsEmailChecked] = useState(false); // 이메일 중복 확인 했는지 여부 (추가)
-  const [isEmailAvailable, setIsEmailAvailable] = useState(false); // 이메일 사용 가능한지 여부 (추가)
+    // 중복 체크 상태 및 메시지 관리
+    const [emailError, setEmailError] = useState(''); // 이메일 에러 메시지
+    const [nicknameError, setNicknameError] = useState(''); // 닉네임 에러 메시지
+    const [isNicknameChecked, setIsNicknameChecked] = useState(false); // 닉네임 중복 확인 했는지 여부 (true/false)
+    const [isNicknameAvailable, setIsNicknameAvailable] = useState(false); // 닉네임 사용 가능한지 여부 (true/false)
+    const [isEmailChecked, setIsEmailChecked] = useState(false); // 이메일 중복 확인 했는지 여부 (추가)
+    const [isEmailAvailable, setIsEmailAvailable] = useState(false); // 이메일 사용 가능한지 여부 (추가)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
 
-    // 입력값이 변경될 때 관련 에러 메시지 및 중복 체크 상태 초기화
+        // 입력값이 변경될 때 관련 에러 메시지 및 중복 체크 상태 초기화
         if (name === 'email') {
             setEmailError('');
             setIsEmailChecked(false);   // 이메일 변경 시 중복 확인 다시 해야 함
@@ -39,9 +39,9 @@ function Signup() {
             setIsNicknameAvailable(false);
         }
 
-  };
+    };
 
-  // 이메일 중복 확인 함수 (버튼 클릭 시 실행)
+    // 이메일 중복 확인 함수 (버튼 클릭 시 실행)
     const handleCheckEmail = async () => {
         const currentEmail = form.email.trim();
 
@@ -84,7 +84,7 @@ function Signup() {
 
         try {
             const res = await api.get(`/mypage/check-nickname?nickname=${currentNickname}`);
-            
+
             if (res.data.code === 'S001') { // 백엔드 응답 코드가 'S001'이면 정상 응답
                 const available = res.data.data; // 실제 중복 여부 (true: 사용 가능, false: 사용 불가)
                 setIsNicknameAvailable(available); // 사용 가능 여부 상태 업데이트
@@ -102,9 +102,9 @@ function Signup() {
             setIsNicknameAvailable(false);
             setIsNicknameChecked(false);
         }
-  };
+    };
 
-  const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // 최종 유효성 검사 및 중복 확인 여부 체크
@@ -139,7 +139,7 @@ function Signup() {
             alert('닉네임 중복 확인을 완료하고 사용 가능한 닉네임을 입력해주세요!');
             formIsValid = false;
         }
-        
+
         // 모든 검증 통과 실패 시, 여기서 함수 종료
         if (!formIsValid) {
             return;
@@ -155,10 +155,10 @@ function Signup() {
             const errorMessage = err.response?.data?.message || '회원가입 중 오류가 발생했어요';
             alert(errorMessage);
         }
-  };
+    };
 
 
-  return (
+    return (
         <div className="bg-gradient-to-br from-white to-[#BAE5FF] min-h-screen select-none">
             <div className="min-h-screen flex flex-col">
                 <header className="p-8 flex justify-between items-center">
@@ -205,30 +205,30 @@ function Signup() {
                             {!nicknameError && isNicknameChecked && isNicknameAvailable && (
                                 <p className="text-green-500 text-sm mb-3 ml-1">사용 가능한 닉네임이에요!</p>
                             )}
-                          
-                          <div className="flex items-center w-full mb-4">
-                            <input
-                                type="email"
-                                name="email"
-                                placeholder="Email"
-                                value={form.email}
-                                onChange={handleChange}
-                                className="w-full bg-[#E2F3FF] rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-100 mr-2"
-                                required
-                            />
-                            <SpurfyButton
-                                variant='outline'
-                                onClick={handleCheckEmail}
-                                className="whitespace-nowrap px-2 py-2 shadow-sm text-sm"
-                                type="button"
-                            >
+
+                            <div className="flex items-center w-full mb-4">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    placeholder="Email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    className="w-full bg-[#E2F3FF] rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-100 mr-2"
+                                    required
+                                />
+                                <SpurfyButton
+                                    variant='outline'
+                                    onClick={handleCheckEmail}
+                                    className="whitespace-nowrap px-2 py-2 shadow-sm text-sm"
+                                    type="button"
+                                >
                                     중복 확인
-                           </SpurfyButton>
-                          </div>
-                          {emailError && <p className="text-red-500 text-sm mb-3 ml-1">{emailError}</p>}
-                          {!emailError && isEmailChecked && isEmailAvailable && (
-                              <p className="text-green-500 text-sm mb-3 ml-1">사용 가능한 이메일이에요!</p>
-                          )}
+                                </SpurfyButton>
+                            </div>
+                            {emailError && <p className="text-red-500 text-sm mb-3 ml-1">{emailError}</p>}
+                            {!emailError && isEmailChecked && isEmailAvailable && (
+                                <p className="text-green-500 text-sm mb-3 ml-1">사용 가능한 이메일이에요!</p>
+                            )}
 
                             <input
                                 type="password"

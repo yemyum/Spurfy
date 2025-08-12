@@ -34,9 +34,7 @@ function Withdrawal() {
       setError("비밀번호를 입력해주세요.");
       return; // 함수 종료
     }
-    // 3. 탈퇴 사유는 이제 '선택 사항'이므로, 여기서 필수로 검사하지 않아.
-    //    만약 '기타'를 선택했는데 입력 내용이 없다면 백엔드에서 빈 문자열로 보낼 거야.
-
+    
     // 최종 확인 알림창
     if (!window.confirm("정말로 회원 탈퇴를 진행하시겠습니까? 복구할 수 없습니다.")) {
       return; // '취소' 누르면 함수 종료
@@ -119,12 +117,12 @@ function Withdrawal() {
         </div>
         <div className="border border-gray-200 bg-gray-100 p-4 rounded-md mb-4 max-h-48 overflow-y-auto">
           <p className="font-semibold text-gray-700 mb-2">회원 탈퇴 약관 및 유의사항</p>
-            <ul className="list-disc list-inside text-sm text-gray-500">
-              <li>탈퇴 시, 회원님의 개인정보 및 이용 기록은 즉시 삭제됩니다.</li>
-              <li>예약 내역, 결제 정보 등 모든 이용 기록이 사라집니다.</li>
-              <li>작성하신 게시물은 삭제되지 않으며, 탈퇴 전 직접 삭제하셔야 합니다.</li>
-              <li>탈퇴한 계정은 재가입 시에도 복구되지 않습니다.</li>
-            </ul>
+          <ul className="list-disc list-inside text-sm text-gray-500">
+            <li>탈퇴 시, 회원님의 개인정보 및 이용 기록은 즉시 삭제됩니다.</li>
+            <li>예약 내역, 결제 정보 등 모든 이용 기록이 사라집니다.</li>
+            <li>작성하신 게시물은 삭제되지 않으며, 탈퇴 전 직접 삭제하셔야 합니다.</li>
+            <li>탈퇴한 계정은 재가입 시에도 복구되지 않습니다.</li>
+          </ul>
         </div>
 
         {/* 이용 약관 동의 체크박스 */}

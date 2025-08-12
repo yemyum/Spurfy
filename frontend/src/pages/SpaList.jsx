@@ -35,18 +35,18 @@ function SpaList() {
 
             {/* 태그 영역 */}
             <div className="flex flex-wrap gap-1 my-2">
-              {spa.tagNames?.map((tagName, index) => (
-                <span key={index} className="text-sm font-semibold bg-blue-50 text-blue-300 px-2 py-1 rounded-full">
-                  #{tagName}
-                </span>
-              ))}
-            </div>
+              {spa.tagNames?.map((tagName, index) => (
+                <span key={index} className="text-sm font-semibold bg-blue-50 text-blue-300 px-2 py-1 rounded-full">
+                  #{tagName}
+                </span>
+              ))}
+            </div>
 
             {/* 예약 버튼 */}
             <Link to={`/spalist/slug/${spa.slug}`}>
-            <SpurfyButton variant="primary" className="w-full px-4 py-2 text-center mt-2">
-             예약하러 가기
-            </SpurfyButton>
+              <SpurfyButton variant="primary" className="w-full px-4 py-2 text-center mt-2">
+                예약하러 가기
+              </SpurfyButton>
             </Link>
           </div>
         ))}

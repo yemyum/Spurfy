@@ -45,7 +45,6 @@ const DogImageAnalysisPage = () => {
     }
   }, [navigate]);
 
-  // 스크롤 이동 로직 (남아있어야 함)
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
   }, [chatMessages]);
@@ -166,7 +165,7 @@ const DogImageAnalysisPage = () => {
   return (
     <div className="w-full h-full mx-auto bg-white flex flex-col">
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center">
-        <h2 className="text-2xl font-bold text-spurfyAI">Spurfy AI Chat</h2>
+        <h2 className="text-2xl font-bold text-spurfyAI">SPURFY AI Chat</h2>
         {/* 오른쪽 끝 이모지 버튼 */}
         <button
           onClick={() => setSheetOpen(true)}
