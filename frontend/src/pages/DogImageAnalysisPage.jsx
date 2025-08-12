@@ -163,8 +163,9 @@ const DogImageAnalysisPage = () => {
   }, [navigate]);
 
   return (
-    <div className="w-full h-full mx-auto bg-white flex flex-col">
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center">
+    <div className="w-full h-screen mx-auto bg-white flex flex-col overflow-hidden">
+      {/* 1. 고정될 헤더 영역 */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center relative">
         <h2 className="text-2xl font-bold text-spurfyAI">SPURFY AI Chat</h2>
         {/* 오른쪽 끝 이모지 버튼 */}
         <button
@@ -181,43 +182,36 @@ const DogImageAnalysisPage = () => {
         </button>
       </div>
 
-      <div className="flex-1 relative bg-gray-50 mt-[70px]">
-        <div className="flex-1 bg-gray-50 overflow-y-auto p-6 pb-24 flex flex-col space-y-2">
-          {chatMessages.length > 0 ? (
-            chatMessages.map((msg) => (
-              <MessageBubble
-                key={msg.id}
-                {...msg}
-                onGoToSpaDetail={handleGoToSpaDetail}
-              />
-            ))
-          ) : (
-            <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
-          )}
-
-          {errorMessage && (
-            <div className="py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold bg-red-50 text-red-600 text-sm">
-              {errorMessage}
-            </div>
-          )}
-        </div>
-
-        <div ref={messagesEndRef} />
-
-        <form onSubmit={handleImageAnalysis} className="absolute bottom-0 left-0 right-0 z-40 w-full flex items-center gap-4 p-4 bg-gray-100">
-          <label htmlFor="dogImageFileInput" className="cursor-pointer">
-            <input
-              type="file"
-              id="dogImageFileInput"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="hidden"
+      {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
+      <div className="flex-1 bg-gray-50 overflow-y-auto p-6 flex flex-col space-y-2">
+        {chatMessages.length > 0 ? (
+          chatMessages.map((msg) => (
+            <MessageBubble
+              key={msg.id}
+              {...msg}
+              onGoToSpaDetail={handleGoToSpaDetail}
             />
+          ))
+        ) : (
+          <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
+        )}
+        {errorMessage && (
+          <div className="py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold bg-red-50 text-red-600 text-sm">
+            {errorMessage}
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* 3. 전송 영역 */}
+      <div className="flex flex-col items-center flex-shrink-0 w-full bg-gray-100 px-4 pt-4">
+        <form onSubmit={handleImageAnalysis} className="w-full flex items-center gap-4">
+          <label htmlFor="dogImageFileInput" className="cursor-pointer">
+            <input type="file" id="dogImageFileInput" accept="image/*" onChange={handleFileChange} className="hidden" />
             <span className="p-2 rounded-full bg-[#67F3EC] text-black hover:bg-[#42e3db] transition">
               <FontAwesomeIcon icon={faCamera} />
             </span>
           </label>
-
           {selectedFile && (
             <div className="relative w-14 h-14">
               <img
@@ -225,34 +219,31 @@ const DogImageAnalysisPage = () => {
                 alt="미리보기"
                 className="w-14 h-14 rounded-xl object-cover border border-gray-200 shadow-sm"
               />
-              <button
-                type="button"
-                onClick={() => setSelectedFile(null)}
-                className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-black rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition"
-              >
+              <button type="button" onClick={() => setSelectedFile(null)} className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-black rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition">
                 ✕
               </button>
             </div>
           )}
-
           <textarea
             id="freeTextQuestion"
             rows="1"
             value={freeTextQuestion}
             onChange={(e) => setFreeTextQuestion(e.target.value)}
-            placeholder="우리 반려견에 대해 궁금한 점이 있나요?"
             className="flex-1 p-2 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-200 transition duration-200 resize-none overflow-hidden"
             onInput={(e) => {
               e.target.style.height = 'auto';
               e.target.style.height = e.target.scrollHeight + 'px';
             }}
           ></textarea>
-
           <SpurfyButton variant="chat" type="submit" className="py-2 px-4 text-sm font-semibold">
             전송
           </SpurfyButton>
         </form>
       </div>
+      <p className="text-center bg-gray-100 pt-3 pb-1 text-[14px] leading-none text-gray-400 select-none pointer-events-none">
+        스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
+        스피는 아직 배우는 중이라서 답변이 정확하지 않을 수 있어요.
+      </p>
 
       <ChecklistDrawer
         sheetOpen={sheetOpen}
@@ -262,7 +253,7 @@ const DogImageAnalysisPage = () => {
         onApply={handleApplyChecklist}
         onReset={handleResetChecklist}
       />
-    </div>
+    </div >
   );
 };
 
