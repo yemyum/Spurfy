@@ -169,7 +169,6 @@ function DogRegister() {
                     name="customBreed"
                     value={form.customBreed}
                     onChange={handleChange}
-                    placeholder="예: 믹스견, 도사견 등"
                     required
                     className="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                   />
@@ -254,7 +253,7 @@ function DogRegister() {
           <SpurfyButton variant='primary'
             type="submit"
             className="px-4 py-2">
-            등록하기 {/* 버튼 텍스트도 '등록하기'로 바꿨어! */}
+            등록하기
           </SpurfyButton>
         </div>
       </form>

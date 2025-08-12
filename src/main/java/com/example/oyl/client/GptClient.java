@@ -67,6 +67,7 @@ public class GptClient {
         promptBuilder.append("- \"추천 스파: ~\" 문장 절대 금지\n");
         promptBuilder.append("- 요약 형식(~~: ~~) 문장 절대 금지\n");
         promptBuilder.append("- 절대 강아지에게 존댓말 쓰지 마. 보호자에게만 존댓말!\n");
+        promptBuilder.append("- 강아지 이름은 직접 언급하지 말고, '이 아이', '이 친구', '반려견' 등으로 자연스럽게 표현할 것.\n");
         promptBuilder.append("- \"성견이신 것 같아요\", \"알 수 없는 견종의 강아지\", \"주요 라벨\" 등 표현은 금지 (예: \"입력된 정보에 따르면\" 등도 금지)\n");
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");
@@ -173,7 +174,7 @@ public class GptClient {
         promptBuilder.append("- \"추천 스파: ~\" 문장 절대 금지\n");
         promptBuilder.append("- 요약 형식(~~: ~~) 문장 절대 금지\n");
         promptBuilder.append("- 절대 강아지에게 존댓말 쓰지 마. 보호자에게만 존댓말!\n");
-        promptBuilder.append("- 제일 첫 문장은 \"사진 속 아이의 견종을 인식하지 못했어요..! 하지만 저희 스퍼피를 찾아와주신 보호자님을 위해 적절한 스파를 추천해드리고 싶어요!\"로 시작하거나, 보호자님이 견종을 알려주셨다면 '보호자님이 알려주신 견종은 **%s**이군요! 다음 정보들을 참고해서 스파를 추천해드릴게요!'로 시작할 것 -> 이것을 'intro' 필드에 넣어줘.\n".formatted(dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed()) ? dto.getBreed() : ""));
+        promptBuilder.append("- 강아지 이름은 직접 언급하지 말고, '이 아이', '이 친구', '반려견' 등으로 자연스럽게 표현할 것.\n");
         promptBuilder.append("- \"성견이신 것 같아요\", \"알 수 없는 견종의 강아지\", \"주요 라벨\" 등 표현은 금지 (예: \"입력된 정보에 따르면\" 등도 금지)\n");
         promptBuilder.append("- 나이, 견종 등은 추정하지 말고 중립적 표현 사용 (예: \"휴식이 필요한 아이\", \"피부가 민감한 친구\")\n");
         promptBuilder.append("- \"노령견\", \"시니어\", \"old dog\", \"고령\" 등 표현 사용 금지\n");

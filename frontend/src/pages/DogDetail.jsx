@@ -9,7 +9,7 @@ function DogDetail() {
   const [dog, setDog] = useState(null);
   const [error, setError] = useState(null);
 
-  const handleDelete = async () => { // dogId와 dogName은 여기서는 이미 dog 상태에 있으니 파라미터로 안 받아도 돼
+  const handleDelete = async () => {
     if (!dog) return; // dog 데이터가 없으면 실행하지 않음
 
     if (!window.confirm(`정말 ${dog.name}를(을) 삭제할까요?`)) {
@@ -74,7 +74,7 @@ function DogDetail() {
       </div>
 
       {/* 1. 이미지와 상세 정보를 가로로 배치할 새로운 flex 컨테이너 */}
-        <div className="flex items-start gap-6 px-6 pb-4 border-b border-gray-200"> {/* gap-6으로 간격 늘리고, px-6와 border-b는 그대로 가져옴 */}
+        <div className="flex items-start gap-6 px-6 pb-4 border-b border-gray-200">
             {/* ⭐ 1.1. 이미지 영역 ⭐ */}
             <div className="w-40 h-40 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                 {dog.imageUrl ? (
@@ -94,7 +94,7 @@ function DogDetail() {
                 <p className="mb-1"><strong>생일:</strong> {dog.birthDate}</p>
                 <p className="mb-1"><strong>성별:</strong> {dog.gender === 'M' ? '남아' : '여아'}</p>
                 <p className="mb-1"><strong>몸무게:</strong> {dog.weight}kg</p>
-                <p className="mb-4"><strong>특이사항:</strong> {dog.notes?.trim().length > 0 ? dog.notes : '없음'}</p> {/* 특이사항은 mb-4로 좀 더 여백 */}
+                <p className="mb-4"><strong>특이사항:</strong> {dog.notes?.trim().length > 0 ? dog.notes : '없음'}</p>
             </div>
         </div>
       
