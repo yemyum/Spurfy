@@ -7,9 +7,9 @@ function ChecklistForm({ onSubmit }) {
   const [healthIssues, setHealthIssues] = useState([]);
 
   const breedOptions = [
-    "선택 안 함", // 선택 안 함 옵션 추가
+    "선택 안 함",
     "말티즈", "푸들", "시츄", "포메라니안", "치와와", "골든 리트리버", "시바견",
-    "비숑 프리제", "웰시코기", "요크셔테리어", "닥스훈트", "믹스견", "보더콜리", "모름"
+    "비숑 프리제", "웰시코기", "요크셔테리어", "닥스훈트", "믹스견", "보더콜리"
   ];
 
   const healthIssuesOptions = [
@@ -45,7 +45,7 @@ function ChecklistForm({ onSubmit }) {
           className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
         >
           {breedOptions.map((option) => (
-            <option key={option} value={option === "선택 안 함" ? "모름" : option}>
+            <option key={option} value={option}>
               {option}
             </option>
           ))}
@@ -58,7 +58,7 @@ function ChecklistForm({ onSubmit }) {
 
         {/* 나이대 */}
         <div className="flex-1"> {/* flex-1로 사용 가능한 공간을 균등하게 차지 */}
-          <h2 className="font-bold text-xl mb-2">나이</h2>
+          <h2 className="font-bold text-xl mb-2">나이대</h2>
           <div className="flex flex-col space-y-2"> {/* 라디오 버튼 간격은 그대로 유지 */}
             {["생후 6개월 ~ 1년", "생후 1년 ~ 5년 이하", "생후 5년 이상"].map((option) => (
               <label key={option} className="flex items-center">
