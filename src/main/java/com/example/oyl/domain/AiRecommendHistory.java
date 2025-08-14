@@ -24,18 +24,19 @@ public class AiRecommendHistory {
     @Column(name = "image_url", length = 255)
     private String imageUrl;
 
+    @Column(name = "detected_breed")
     private String detectedBreed;
 
-    @Column(nullable = false)
+    @Column(name = "is_dog", nullable = false)
     private Boolean isDog;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "recommend_result", columnDefinition = "TEXT")
     private String recommendResult;
 
     @Column(columnDefinition = "TEXT")
     private String prompt;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
     @Column(name = "created_at", updatable = false)

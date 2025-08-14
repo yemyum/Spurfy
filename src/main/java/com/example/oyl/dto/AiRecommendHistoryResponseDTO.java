@@ -30,6 +30,8 @@ public class AiRecommendHistoryResponseDTO {
 
     private LocalDateTime createdAt; // 기록 생성 시간 (언제 추천받았는지 보여줄 때)
 
+    private String errorMessage;
+
     // 만약 에러 발생 기록도 보여주고 싶다면 추가
     // private String errorMessage;
 }

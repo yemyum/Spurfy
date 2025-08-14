@@ -40,12 +40,23 @@ public class AiSpaRecommendationController {
                             .build()
             );
         }
+        // ★ 추가: 이미지 MIME 가드
+        String ct = dogImageFile.getContentType();
+        if (ct == null || !ct.startsWith("image/")) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.<GptSpaRecommendationResponseDTO>builder()
+                            .code("E002")
+                            .message("이미지 파일만 업로드해주세요!")
+                            .data(null)
+                            .build()
+            );
+        }
 
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            System.out.println("로그인한 사용자 이메일: " + userEmail);
             GptSpaRecommendationResponseDTO result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
 
+            // 정상 추천일 때만 성공 메시지
             return ResponseEntity.ok(
                     ApiResponse.<GptSpaRecommendationResponseDTO>builder()
                             .code("S004")

@@ -18,4 +18,19 @@ public class GptSpaRecommendationResponseDTO {
     private LocalDateTime createdAt; // AI 추천 기록이 생성된 시간
 
     private String imageUrl;
+
+    private String errorMessage;
+    private String reasonCode;   // (옵션) "MULTI_DOG", "NO_DOG" 등
+
+    // imageUrl도 받도록 함수를 수정
+    public static GptSpaRecommendationResponseDTO createFailureResponse(String errorMessage, String imageUrl) {
+        GptSpaRecommendationResponseDTO res = new GptSpaRecommendationResponseDTO();
+        res.setIntro(null);
+        res.setCompliment(null);
+        // 에러 메시지는 'errorMessage'에 담아서 보냄
+        res.setErrorMessage(errorMessage);
+        res.setImageUrl(imageUrl); // imageUrl을 DTO에 포함
+        res.setReasonCode("VISION_RULE");
+        return res;
+    }
 }

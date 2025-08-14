@@ -28,26 +28,21 @@ public class AiRecommendHistoryService {
         // 1. 레포지를 통해 DB에서 AiRecommendHistory 엔티티 리스트를 가져오기
         List<AiRecommendHistory> histories = aiRecommendHistoryRepository.findByUserId(userId);
 
-        // 2. 가져온 엔티티 리스트를 DTO 리스트로 변환!
+        // 2. 필터링 없이 모든 엔티티를 DTO 리스트로 변환!
+        // ✅ 모든 엔티티를 DTO로 변환하되, 에러가 있어도 DTO 자체는 생성하도록 수정!
         return histories.stream()
-                .filter(history -> history.getRecommendResult() != null && !history.getRecommendResult().trim().isEmpty())
                 .map(this::convertToDTO)
-                .filter(Objects::nonNull)
-                .filter(dto -> dto.getIntro() != null || dto.getSpaName() != null)
                 .collect(Collectors.toList());
     }
 
     // AiRecommendHistory 엔티티 하나를 AiRecommendHistoryResponseDto 하나로 변환하는 도우미 메서드
     private AiRecommendHistoryResponseDTO convertToDTO(AiRecommendHistory history) {
-        // recommendResult는 JSON 문자열이니까 파싱해야 해!
-        String intro = null;
-        String compliment = null;
-        String recommendationHeader = null;
-        String spaName = null;
+        String intro = null, compliment = null, recommendationHeader = null, spaName = null, closing = null, spaSlug = null;
         List<String> spaDescription = new ArrayList<>();
-        String closing = null;
-        String spaSlug = null;
+        String errorMessage = history.getErrorMessage();
 
+        // ✅ recommendResult가 있을 때만 JSON 파싱을 시도!
+        if (history.getRecommendResult() != null && !history.getRecommendResult().trim().isEmpty()) {
         try {
             // JSON 문자열을 JsonNode 객체로 파싱
             JsonNode jsonNode = objectMapper.readTree(history.getRecommendResult());
@@ -68,7 +63,8 @@ public class AiRecommendHistoryService {
             }
         } catch (Exception e) {
             log.error("Failed to parse recommendResult JSON for history id: {}", history.getId(), e);
-            // 에러 발생 시 DTO 필드를 null 또는 기본값으로 남겨두거나, 에러 DTO를 반환하는 등 처리할 수 있음
+            // ✅ 파싱에 실패해도 DTO는 생성되도록 여기서 null을 리턴하지 않음
+        }
         }
 
         // Builder 패턴을 사용해서 DTO 객체 생성
@@ -78,7 +74,6 @@ public class AiRecommendHistoryService {
                 .detectedBreed(history.getDetectedBreed())
                 .prompt(history.getPrompt())
                 .createdAt(history.getCreatedAt())
-                // JSON 파싱 결과
                 .intro(intro)
                 .compliment(compliment)
                 .recommendationHeader(recommendationHeader)
@@ -86,6 +81,7 @@ public class AiRecommendHistoryService {
                 .spaDescription(spaDescription)
                 .closing(closing)
                 .spaSlug(spaSlug)
+                .errorMessage(errorMessage)
                 .build();
     }
 }

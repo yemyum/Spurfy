@@ -15,4 +15,15 @@ public class VisionAnalysisResult {
     private String detectedBreed;  // ex: "푸들", "알 수 없는 견종의 강아지"
     private List<GoogleVisionResponseDTO.Response.LabelAnnotation> labels;  // GoogleVision 라벨 객체 리스트
     private boolean isDog;
+
+    // 객체 탐지 결과(선택: 필요한 필드만)
+    private List<DetectedObject> objects;
+
+    @Data
+    public static class DetectedObject {
+        private String name;   // "Dog"
+        private Float score;   // 신뢰도
+        // 필요하면 boundingPoly 좌표도 추가 가능
+    }
+
 }

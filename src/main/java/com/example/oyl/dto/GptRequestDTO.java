@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class GptRequestDTO {
-    private String model = "gpt-3.5-turbo";
+    private String model = "gpt-4o";
     private List<Message> messages;
 
     @Data

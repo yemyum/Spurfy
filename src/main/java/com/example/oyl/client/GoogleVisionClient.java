@@ -42,17 +42,24 @@ public class GoogleVisionClient {
     );
 
     public GoogleVisionResponseDTO analyzeImage(String base64Image) {
-        // DTO 생성
+        // 1) 이미지 세팅
         GoogleVisionRequestDTO.Request.Image image = new GoogleVisionRequestDTO.Request.Image();
         image.setContent(base64Image);
 
-        GoogleVisionRequestDTO.Request.Feature feature = new GoogleVisionRequestDTO.Request.Feature();
-        feature.setType("LABEL_DETECTION");
-        feature.setMaxResults(10);
+        // 2) 기존 라벨 감지
+        GoogleVisionRequestDTO.Request.Feature labelFeature = new GoogleVisionRequestDTO.Request.Feature();
+        labelFeature.setType("LABEL_DETECTION");
+        labelFeature.setMaxResults(50); // 넉넉히
 
+        // 3) 객체 로컬라이제이션(마릿수/박스용) 추가
+        GoogleVisionRequestDTO.Request.Feature objectFeature = new GoogleVisionRequestDTO.Request.Feature();
+        objectFeature.setType("OBJECT_LOCALIZATION");
+        // objectFeature는 maxResults 불필요
+
+        // 4) 요청 조립: features에 두 개를 함께 넣기
         GoogleVisionRequestDTO.Request request = new GoogleVisionRequestDTO.Request();
         request.setImage(image);
-        request.setFeatures(List.of(feature));
+        request.setFeatures(List.of(labelFeature, objectFeature));
 
         GoogleVisionRequestDTO body = new GoogleVisionRequestDTO();
         body.setRequests(List.of(request));
@@ -61,7 +68,7 @@ public class GoogleVisionClient {
         return googleVisionWebClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path("images:annotate")
-                        .queryParam("key", visionApiKey) // 여기에 key 붙이기
+                        .queryParam("key", visionApiKey)
                         .build()
                 )
                 .bodyValue(body)
@@ -77,21 +84,29 @@ public class GoogleVisionClient {
 
             GoogleVisionResponseDTO response = analyzeImage(base64Image);
 
-            if (response == null || response.getResponses() == null || response.getResponses().isEmpty() ||
-                    response.getResponses().get(0).getLabelAnnotations() == null || response.getResponses().get(0).getLabelAnnotations().isEmpty()) {
-                throw new CustomException(ErrorCode.AI_ANALYSIS_FAILED, "사진에 강아지를 인식하지 못했어요! 정면 얼굴이 잘 보이게 다시 찍어주세요!");
-            }
+            var res = response.getResponses().get(0);
+            var labels = res.getLabelAnnotations();
 
-            List<GoogleVisionResponseDTO.Response.LabelAnnotation> labels = response.getResponses().get(0).getLabelAnnotations();
+            boolean isDogDetected = labels.stream().anyMatch(label -> {
+                String d = label.getDescription();
+                return d != null &&
+                        (d.equalsIgnoreCase("dog") || d.equalsIgnoreCase("puppy") || d.equalsIgnoreCase("canine")) &&
+                        label.getScore() >= 0.7;
+            });
 
-            boolean isDogDetected = labels.stream()
-                    .anyMatch(label -> {
-                        String desc = label.getDescription();
-                        return desc != null &&
-                                (desc.equalsIgnoreCase("dog") || desc.equalsIgnoreCase("puppy") || desc.equalsIgnoreCase("canine")) &&
-                                label.getScore() >= 0.7;
-                    });
+            // 객체 탐지 결과 수집
+            List<GoogleVisionResponseDTO.Response.LocalizedObjectAnnotation> objs =
+                    Optional.ofNullable(res.getLocalizedObjectAnnotations()).orElse(List.of());
 
+            List<VisionAnalysisResult.DetectedObject> mappedObjects = objs.stream()
+                    .map(o -> {
+                        VisionAnalysisResult.DetectedObject v = new VisionAnalysisResult.DetectedObject();
+                        v.setName(o.getName());
+                        v.setScore(o.getScore());
+                        return v;
+                    }).toList();
+
+            // 품종 라벨 추출
             Optional<GoogleVisionResponseDTO.Response.LabelAnnotation> detectedBreedLabel = labels.stream()
                     .sorted(Comparator.comparing(GoogleVisionResponseDTO.Response.LabelAnnotation::getScore).reversed())
                     .filter(label -> {
@@ -104,19 +119,18 @@ public class GoogleVisionClient {
                     .findFirst();
 
             String detectedBreed = detectedBreedLabel
-                    .map(label -> BREED_KOR_MAP.getOrDefault(label.getDescription(), label.getDescription()))
+                    .map(l -> BREED_KOR_MAP.getOrDefault(l.getDescription(), l.getDescription()))
                     .orElse("알 수 없는 견종의 강아지");
 
             return VisionAnalysisResult.builder()
                     .detectedBreed(detectedBreed)
                     .labels(labels)
+                    .objects(mappedObjects)
                     .isDog(isDogDetected)
                     .build();
 
         } catch (IOException e) {
             throw new RuntimeException("이미지 파일 처리 중 오류 발생", e);
-        } catch (CustomException e) {
-            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Vision API 분석 중 오류 발생: " + e.getMessage(), e);
         }
