@@ -36,8 +36,6 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 - 사용자(users), 반려견(dogs), 스파 서비스(spa_services), 예약(reservations), 리뷰(reviews)
 - 사용자 1:N 강아지, 예약 1:1 리뷰 구조
 
-👉 ERD 및 상세 SQL은 Notion 참고: https://www.notion.so/SPURFY-SOLO-PROJECT-1-206023034fb1806a9cabd9031a1a02d1?source=copy_link
-
 ---
 
 ## 🔗 API 요약
@@ -49,8 +47,6 @@ RESTful API + JWT 기반 인증
 - `POST /api/reservations`: 예약 생성
 - `PATCH /api/reservations/{id}/cancel`: 예약 취소
 - `POST /api/admin/services`: 관리자 서비스 등록
-
-요청/응답 JSON, 에러 핸들링 등 포함 👉 https://www.notion.so/SPURFY-SOLO-PROJECT-3-208023034fb18058b380ed586cce2bbc?source=copy_link
 
 ---
 
