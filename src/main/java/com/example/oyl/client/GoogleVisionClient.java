@@ -41,6 +41,8 @@ public class GoogleVisionClient {
             "dog", "mammal", "animal", "canine", "carnivores", "vertebrate", "pet"
     );
 
+    private static final String UNKNOWN_BREED = "알 수 없는 견종";
+
     public GoogleVisionResponseDTO analyzeImage(String base64Image) {
         // 1) 이미지 세팅
         GoogleVisionRequestDTO.Request.Image image = new GoogleVisionRequestDTO.Request.Image();
@@ -119,8 +121,14 @@ public class GoogleVisionClient {
                     .findFirst();
 
             String detectedBreed = detectedBreedLabel
+                    // ① Vision 영문 라벨을 한글로 매핑(없으면 원문 유지)
                     .map(l -> BREED_KOR_MAP.getOrDefault(l.getDescription(), l.getDescription()))
-                    .orElse("알 수 없는 견종의 강아지");
+                    // ② 좌우 공백 제거(“ 말티즈 ” 같은 케이스)
+                    .map(String::trim)
+                    // ③ 빈 값이면 버리고
+                    .filter(s -> !s.isBlank())
+                    // ④ 공통 상수로 통일
+                    .orElse(UNKNOWN_BREED);
 
             return VisionAnalysisResult.builder()
                     .detectedBreed(detectedBreed)

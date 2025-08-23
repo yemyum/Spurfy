@@ -44,16 +44,11 @@ public class GptClient {
                         ? ""
                         : String.format("- 건강 상태: %s\n", String.join(", ", dto.getHealthIssues()));
 
-        // 그대로 쓰던 값
-        String checklist = dto.getChecklist();
         String question  = dto.getQuestion();
-
-        // 필요하면 한 번에 합치기
-        String userContext = breedInfo + ageGroupInfo + activityLevelInfo + skinTypesInfo + healthIssuesInfo;
 
         // 2. 메시지 구성 (GPT에게 JSON 형식으로 응답 요청)
         StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("너는 \"스퍼피(spurfy)\"라는 반려견 힐링 스파 예약 시스템의 AI야.\n");
+        promptBuilder.append("너는 \"스퍼피(spurfy)\"라는 반려견 힐링 스파 예약 시스템의 AI '스피'야.\n");
         promptBuilder.append("보호자가 올려준 강아지 사진과 입력 정보들을 바탕으로, 자연스럽고 다정하게 어울리는 스파를 추천해줘.\n\n");
 
         promptBuilder.append(String.format("사진 속 강아지는 '%s'로 인식됐고, 다음 정보들을 참고해: ", dto.getBreed()));
@@ -68,11 +63,6 @@ public class GptClient {
                 activityLevelInfo
         ));
         promptBuilder.append("\n");
-
-        Optional.ofNullable(checklist)
-                .filter(s -> !s.trim().isEmpty())
-                .ifPresent(c -> promptBuilder.append("## 보호자가 선택한 특징:\n")
-                        .append(c).append("\n\n"));
 
         Optional.ofNullable(question)
                 .filter(s -> !s.trim().isEmpty())
@@ -107,7 +97,7 @@ public class GptClient {
         promptBuilder.append("[응답 규칙] 반드시 순수 JSON 객체만 응답할 것. 마크다운 코드 블록(```), 백틱(`), 설명, 주석, 자연어는 절대 포함하지 말 것.\n");
         promptBuilder.append("응답은 반드시 '{' 로 시작하고 '}' 로 끝나는 JSON 객체여야 함.\n");
         promptBuilder.append("{\n");
-        promptBuilder.append("  \"intro\": \"사진 속 아이는 **%s**(으)로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n\",\n".formatted(dto.getBreed()));
+        promptBuilder.append("  \"intro\": \"사진 속 아이는 **%s**로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n\",\n".formatted(dto.getBreed()));
         promptBuilder.append("  \"compliment\": \"이 견종의 성격, 분위기, 보호자에게 어필할만한 특징을 1~2줄로 요약\\n\\n\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는:\\n\\n\",\n");
         promptBuilder.append("  \"spaName\": \"**%s**에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
@@ -167,26 +157,25 @@ public class GptClient {
                         ? ""
                         : String.format("- 건강 상태: %s\n", String.join(", ", dto.getHealthIssues()));
 
-        String checklist = dto.getChecklist();
         String question = dto.getQuestion();
-
-        // 필요하면 한 번에 합치기
-        String userContext = labelsInfo
-                + ageGroupInfo
-                + activityLevelInfo
-                + skinTypesInfo
-                + healthIssuesInfo;
 
         // 2. 메시지 구성 (GPT에게 JSON 형식으로 응답 요청)
         StringBuilder promptBuilder = new StringBuilder();
-        promptBuilder.append("너는 \"스퍼피(spurfy)\"라는 반려견 힐링 스파 예약 시스템의 AI야.\n");
+        promptBuilder.append("너는 \"스퍼피(spurfy)\"라는 반려견 힐링 스파 예약 시스템의 AI '스피'야.\n");
         promptBuilder.append("보호자가 올려준 강아지 사진과 입력 정보들을 바탕으로, 자연스럽고 다정하게 어울리는 스파를 추천해줘.\n\n");
 
         // 견종 인식 실패 시에도 사용자가 선택한 견종이 있다면 활용
-        if (dto.getBreed() != null && !dto.getBreed().isEmpty() && !"알 수 없는 견종의 강아지".equals(dto.getBreed())) {
-            promptBuilder.append(String.format("분석 결과, 명확한 견종은 인식되지 않았지만 보호자님이 직접 '%s' 견종이라고 알려주셨어! 다음 정보들을 참고해: ", dto.getBreed()));
+        String userBreed = Optional.ofNullable(dto.getSelectedBreed()).orElse("").trim();
+        boolean hasUserBreed = !userBreed.isEmpty();
+        String visionBreed = Optional.ofNullable(dto.getBreed()).orElse("").trim();
+
+        if (hasUserBreed) {
+            promptBuilder.append(
+                    "보호자님이 '%s' 견종이라고 알려주셨어. 아래 정보를 참고해서 스파를 추천해줘: "
+                            .formatted(userBreed)
+            );
         } else {
-            promptBuilder.append("분석 결과, 명확한 견종은 인식되지 않았지만, 다음 정보들을 참고해: ");
+            promptBuilder.append("아래 정보를 참고해서 스파를 추천해줘: ");
         }
 
         promptBuilder.append(String.format("""
@@ -199,11 +188,6 @@ public class GptClient {
                 activityLevelInfo
         ));
         promptBuilder.append("\n");
-
-        Optional.ofNullable(checklist)
-                .filter(s -> !s.trim().isEmpty())
-                .ifPresent(c -> promptBuilder.append("## 보호자가 선택한 특징:\n")
-                        .append(c).append("\n\n"));
 
         Optional.ofNullable(question)
                 .filter(s -> !s.trim().isEmpty())
@@ -238,17 +222,27 @@ public class GptClient {
         promptBuilder.append("[응답 규칙] 반드시 순수 JSON 객체만 응답할 것. 마크다운 코드 블록(```), 백틱(`), 설명, 주석, 자연어는 절대 포함하지 말 것.\n");
         promptBuilder.append("응답은 반드시 '{' 로 시작하고 '}' 로 끝나는 JSON 객체여야 함.\n");
         promptBuilder.append("{\n");
+        boolean breedUnknown = visionBreed.isEmpty()
+                || visionBreed.equals("알 수 없는 견종")
+                || visionBreed.contains("알 수 없는")
+                || visionBreed.equalsIgnoreCase("unknown")
+                || visionBreed.toLowerCase(java.util.Locale.ROOT).contains("unidentified");
+
+        // 체크리스트에서 최소 하나라도 들어왔는지
+        boolean hasUserInfo =
+                (dto.getAgeGroup() != null && !dto.getAgeGroup().isBlank()) ||
+                        (dto.getActivityLevel() != null && !dto.getActivityLevel().isBlank()) ||
+                        (dto.getHealthIssues() != null && !dto.getHealthIssues().isEmpty());
         String introMessage;
-        if (dto.getBreed() != null && !dto.getBreed().isEmpty()
-                && !"알 수 없는 견종의 강아지".equals(dto.getBreed())
-                && !"모름".equals(dto.getBreed())) {
-            introMessage =
-                    "보호자님이 알려주신 견종은 **%s**(이)군요!\\n" +
-                            "소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n".formatted(dto.getBreed());
-        } else { // 견종 정보가 없을 때
-            introMessage =
-                    "사진 속 견종을 정확하게 파악하긴 어려웠지만,\\n" +
-                            "소중한 보호자님의 마음을 담아 맞춤 스파를 추천해드릴게요. 😉\\n";
+        if (hasUserBreed) {
+            introMessage = "보호자님이 알려주신 견종은 **%s**군요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n"
+                    .formatted(userBreed);
+        } else if (breedUnknown && !hasUserInfo) {
+            // 사진도 모르고(unknown) 체크리스트도 없음 → 부드러운 안내
+            introMessage = "반려견의 정확한 정보를 찾지 못했지만,\\n저 스피가 최적의 스파를 추천해드릴게요! 🤩\\n";
+        } else {
+            // 뭔가라도 정보가 있으면 중립/긍정 톤
+            introMessage = "제공해주신 정보를 바탕으로, 사랑스러운 반려견에게 어울리는 스파를 추천해드릴게요. 😉\\n";
         }
         promptBuilder.append("  \"intro\": \"" + introMessage + "\",\n");
         promptBuilder.append("  \"compliment\": \"이 견종의 성격, 분위기, 보호자에게 어필할만한 특징을 1줄로 요약\\n\\n\",\n");
