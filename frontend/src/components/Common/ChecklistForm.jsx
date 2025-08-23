@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 
 function ChecklistForm({ onSubmit }) {
   const [ageGroup, setAgeGroup] = useState("");
@@ -7,29 +7,48 @@ function ChecklistForm({ onSubmit }) {
   const [healthIssues, setHealthIssues] = useState([]);
 
   const breedOptions = [
-    "선택 안 함",
-    "말티즈", "푸들", "시츄", "포메라니안", "치와와", "골든 리트리버", "시바견",
-    "비숑 프리제", "웰시코기", "요크셔테리어", "닥스훈트", "믹스견", "보더콜리"
+    { label: "선택 안 함", value: "" },
+    { label: "말티즈", value: "말티즈" },
+    { label: "푸들", value: "푸들" },
+    { label: "시츄", value: "시츄" },
+    { label: "비숑 프리제", value: "비숑 프리제" },
+    { label: "포메라니안", value: "포메라니안" },
+    { label: "치와와", value: "치와와" },
+    { label: "골든 리트리버", value: "골든 리트리버" },
+    { label: "진돗개", value: "진돗개" },
+    { label: "웰시코기", value: "웰시코기" },
+    { label: "닥스훈트", value: "닥스훈트" },
+    { label: "보더콜리", value: "보더콜리" },
+    { label: "시바견", value: "시바견" },
+    { label: "믹스견", value: "믹스견" },
   ];
 
   const healthIssuesOptions = [
     "피부 민감", "관절 약함", "알레르기", "심장 질환", "비만", "소화 문제", "귀 문제", "호흡기 문제"
   ];
 
-  // ageGroup이나 activityLevel이 바뀔 때마다 부모 컴포넌트에 최신 데이터를 넘겨주기
+  // 부모로 보낼 payload 정규화
+  const payload = useMemo(() => ({
+    ageGroup: (ageGroup || "").trim(),
+    activityLevel: (activityLevel || "").trim(),
+    selectedBreed: selectedBreed || "",
+    healthIssues: Array.from(new Set(healthIssues)),
+  }), [ageGroup, activityLevel, selectedBreed, healthIssues]);
+
+  // 동일 payload 반복 호출 방지 (StrictMode 대비)
+  const prevRef = useRef("");
   useEffect(() => {
-    // ageGroup이나 activityLevel 중 하나라도 선택되면 (또는 초기 빈 값이라도)
-    // 부모 컴포넌트의 onSubmit 함수를 호출해서 현재 상태를 전달
-    onSubmit({ ageGroup, activityLevel, healthIssues, selectedBreed });
-  }, [ageGroup, activityLevel, selectedBreed, healthIssues]);
+    const now = JSON.stringify(payload);
+    if (prevRef.current !== now) {
+      onSubmit(payload);
+      prevRef.current = now;
+    }
+  }, [payload, onSubmit]);
 
   const handleHealthIssuesChange = (e) => {
     const { value, checked } = e.target;
-    if (checked) {
-      setHealthIssues((prev) => [...prev, value]); // 체크되면 배열에 추가
-    } else {
-      setHealthIssues((prev) => prev.filter((item) => item !== value)); // 체크 해제되면 배열에서 제거
-    }
+    setHealthIssues(prev => checked ? (prev.includes(value) ? prev : [...prev, value])
+      : prev.filter(v => v !== value));
   };
 
   return (
@@ -40,13 +59,13 @@ function ChecklistForm({ onSubmit }) {
         <h2 className="font-bold text-xl mb-2">견종</h2>
         <select
           name="breed"
-          value={selectedBreed}
+          value={selectedBreed ?? ""}   // 빈문자열이 "미선택"
           onChange={(e) => setSelectedBreed(e.target.value)}
           className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
         >
-          {breedOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
+          {breedOptions.map((o) => (
+            <option key={o.label} value={o.value}>
+              {o.label}
             </option>
           ))}
         </select>

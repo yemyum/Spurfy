@@ -9,7 +9,7 @@ import { faCamera, faListCheck } from "@fortawesome/free-solid-svg-icons";
 
 import { useChatHistory } from "../hooks/useChatHistory";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
-import { useChecklistStore } from "../hooks/useChecklistStore";
+import { useChecklist } from "../hooks/useChecklist";
 
 const DogImageAnalysisPage = () => {
   const navigate = useNavigate();
@@ -20,19 +20,25 @@ const DogImageAnalysisPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   // 대화/체크리스트 훅
-  const { chatMessages, addMessage, replaceMessage } = useChatHistory(); // replaceMessage 추가
+  const { chatMessages, addMessage, replaceMessage, removeMessage } = useChatHistory();
+
   const {
-    sheetOpen,
-    setSheetOpen,
-    checklist,
-    checklistDataRef,
+    sheetOpen, setSheetOpen,
+    checklist, setChecklist,
     selectedCount,
-    handleChecklistSubmit,
-    handleApplyChecklist,
-    handleResetChecklist,
-  } = useChecklistStore();
+    hasAnySelection,   // ← 불리언!
+    toPayload,         // ← 정규화 함수
+    handleChecklistSubmit, handleApplyChecklist,
+  } = useChecklist();
 
   useBodyScrollLock(sheetOpen);
+
+  // 안전한 timestamp 파서
+  const parseTs = (v) => {
+    if (typeof v === "number" && Number.isFinite(v)) return v;
+    const t = Date.parse(v);
+    return Number.isFinite(t) ? t : Date.now();
+  };
 
   // 로그인 체크
   useEffect(() => {
@@ -75,7 +81,7 @@ const DogImageAnalysisPage = () => {
           .join("\n\n"),
       spaSlug: result.spaSlug,
       id: result.id,
-      timestamp: new Date(result.createdAt).getTime(),
+      timestamp: parseTs(result.createdAt),
       imageUrl: result.imageUrl || null,
       errorMessage: result.errorMessage || null, // ✅ errorMessage도 추가
     };
@@ -90,47 +96,43 @@ const DogImageAnalysisPage = () => {
     }
     setSelectedFile(file);
     setErrorMessage("");
-    e.target.value = "";
   };
 
   const handleImageAnalysis = async (event) => {
     event.preventDefault();
+    console.log("전송 버튼 눌림");
     setErrorMessage("");
 
-    const hasAnySelection = (c) =>
-      !!c &&
-      ((c.selectedBreed && c.selectedBreed !== "선택 안 함") ||
-        (Array.isArray(c.healthIssues) && c.healthIssues.length > 0) ||
-        (typeof c.ageGroup === "string" && c.ageGroup.trim() !== "") ||
-        (typeof c.activityLevel === "string" && c.activityLevel.trim() !== ""));
-
-    checklistDataRef.current = hasAnySelection(checklist) ? checklist : null;
+    const payloadChecklist = hasAnySelection ? toPayload() : null;
 
     if (!selectedFile) {
       setErrorMessage("사진은 필수입니다. 파일을 선택해주세요!");
       return;
     }
 
-    const userMessageId = `temp-${Date.now()}`;
+    // ✅ 1. 임시 유저 메시지의 고유 ID를 생성
+    const userTempId = `temp-${Date.now()}`;
     const previewUrl = URL.createObjectURL(selectedFile);
+    const userTs = Date.now();
 
-    // ✅ API 요청 전에 임시 유저 버블을 추가!
+    // ✅ 2. API 요청 전에 임시 유저 메시지를 추가
     addMessage({
-      id: `temp-user-${userMessageId}`,
+      id: userTempId, // 이 임시 ID로 나중에 메시지를 찾아서 교체
       text: sanitizeText(freeTextQuestion),
       isUser: true,
       imageUrl: previewUrl,
-      checklist: checklistDataRef.current,
+      checklist: payloadChecklist,
+      timestamp: userTs,
     });
 
     try {
-      // 2) 업로드 + 분석 요청
+      // 3. 업로드 + 분석 요청
       const formData = new FormData();
       formData.append("dogImageFile", selectedFile);
-      if (checklistDataRef.current) {
-        formData.append("checklist", JSON.stringify(checklistDataRef.current));
+      formData.append("question", sanitizeText(freeTextQuestion));  // 빈 문자열도 허용 가능
+      if (payloadChecklist) {
+        formData.append("checklist", JSON.stringify(payloadChecklist));
       }
-      if (freeTextQuestion) formData.append("question", freeTextQuestion);
 
       const response = await api.post("/dog-image", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -142,67 +144,70 @@ const DogImageAnalysisPage = () => {
         return;
       }
 
-      // ✅ 2. 성공 응답을 받으면 임시 버블을 진짜 버블로 교체
-      const permanentUserMsg = {
-        id: `prompt-${payload.id}`,
-        text: freeTextQuestion.trim(),
-        isUser: true,
-        imageUrl: payload.imageUrl,
-        checklist: checklistDataRef.current,
-        timestamp: new Date(payload.createdAt).getTime() - 1,
-      };
-      replaceMessage(userMessageId, permanentUserMsg);
+      // ✅ 4. 성공 응답을 받으면 임시 메시지를 진짜 메시지로 교체
+      const serverId = payload.id;
+      const userPromptId = `user-${serverId}`; // ✅ user- 접두사로 통일
+      const aiResponseId = `ai-${serverId}`;   // ✅ ai- 접두사로 통일
+      const serverImgUrl = payload.imageUrl;
 
-      // 3. AI 버블 추가
+      // (useChatHistory에서 만든 replaceMessage를 활용)
+      replaceMessage(userTempId, userPromptId, serverImgUrl);
+
+      // ✅ 5. AI 메시지 추가
       const aiResult = formatAiMessage(payload);
       addMessage({
         ...aiResult,
         isUser: false,
         imageUrl: null,
-        id: `ai-${aiResult.id}`,
+        id: aiResponseId, // 서버에서 받은 ID로 AI 메시지 ID 생성
+        timestamp: parseTs(payload.createdAt),
       });
 
-      URL.revokeObjectURL(previewUrl);
-      setSelectedFile(null);
-      checklistDataRef.current = null;
-      setFreeTextQuestion("");
-
     } catch (error) {
-      URL.revokeObjectURL(previewUrl);
-
       let msg = "이미지 분석 요청 중 오류가 발생했습니다!";
       const apiMsg = error.response?.data?.message;
       const apiCode = error.response?.data?.code;
 
-      // API 응답에서 에러 메시지를 가져와
       if (apiMsg) msg = `오류: ${apiMsg}${apiCode ? ` (${apiCode})` : ""}`;
       else if (error.message) msg = `오류: ${error.message}`;
 
       const payloadId = error.response?.data?.data?.id;
       const serverImg = error.response?.data?.data?.imageUrl;
 
-      if (payloadId && serverImg) {
-        const permanentUserMsg = {
-          id: `prompt-${payloadId}`,
-          text: freeTextQuestion.trim(),
-          isUser: true,
-          imageUrl: serverImg,
-          checklist: checklistDataRef.current,
-        };
-        replaceMessage(userMessageId, permanentUserMsg);
+      // ✅ 6. 오류 응답을 받으면 메시지 처리
+      if (payloadId) {
+        // 서버 응답에 ID가 있을 때: 임시 유저 메시지를 서버 ID로 교체
+        // ✅ 오류 응답 시 필요한 ID를 상수로 빼내기
+        const userPromptId = `prompt-${payloadId}`;
+        const aiResponseId = `ai-${payloadId}`;
+        replaceMessage(userTempId, userPromptId, serverImg);
 
+        // AI 오류 메시지 추가
         addMessage({
-          id: `ai-${payloadId}`,
+          id: aiResponseId,
           isUser: false,
           text: msg,
           errorMessage: msg,
+          timestamp: Date.now(),
         });
       } else {
-        setErrorMessage(msg);
+        // 서버 응답에 ID가 없을 때: 임시 유저 메시지 삭제
+        removeMessage(userTempId);
+
+        // AI 오류 메시지 추가
+        addMessage({
+          id: `ai-error-${Date.now()}`,
+          isUser: false,
+          text: msg,
+          errorMessage: msg,
+          timestamp: Date.now(),
+        });
       }
 
+    } finally {
+      // 성공/실패와 상관없이 항상 실행
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
       setSelectedFile(null);
-      checklistDataRef.current = null;
       setFreeTextQuestion("");
     }
   };
@@ -243,7 +248,6 @@ const DogImageAnalysisPage = () => {
               text={m.text}
               isUser={m.isUser}
               imageUrl={m.imageUrl ?? m.image_url ?? null} // snake_case 대비
-              checklist={m.checklist}
               spaSlug={m.spaSlug}
               onGoToSpaDetail={handleGoToSpaDetail}
             />
@@ -251,13 +255,13 @@ const DogImageAnalysisPage = () => {
         ) : (
           <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
         )}
-        {errorMessage && (
-          <div className="py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold bg-red-50 text-red-600 text-sm">
-            {errorMessage}
-          </div>
-        )}
         <div ref={messagesEndRef} />
       </div>
+      {errorMessage && (
+        <div className="py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold bg-red-50 text-red-600 text-sm">
+          {errorMessage}
+        </div>
+      )}
 
       {/* 3. 전송 영역 */}
       <div className="flex flex-col items-center flex-shrink-0 w-full bg-gray-100 p-2 px-4 pt-4">
@@ -305,9 +309,10 @@ const DogImageAnalysisPage = () => {
         sheetOpen={sheetOpen}
         onClose={() => setSheetOpen(false)}
         checklist={checklist}
+        setChecklist={setChecklist}
         onChecklistSubmit={handleChecklistSubmit}
         onApply={handleApplyChecklist}
-        onReset={handleResetChecklist}
+      // onReset은 지금 구조엔 안 씀 → 제거 or 내부 처리 방식 수정
       />
     </div >
   );
