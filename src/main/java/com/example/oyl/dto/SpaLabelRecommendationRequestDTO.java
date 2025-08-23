@@ -21,4 +21,6 @@ public class SpaLabelRecommendationRequestDTO {
 
     private String checklist;
     private String question;
+
+    private String selectedBreed;
 }

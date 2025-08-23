@@ -43,36 +43,48 @@ public class DogImageService {
     private static final String UPLOAD_DIRECTORY = "uploads";
     private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
 
-    // 견종 관련
-    private static final String UNKNOWN_BREED = "알 수 없는 견종의 강아지"; // Vision 실패 시
-    private static final String CHECKLIST_NOT_SELECTED_BREED = "선택 안 함"; // 사용자가 선택 안 함
-
-    // 기본값
+    // ===== constants =====
+    private static final String UNKNOWN_BREED = "알 수 없는 견종";
     private static final String DEFAULT_AGE_GROUP = "성견";
     private static final String DEFAULT_ACTIVITY_LEVEL = "보통";
 
-    // Vision 필터
     private static final List<String> BANNED_LABELS = List.of(
             "clothes", "costume", "pet supply", "clothing", "supply"
     );
-
-    // 튜닝 상수
     private static final float DOG_OBJECT_MIN_SCORE = 0.6f;
-
     private static final String IMAGE_BASE_PATH = "/api/images/";
 
-    // 문자열 유틸
+    // ===== tiny utils (only what we actually use) =====
     private static String norm(String s) { return s == null ? "" : s.trim(); }
 
-    private static boolean isNotSelected(String s) {
-        String v = norm(s);
-        return v.isEmpty() || CHECKLIST_NOT_SELECTED_BREED.equals(v); // "선택 안 함"
+    // Vision unknown 판정: 상수/한글/영문 변형 커버
+    private static boolean isUnknownBreed(String s) {
+        String t = norm(s).toLowerCase(java.util.Locale.ROOT);
+        if (t.isEmpty()) return true;
+
+        if (t.equals(UNKNOWN_BREED.toLowerCase(java.util.Locale.ROOT))) return true;
+        String compact = t.replaceAll("\\s+", ""); // "알수없는견종" 케이스
+        if (compact.contains("알수없는")) return true;
+
+        return t.contains("unknown") || t.contains("unidentified");
     }
 
-    private static boolean containsAny(String haystack, String... needles) {
-        String h = norm(haystack).toLowerCase();
-        for (String n : needles) if (h.contains(n.toLowerCase())) return true;
-        return false;
+    private static String truncate(String s, int max) {
+        if (s == null) return null;
+        return s.length() <= max ? s : s.substring(0, max) + "...(truncated)";
+    }
+
+    @SuppressWarnings("unchecked")
+    private static java.util.List<String> safeGetList(Object v) {
+        if (v instanceof java.util.List<?> l) {
+            return l.stream()
+                    .filter(java.util.Objects::nonNull)
+                    .map(String::valueOf)
+                    .map(String::trim)
+                    .filter(x -> !x.isEmpty())
+                    .toList(); // 자바 17 OK
+        }
+        return java.util.List.of();
     }
 
     // AI 호출 횟수
@@ -218,51 +230,74 @@ public class DogImageService {
         String userSelectedActivityLevel = DEFAULT_ACTIVITY_LEVEL; // "보통"을 상수로 대체
         List<String> userSelectedHealthIssues = new ArrayList<>(); // 사용자 선택 건강 문제
 
-        log.info("Received raw checklist string from frontend: {}", checklist);
+        log.info("[Checklist] raw(len={}): {}", checklist == null ? 0 : checklist.length(), truncate(checklist, 500));
 
         if (checklist != null && !checklist.trim().isEmpty()) {
             try {
-                // Checklist 문자열을 Map으로 파싱 (Map<String, Object>로 받아서 List<String> 파싱 가능)
                 Map<String, Object> parsedChecklist = objectMapper.readValue(checklist, Map.class);
-                log.info("Parsed checklist map: {}", parsedChecklist);
+                log.info("[Checklist] parsed: {}", parsedChecklist);
 
-                userSelectedBreed = (String) parsedChecklist.get("selectedBreed");
-                userSelectedAgeGroup = (String) parsedChecklist.get("ageGroup");
-                userSelectedActivityLevel = (String) parsedChecklist.get("activityLevel");
+                String v;
 
-                // healthIssues는 List<String>으로 파싱될 수 있도록 처리
-                Object healthIssuesObj = parsedChecklist.get("healthIssues");
-                if (healthIssuesObj instanceof List) {
-                    userSelectedHealthIssues = (List<String>) healthIssuesObj;
+                v = (String) parsedChecklist.get("selectedBreed");
+                if (v != null && !v.isBlank() && !"선택 안 함".equals(v)) {
+                    userSelectedBreed = v.trim();
+                }
+
+                v = (String) parsedChecklist.get("ageGroup");
+                if (v != null && !v.isBlank()) {
+                    userSelectedAgeGroup = v.trim();
+                }
+
+                v = (String) parsedChecklist.get("activityLevel");
+                if (v != null && !v.isBlank()) {
+                    userSelectedActivityLevel = v.trim();
+                }
+
+                Object hiObj = parsedChecklist.get("healthIssues");
+                if (hiObj instanceof List<?> l && !l.isEmpty()) {
+                    userSelectedHealthIssues = l.stream()
+                            .filter(Objects::nonNull)
+                            .map(String::valueOf)
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .toList(); // 자바 17 OK
                 }
 
             } catch (IOException e) {
                 log.error("체크리스트 JSON 파싱 실패: {}", checklist, e);
             }
         }
+        log.info("[Checklist] decided → breed='{}', age='{}', act='{}', issues={}",
+                userSelectedBreed, userSelectedAgeGroup, userSelectedActivityLevel,
+                userSelectedHealthIssues == null ? 0 : userSelectedHealthIssues.size());
 
 
-        // ✅ 최종적으로 GPT에 전달할 견종, 연령대, 활동 수준 결정
-        // 1) 견종: 사용자가 선택했으면 우선, 아니면 Vision 결과
-        String finalBreedToUse = !isNotSelected(userSelectedBreed) ? userSelectedBreed.trim() : detectedBreed;
+        // ✅ Vision 자체가 유효한가? (먼저 계산)
+        boolean visionBreedUsable = !isUnknownBreed(detectedBreed);
+
+        // ✅ 견종: Vision 결과가 유효하면 우선, 아니면 사용자 선택
+        String finalBreedToUse;
+        if (visionBreedUsable) {
+            finalBreedToUse = norm(detectedBreed);               // Vision 우선
+        } else if (userSelectedBreed != null && !userSelectedBreed.isBlank()) {
+            finalBreedToUse = userSelectedBreed.trim();          // Vision unknown → 사용자 선택
+        } else {
+            finalBreedToUse = UNKNOWN_BREED;
+        }
+        boolean hasUsableBreed = !isUnknownBreed(finalBreedToUse);
 
         // 2) 연령/활동성: 공백 정리만
         String finalAgeGroupToUse = norm(userSelectedAgeGroup);
         String finalActivityLevelToUse = norm(userSelectedActivityLevel);
 
-        // 3) 건강 이슈: 사용자 선택 + Vision 라벨 합치기(중복 제거)
-        Set<String> combinedHealthIssues = new LinkedHashSet<>(Optional.ofNullable(userSelectedHealthIssues).orElse(List.of()));
-        for (String label : Optional.ofNullable(visionLabels).orElse(List.of())) {
-            if (containsAny(label, "skin", "dermatitis", "itchy", "rash"))   combinedHealthIssues.add("피부 문제 (Vision)");
-            if (containsAny(label, "joint", "arthritis", "limp", "lameness")) combinedHealthIssues.add("관절 문제 (Vision)");
-            if (containsAny(label, "sick", "ill", "bandage", "wound"))        combinedHealthIssues.add("건강 이상 (Vision)");
-        }
-        List<String> finalHealthIssuesToUse = new ArrayList<>(combinedHealthIssues);
+        // 3) 건강 이슈: 사용자 선택 입력만 사용
+        List<String> finalHealthIssuesToUse =
+                new ArrayList<>(Optional.ofNullable(userSelectedHealthIssues).orElse(List.of()));
 
         // 4) 보조 필드
         String finalAdjActivity = toAdjective(finalActivityLevelToUse); // "활발함" → "활발한"
-        String breedForPrompt = finalBreedToUse;
-        boolean hasUsableBreed = !UNKNOWN_BREED.equals(finalBreedToUse);
+        String breedForPrompt = finalBreedToUse; // 재선언 금지: 위에서 hasUsableBreed 이미 계산됨
 
         // 5) 로그 최소화
         log.info("[GPT-IN] breed='{}'(usable={}), age='{}', act='{}', issues={}",
@@ -273,7 +308,7 @@ public class DogImageService {
             log.info("GPT 차단: breed/labels 부적합 → 안내만 반환");
             final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
             return GptSpaRecommendationResponseDTO.createFailureResponse(
-                    "사진 정보가 부족합니다. 반려견 **정면 단독샷**으로 다시 올려주세요!", imageUrlForHistory
+                    "사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
             );
         }
 
@@ -287,7 +322,7 @@ public class DogImageService {
                     finalHealthIssuesToUse != null ? finalHealthIssuesToUse.size() : 0);
 
             // Vision API 결과에 따라 다른 GPT 클라이언트를 호출
-            if (!hasUsableBreed) { // 견종 확정 불가 → 라벨 기반
+            if (!visionBreedUsable) { // Vision unknown → 라벨 기반(추천스파 by labels)
                 log.info("Calling gptClient.recommendSpaByLabels...");
 
                 // (보너스 안전망) 라벨 비었으면 여기서도 한번 더 컷
@@ -302,12 +337,12 @@ public class DogImageService {
                             .isDog(true) // 여기선 강아지 인식은 됐으니 true
                             .recommendResult(null)
                             .prompt(question)
-                            .errorMessage("사진 정보가 부족합니다. 반려견 **정면 단독샷**으로 다시 올려주세요!")
+                            .errorMessage("사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!")
                             .build();
                     aiRecommendHistoryRepository.save(history);
 
                     return GptSpaRecommendationResponseDTO.createFailureResponse(
-                            "사진 정보가 부족합니다. 반려견 **정면 단독샷**으로 다시 올려주세요!", imageUrlForHistory
+                            "사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
                     );
                 }
 
@@ -319,15 +354,16 @@ public class DogImageService {
                         .activityLevel(finalAdjActivity)
                         .checklist(checklist)
                         .question(question)
-                        .breed(breedForPrompt) // UNKNOWN_BREED 또는 실제 값
+                        .breed(detectedBreed)              // Vision이 돌린 결과(여긴 unknown일 것)
+                        .selectedBreed(userSelectedBreed)  // 보호자 선택
                         .build();
 
-                spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto); // DTO로 받음
+                spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto);
 
             } else {  // 견종 확정됨 → 견종 기반
                 log.info("Calling gptClient.recommendSpa...");
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
-                        .breed(breedForPrompt) // 실제 견종명
+                        .breed(detectedBreed)
                         .ageGroup(finalAgeGroupToUse)
                         .skinTypes(List.of())
                         .healthIssues(Optional.ofNullable(finalHealthIssuesToUse).orElse(List.of()))
@@ -336,7 +372,7 @@ public class DogImageService {
                         .question(question)
                         .build();
 
-                spaRecommendationDto = gptClient.recommendSpa(request); // DTO로 받음
+                spaRecommendationDto = gptClient.recommendSpa(request);
             }
 
             // 3) 널 가드

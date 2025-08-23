@@ -5,6 +5,7 @@ import com.example.oyl.dto.GptSpaRecommendationResponseDTO;
 import com.example.oyl.exception.CustomException;
 import com.example.oyl.service.DogImageService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/dog-image")
 @RequiredArgsConstructor
@@ -29,6 +31,7 @@ public class AiSpaRecommendationController {
             @RequestParam(value = "checklist", required = false) String checklist,
             @RequestParam(value = "question", required = false) String question
     ) {
+        log.info("[Controller] checklist raw: {}", checklist);
         // React에서 'dogImageFile'이라는 이름으로 파일을 보낼 거라고 약속!
         // 1. 파일이 비어있는지 먼저 확인! (파일이 없는 요청이 올 수도 있으니까)
         if (dogImageFile == null || dogImageFile.isEmpty()) {
