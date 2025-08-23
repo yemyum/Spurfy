@@ -15,7 +15,7 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 - 스파 서비스 목록 조회
 - 마이페이지 예약 확인
 - 리뷰 작성 및 이미지 업로드
-- AI가 반려견 사진을 분석해 견종별 맞춤 스파를 추천
+- Vision: 반려견 사진 분석 -> ChatGPT: 견종별 맞춤 스파 추천
 
 ---
 
@@ -23,11 +23,11 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 
 | 구분 | 기술 |
 |------|------|
-| 백엔드 | Spring Boot 3, Spring Security, JPA+MyBatis |
-| 프론트 | React (Vite), TailwindCSS |
+| 백엔드 | Spring Boot 3, Spring Security, JPA, Maven, Java17 |
+| 프론트 | React (Vite), TailwindCSS, node.js |
 | 챗봇 연동 | GPT API, Google Vision API 등 |
 | 데이터베이스 | MySQL |
-| 기타 도구 | Postman, Notion, Miro |
+| 기타 도구 | Postman, Notion, Miro, figma |
 
 ---
 
@@ -35,8 +35,6 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 
 - 사용자(users), 반려견(dogs), 스파 서비스(spa_services), 예약(reservations), 리뷰(reviews)
 - 사용자 1:N 강아지, 예약 1:1 리뷰 구조
-
-👉 ERD 및 상세 SQL은 Notion 참고: https://www.notion.so/SPURFY-SOLO-PROJECT-1-206023034fb1806a9cabd9031a1a02d1?source=copy_link
 
 ---
 
@@ -49,8 +47,6 @@ RESTful API + JWT 기반 인증
 - `POST /api/reservations`: 예약 생성
 - `PATCH /api/reservations/{id}/cancel`: 예약 취소
 - `POST /api/admin/services`: 관리자 서비스 등록
-
-요청/응답 JSON, 에러 핸들링 등 포함 👉 https://www.notion.so/SPURFY-SOLO-PROJECT-3-208023034fb18058b380ed586cce2bbc?source=copy_link
 
 ---
 
