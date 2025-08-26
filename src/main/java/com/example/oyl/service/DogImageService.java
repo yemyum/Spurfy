@@ -54,6 +54,13 @@ public class DogImageService {
     private static final float DOG_OBJECT_MIN_SCORE = 0.6f;
     private static final String IMAGE_BASE_PATH = "/api/images/";
 
+    // 라벨 도메인 신호(개/견 관련, 속성 관련)
+    private static final List<String> POSITIVE_LABEL_HINTS = List.of(
+            "dog","puppy","canine","강아지","반려견","견",
+            "coat","털","毛","shortcoat","longcoat","doublecoat",
+            "small","medium","large","소형","중형","대형"
+    );
+
     // ===== tiny utils (only what we actually use) =====
     private static String norm(String s) { return s == null ? "" : s.trim(); }
 
@@ -303,7 +310,13 @@ public class DogImageService {
         log.info("[GPT-IN] breed='{}'(usable={}), age='{}', act='{}', issues={}",
                 breedForPrompt, hasUsableBreed, finalAgeGroupToUse, finalAdjActivity, finalHealthIssuesToUse);
 
-        boolean labelsUsable = visionLabels != null && !visionLabels.isEmpty();
+        // 강아지 관련 단서만 있다면 GPT 추천 허용
+        boolean labelsUsable = visionLabels != null
+                && !visionLabels.isEmpty()
+                && visionLabels.stream()
+                .map(s -> norm(s))
+                .anyMatch(d -> POSITIVE_LABEL_HINTS.stream().anyMatch(d::contains));
+
         if (!hasUsableBreed && !labelsUsable) {
             log.info("GPT 차단: breed/labels 부적합 → 안내만 반환");
             final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
