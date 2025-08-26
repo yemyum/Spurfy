@@ -1,46 +1,63 @@
-// src/pages/MypageLayout.jsx
-import React from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { NavLink, Outlet } from "react-router-dom";
 
 function MypageLayout() {
-  const location = useLocation();
-
-  const menuItems = [
-    { label: '내 프로필', path: '/mypage/profile' },
-    { label: '반려견 케어', path: '/mypage/dogs' },
-    { label: '예약 내역', path: '/mypage/reservations' },
-    { label: '리뷰 조회', path: '/mypage/reviews' },
+  const menu = [
+    { label: "내 프로필", path: "/mypage/profile" },
+    { label: "반려견 케어", path: "/mypage/dogs" },
+    { label: "예약 내역", path: "/mypage/reservations" },
+    { label: "리뷰 조회", path: "/mypage/reviews" },
   ];
 
   return (
-  <div className="w-full mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 flex">
-  {/* 사이드바 */}
-  <aside className="w-56 border-r border-gray-200 py-6 p-3">
-    <h2 className="text-xl font-bold px-6 py-2 mb-4">마이페이지</h2>
-    <ul className="flex flex-col w-full">
-      {menuItems.map((item, idx) => (
-        <li key={item.path} className="w-full">
-          <Link
-            to={item.path}
-            className={`w-full text-left px-6 py-3 block transition-all ${
-              location.pathname === item.path
-                ? 'font-semibold text-spurfyBlue'
-                : 'text-gray-800 hover:text-spurfyBlue'
-            }`}
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      {/* 모바일 탭 */}
+      <nav className="grid grid-cols-4 gap-2 lg:hidden mb-4">
+        {menu.map(m => (
+          <NavLink
+            key={m.path}
+            to={m.path}
+            className={({ isActive }) =>
+              `text-center text-sm py-2 rounded-lg transition bg-white shadow-sm
+               ${isActive ? "border border-gray-200 font-semibold" : "border border-gray-200 hover:bg-gray-50"}`
+            }
           >
-            {item.label}
-          </Link>
-          {idx !== menuItems.length - 1 && (
-          <div className="border-b-2 border-gray-200 mx-2" />
-        )}
-        </li>
-      ))}
-    </ul>
-  </aside>
+            {m.label}
+          </NavLink>
+        ))}
+      </nav>
 
-      <main className="flex-1 p-8 min-h-[500px]">
-        <Outlet />
-      </main>
+      <div className="lg:grid lg:grid-cols-[220px,1fr] gap-6">
+        {/* 사이드바 */}
+        <aside className="hidden lg:block">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 py-6 sticky top-24">
+            <h2 className="text-lg font-bold mb-4 px-2">마이페이지</h2>
+            <ul className="space-y-2">
+              {menu.map(m => (
+                <li key={m.path}>
+                  <NavLink
+                    to={m.path}
+                    className={({ isActive }) =>
+                      `block w-full rounded-xl px-3 py-2 text-sm transition
+                       ${isActive
+                         ? "bg-blue-50 text-spurfyBlue font-semibold"
+                         : "hover:bg-gray-50"}`
+                    }
+                  >
+                    {m.label}
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
+
+        {/* 본문 */}
+        <main className="min-h-[560px]">
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+            <Outlet />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

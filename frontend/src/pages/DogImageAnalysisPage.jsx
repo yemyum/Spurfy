@@ -18,6 +18,7 @@ const DogImageAnalysisPage = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [freeTextQuestion, setFreeTextQuestion] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showToast, setShowToast] = useState(false);
 
   // 대화/체크리스트 훅
   const { chatMessages, addMessage, replaceMessage, removeMessage } = useChatHistory();
@@ -39,6 +40,13 @@ const DogImageAnalysisPage = () => {
     const t = Date.parse(v);
     return Number.isFinite(t) ? t : Date.now();
   };
+
+  useEffect(() => {
+    if (!errorMessage) return;
+    setShowToast(true);
+    const t = setTimeout(() => setShowToast(false), 2400);
+    return () => clearTimeout(t);
+  }, [errorMessage]);
 
   // 로그인 체크
   useEffect(() => {
@@ -257,11 +265,6 @@ const DogImageAnalysisPage = () => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      {errorMessage && (
-        <div className="py-2 px-4 rounded-lg text-center whitespace-pre-wrap font-semibold bg-red-50 text-red-600 text-sm">
-          {errorMessage}
-        </div>
-      )}
 
       {/* 3. 전송 영역 */}
       <div className="flex flex-col items-center flex-shrink-0 w-full bg-gray-100 p-2 px-4 pt-4">
@@ -314,6 +317,15 @@ const DogImageAnalysisPage = () => {
         onApply={handleApplyChecklist}
       // onReset은 지금 구조엔 안 씀 → 제거 or 내부 처리 방식 수정
       />
+
+      {showToast && (
+        <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50"
+          role="alert" aria-live="assertive">
+          <div className="px-4 py-2 rounded-full bg-red-500 text-white text-sm shadow-md">
+            {errorMessage}
+          </div>
+        </div>
+      )}
     </div >
   );
 };

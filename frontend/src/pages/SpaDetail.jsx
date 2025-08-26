@@ -114,35 +114,32 @@ function SpaDetail() {
 
   return (
     <div className="w-full mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-6">
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col">
         {/* 1. 스파 사진 영역 (임시) */}
         <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
           이미지 준비중
         </div>
 
-        {/* 2. 스파 설명 */}
-        <div className="bg-blue-50 p-4 rounded-lg">
-          <p className="text-blue-900/50 font-semibold leading-relaxed whitespace-pre-line">
-            {spa.description}
-          </p>
-        </div>
-
-        {/* 3. 이름 + 가격 + 소요시간 */}
-        <div className="mt-6">
-          <h2 className="text-2xl font-bold text-spurfyBlue">{spa.name}</h2>
-          {/* 가격 + 소요시간 */}
+        {/* 2. 이름 + 가격 */}
+        <div className="py-6">
+          <h2 className="text-2xl font-semibold text-spurfyBlue">{spa.name}
+          </h2>
           <p className="font-semibold text-gray-800 text-lg">
             {spa.price.toLocaleString()}원
-            <span className="text-gray-500 text-base font-normal ml-1">
-              ({formatDuration(spa.durationMinutes)})
-            </span>
           </p>
+
+          {/* 3. 스파 설명 */}
+          <div className="bg-sky-50 border mt-3 border-sky-200 p-4 rounded-lg">
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {spa.description}
+            </p>
+          </div>
         </div>
 
         {/* 이용 전 안내 */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-gray-200 py-6">
           {serviceInfos.length === 0 ? (
-            <p className="text-sm text-gray-500">준비 중.</p>
+            <p className="text-sm text-gray-500">준비 중이에요!</p>
           ) : (
             <ul className="space-y-4">
               {serviceInfos.map((info, idx) => {
@@ -172,7 +169,7 @@ function SpaDetail() {
                     {/* ⭐ info.content를 점리스트로 ⭐ */}
                     <ul className="list-disc list-inside space-y-2">
                       {info.content.split('\n').map((item, i) => (
-                        <li key={i} className="text-base text-gray-500">{item}</li>
+                        <li key={i} className="text-sm text-gray-500">{item}</li>
                       ))}
                     </ul>
                   </li>
@@ -186,23 +183,23 @@ function SpaDetail() {
         </div>
 
         {/* 4. 날짜 선택 */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-gray-200 py-6">
           <h3 className="font-semibold mb-2">이용 날짜 선택</h3>
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2 mb-2"
+            className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
           />
         </div>
 
         {/* 5. 시간 선택 */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-gray-200 py-6">
           <h3 className="font-semibold mb-2">이용 시간 선택</h3>
           <select
             value={time}
             onChange={e => setTime(e.target.value)}
-            className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2 mb-2"
+            className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
           >
             <option value="">시간 선택</option>
             {Array.isArray(spa.availableTimes) && spa.availableTimes.length > 0 ? (
@@ -216,7 +213,7 @@ function SpaDetail() {
         </div>
 
         {/* 6. 강아지 선택 */}
-        <div className="border-t border-gray-200 pt-4">
+        <div className="border-t border-gray-200 py-6">
           <h3 className="font-semibold">반려견 선택</h3>
           <p className="text-sm text-gray-400 mb-2">
             (반려견을 등록하셔야 예약이 가능하며, 등록하신 정보를 토대로 진행됩니다.)
@@ -234,7 +231,7 @@ function SpaDetail() {
         </div>
 
         {/* 8. 예약 버튼 */}
-        <div className="pt-6">
+        <div className="py-4">
           <SpurfyButton variant="primary"
             onClick={handleReservation}
             className="w-full text-white py-3 rounded font-semibold mb-2"

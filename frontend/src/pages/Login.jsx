@@ -34,27 +34,21 @@ function Login() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-white to-[#BAE5FF] min-h-screen select-none">
+    <div className="bg-[#F1FAFF] min-h-screen select-none">
       <div className="min-h-screen flex flex-col">
         {/* 헤더 섹션 */}
         <header className="p-8 flex justify-between items-center">
-          <img
-            src={Logo}
-            alt="Spurfy 로고"
-            className="w-48 h-14 mr-3 cursor-pointer relative z-50"
-            onClick={() => navigate('/')}
-          />
+          <div
+            onClick={() => (window.location.href = '/')}
+            className="cursor-pointer relative z-50 mr-3 font-logo text-4xl font-bold text-[#67C7FF]"
+          >
+            SPURFY
+          </div>
         </header>
 
-        <div className="flex flex-grow items-center justify-center gap-x-64 p-4 -mt-20">
-          {/* 설명글 div */}
-          <div className="text-left font-logo text-stone-600 text-3xl max-w-sm">
-            <p>소중한 <span className="text-spurfyAI">반려견</span>을 위한</p>
-            <p><span className="text-spurfyBlue">힐링 스파</span> 입니다.</p>
-          </div>
-
-          <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-sm">
-            <h2 className="font-logo text-[#9EC5FF] text-2xl mt-4 mb-10">Sing in</h2>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-sm w-full">
+            <h2 className="font-logo text-[#9EC5FF] text-2xl mt-4 mb-10">Sign in</h2>
             <form onSubmit={handleSubmit}>
               <input
                 type="email"
@@ -75,22 +69,23 @@ function Login() {
                 required
               />
 
-              <div className="flex justify-between w-full text-sm text-gray-500 mb-4"> {/* mb-4로 버튼과 간격, w-full로 가로 꽉 채우기 */}
-                <Link to="/signup" className="hover:underline"> {/* 회원가입 페이지 링크 */}
-                  <span className="text-xs text-spurfyBlue font-bold">&lt;</span> 회원가입
-                </Link>
-                <Link to="/find-password" className="hover:underline"> {/* 비밀번호 찾기 페이지 링크 */}
-                  이메일/PW 찾기 <span className="text-xs text-spurfyBlue font-bold">&gt;</span>
-                </Link>
-              </div>
-
               <SpurfyButton
-                variant='primary'
+                variant="primary"
                 type="submit"
-                className="font-logo text-lg py-2 w-full mt-8"
+                className="font-logo text-lg py-2 w-full mt-8 mb-6"
               >
                 Login
               </SpurfyButton>
+
+              <div className="w-full text-sm text-gray-500 mb-4 flex flex-col items-center">
+                <p className="text-sm text-gray-500 text-center">
+                  아직 회원이 아니신가요?
+                  <Link to="/signup" className="font-semibold hover:underline ml-1">
+                    회원가입하기
+                  </Link>
+                </p>
+              </div>
+
             </form>
           </div>
         </div>

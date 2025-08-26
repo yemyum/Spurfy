@@ -6,12 +6,13 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        logo: ['Mungyeong-Gamhong-Apple'],
+        logo: ['Sangju-Gotgam'],
         body: ['Pretendard', 'sans-serif'],
+        point: ['Mungyeong-Gamhong-Apple'],
       },
       colors: {
-        spurfyBlue: '#6DA7FF',
-        spurfyLogo: '#BAE5FF',
+        spurfyBlue: '#4A90FF',
+        spurfyLogo: '#67C7FF',
         spurfyColor: '#9EC5FF',
         spurfyNavy: '#7FA3DA',
         spurfyAI: '#67F3EC',

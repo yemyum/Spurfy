@@ -24,7 +24,7 @@ const usePasswordChange = () => {
         if (!window.confirm("비밀번호를 변경하시겠습니까?")) return;
 
         try {
-            const res = await api.put('/mypage/password', {
+            const res = await api.put('/users/me/password', {
                 currentPassword,
                 newPassword,
                 confirmPassword: confirmNewPassword,

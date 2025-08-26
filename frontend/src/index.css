@@ -5,10 +5,17 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Mungyeong-Gamhong-Apple';
-  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/2410-2@1.0/Mungyeong-Gamhong-Apple.woff2') format('woff2');
+  font-family: 'Sangju-Gotgam';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/SANJUGotgam.woff') format('woff');
   font-weight: normal;
-  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+    font-family: 'Mungyeong-Gamhong-Apple';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-2@1.0/Mungyeong-Gamhong-Apple.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
 }
 
 @layer base {
@@ -33,13 +40,16 @@ h1 {
 
 /* 1. 로딩 중일 때 전체 body의 스타일 변경 */
 body.loading {
-  cursor: wait; /* 마우스 커서를 로딩 중으로 변경 */
-  overflow: hidden; /* 로딩 중일 때 스크롤 방지 */
+  cursor: wait;
+  /* 마우스 커서를 로딩 중으로 변경 */
+  overflow: hidden;
+  /* 로딩 중일 때 스크롤 방지 */
 }
 
 /* 2. 콘텐츠 위에 깔리는 반투명 오버레이 (::before 가상 요소) */
 body.loading::before {
-  content: ''; /* 필수 */
+  content: '';
+  /* 필수 */
   position: fixed;
   top: 0;
   left: 0;
@@ -47,27 +57,42 @@ body.loading::before {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(2px);
-  z-index: 9998; /* 스피너보다 아래에 위치 */
+  z-index: 9998;
+  /* 스피너보다 아래에 위치 */
 }
 
 /* 3. 가운데 뜨는 로딩 스피너 (::after 가상 요소) */
 body.loading::after {
-  content: ''; /* 텍스트 대신 빈 문자열로 스피너 모양을 만듦 */
+  content: '';
+  /* 텍스트 대신 빈 문자열로 스피너 모양을 만듦 */
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%); /* 정확히 중앙에 배치 */
-  width: 50px; /* 스피너 크기 */
-  height: 50px; /* 스피너 크기 */
-  border: 5px solid rgba(255, 255, 255, 0.3); /* 스피너 테두리 (투명도를 줘서 부드럽게) */
-  border-top: 5px solid #fff; /* 스피너가 돌아가는 부분 색상 (하얀색으로 깔끔하게) */
-  border-radius: 50%; /* 원형으로 만듦 */
-  animation: spin 1s linear infinite; /* 1초 동안 무한히 회전 */
-  z-index: 9999; /* 모든 콘텐츠 위에 위치 */
+  transform: translate(-50%, -50%);
+  /* 정확히 중앙에 배치 */
+  width: 50px;
+  /* 스피너 크기 */
+  height: 50px;
+  /* 스피너 크기 */
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  /* 스피너 테두리 (투명도를 줘서 부드럽게) */
+  border-top: 5px solid #fff;
+  /* 스피너가 돌아가는 부분 색상 (하얀색으로 깔끔하게) */
+  border-radius: 50%;
+  /* 원형으로 만듦 */
+  animation: spin 1s linear infinite;
+  /* 1초 동안 무한히 회전 */
+  z-index: 9999;
+  /* 모든 콘텐츠 위에 위치 */
 }
 
 /* 스피너 회전 애니메이션 */
 @keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }

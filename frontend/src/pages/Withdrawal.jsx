@@ -41,8 +41,7 @@ function Withdrawal() {
     }
 
     try {
-      // 백엔드 API 호출 (DELETE /api/mypage/withdrawal)
-      const res = await api.delete('/mypage/withdrawal', {
+      const res = await api.delete('/users/me/withdrawal', {
         data: { // DELETE 요청 시 body에 데이터를 담으려면 'data' 필드 사용
           password,
           // '탈퇴 사유를 선택하거나 입력해주세요.'라는 기본 옵션이 선택되어 있다면 빈 문자열로 전송

@@ -76,6 +76,8 @@ api.interceptors.request.use(
 );
 
 // ===== [응답 인터셉터] =====
+window.__alreadyRedirected = false;
+
 api.interceptors.response.use(
   (res) => {
     hideLoading();
@@ -85,18 +87,19 @@ api.interceptors.response.use(
     hideLoading();
 
     const status = err.response?.status;
-    const data = err.response?.data;
     const reqUrl = err.config?.url;
 
-    // 공개 경로 요청에서의 401/403은 로그인 리다이렉트 금지
     if ((status === 401 || status === 403) && !isPublicPath(reqUrl)) {
-
-      alert('로그인 시간이 만료되었습니다. 다시 로그인해주세요.');
-
-      setTimeout(() => {
-        localStorage.removeItem('token');
-        window.location.href = '/login';
-      }, 100);
+      if (!window.__alreadyRedirected) {
+        window.__alreadyRedirected = true;
+        alert('로그인 시간이 만료되었습니다. 다시 로그인해주세요.');
+        setTimeout(() => {
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+        }, 100);
+      }
+      // Promise를 반환해서 catch 블록으로 에러가 전달되지 않게 함
+      return new Promise(() => { });
     }
 
     return Promise.reject(err);

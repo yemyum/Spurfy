@@ -20,7 +20,7 @@ function SpaList() {
         {list.map((spa) => (
           <div
             key={spa.serviceId}
-            className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-[#E2F3FF] transition-all duration-300 ease-in-out"
+            className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-sky-100 transition-all duration-300 ease-in-out"
           >
             {/* 이미지 영역 */}
             <div className="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400">
@@ -36,7 +36,7 @@ function SpaList() {
             {/* 태그 영역 */}
             <div className="flex flex-wrap gap-1 my-2">
               {spa.tagNames?.map((tagName, index) => (
-                <span key={index} className="text-sm font-semibold bg-blue-50 text-blue-300 px-2 py-1 rounded-full">
+                <span key={index} className="text-sm font-semibold bg-sky-50 text-spurfyLogo px-2 py-1 rounded-full">
                   #{tagName}
                 </span>
               ))}
@@ -44,7 +44,7 @@ function SpaList() {
 
             {/* 예약 버튼 */}
             <Link to={`/spalist/slug/${spa.slug}`}>
-              <SpurfyButton variant="primary" className="w-full px-4 py-2 text-center mt-2">
+              <SpurfyButton variant="primary" className="w-full px-4 py-3 text-center mt-2">
                 예약하러 가기
               </SpurfyButton>
             </Link>

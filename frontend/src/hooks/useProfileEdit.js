@@ -15,7 +15,7 @@ const useProfileEdit = (navigate) => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await api.get('/mypage/profile');
+                const res = await api.get('/users/me/profile');
                 if (res.data.code === 'S001') {
                     const fetchedProfile = res.data.data;
                     setProfile(fetchedProfile);
@@ -29,16 +29,21 @@ const useProfileEdit = (navigate) => {
                     alert(res.data.message || '프로필 정보를 불러오는데 실패했습니다.');
                 }
             } catch (err) {
-                console.error('프로필 조회 실패:', err);
-                alert(err.response?.data?.message || '프로필을 불러오지 못했어요 😢');
-                setProfile(null);
+                const status = err.response?.status;
+                // 401/403 에러는 인터셉터가 처리하므로 여기선 무시
+                if (status === 401 || status === 403) {
+                    // 아무것도 하지 않음 (인터셉터가 이미 alert & 리다이렉트 처리)
+                } else {
+                    // 그 외 다른 에러일 경우에만 alert 띄우기
+                    alert(err.response?.data?.message || '프로필을 불러오지 못했어요.');
+                }
             }
-        };
-        fetchProfile();
-    }, []);
+            };
+            fetchProfile();
+        }, []);
 
     const handleGoToWithdrawal = () => {
-        navigate('/mypage/withdrawal');
+        navigate('/users/me/withdrawal');
     };
 
     const handleCheckNickname = async () => {
@@ -57,7 +62,7 @@ const useProfileEdit = (navigate) => {
         }
 
         try {
-            const res = await api.get(`/mypage/check-nickname?nickname=${editedNickname}`);
+            const res = await api.get(`/users/me/check-nickname?nickname=${editedNickname}`);
             if (res.data.code === 'S001') {
                 const available = res.data.data;
                 setIsNicknameAvailable(available);
@@ -96,7 +101,7 @@ const useProfileEdit = (navigate) => {
                 phone: editedPhone,
             };
 
-            const res = await api.put('/mypage/profile', updateData);
+            const res = await api.put('/users/me/profile', updateData);
 
             if (res.data.code === 'S001') {
                 alert('프로필이 성공적으로 수정되었습니다!');
