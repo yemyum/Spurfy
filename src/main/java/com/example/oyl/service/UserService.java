@@ -2,6 +2,7 @@ package com.example.oyl.service;
 
 
 import com.example.oyl.domain.User;
+import com.example.oyl.dto.LoginResult;
 import com.example.oyl.dto.UserLoginRequestDTO;
 import com.example.oyl.dto.UserSignupRequestDTO;
 import com.example.oyl.repository.UserRepository;
@@ -13,12 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Service
 public interface UserService {
 
     void signup(UserSignupRequestDTO requestDTO);
 
-    String login(UserLoginRequestDTO requestDTO);
+    LoginResult login(UserLoginRequestDTO requestDTO);
 
     boolean existsByEmail(String email);
 

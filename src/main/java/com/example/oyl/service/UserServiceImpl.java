@@ -1,6 +1,7 @@
 package com.example.oyl.service;
 
 import com.example.oyl.domain.User;
+import com.example.oyl.dto.LoginResult;
 import com.example.oyl.dto.UserLoginRequestDTO;
 import com.example.oyl.dto.UserSignupRequestDTO;
 import com.example.oyl.exception.CustomException;
@@ -23,8 +24,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
+    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder; // 의존성 주입
+    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -62,17 +65,23 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public String login(UserLoginRequestDTO dto) {
+    @Transactional
+    public LoginResult login(UserLoginRequestDTO dto) {
         User user = userRepository.findByEmail(dto.getEmail())
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 비밀번호 비교: 입력받은 비밀번호를 암호화된 비밀번호와 비교
         if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
-        return JwtUtil.createToken(user.getEmail()); // JWT 발급
+        // Access / Refresh 발급
+        String accessToken = jwtUtil.createAccessToken(user);
+        String refreshToken = jwtUtil.createRefreshToken(user);
+
+        // refreshToken 저장 (expiresAt 계산은 서비스가 알아서 함)
+        refreshTokenService.save(user, refreshToken);
+
+        return new LoginResult(accessToken, refreshToken);
     }
 
     @Override
