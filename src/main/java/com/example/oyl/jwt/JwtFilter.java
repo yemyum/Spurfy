@@ -28,34 +28,37 @@ import java.util.List;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
-    private static final Key key = JwtUtil.getSigningKey();
+    private final JwtUtil jwtUtil;
     private static final AntPathMatcher matcher = new AntPathMatcher();
 
     // 퍼블릭 경로 목록
     private static final List<String> SKIP_PATHS = List.of(
             "/api/users/login",
             "/api/users/signup",
+            "/api/users/refresh-token",
             "/api/images/**",
             "/dog-images/**",
             "/api/users/check-email",
-            "/api/mypage/check-nickname",
+            "/api/users/me/check-nickname",
             "/api/spa-services/**",
             "/api/service-info",
             "/api/reviews/public/**"
     );
 
-    public JwtFilter(UserRepository userRepository) {
+    public JwtFilter(UserRepository userRepository, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
+        this.jwtUtil = jwtUtil;
     }
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
+        String uri = request.getRequestURI();
+        String ctx = request.getContextPath();
+        String path = uri.substring(ctx.length());
 
-        // CORS 프리플라이트는 스킵
+        log.info("JwtFilter.shouldNotFilter uri={}, ctx={}, path={}", uri, ctx, path);
+
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
-
-        // 퍼블릭 경로는 스킵 (토큰 없어도 구경 가능)
         return SKIP_PATHS.stream().anyMatch(p -> matcher.match(p, path));
     }
 
@@ -75,7 +78,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         try {
             Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
+                    .setSigningKey(jwtUtil.getSigningKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
