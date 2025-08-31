@@ -13,7 +13,7 @@ const PasswordChangeSection = ({
 }) => {
     return (
         <section className="mt-4 pt-8 border-t border-gray-200">
-            <h3 className="text-xl font-bold mb-5 text-spurfyBlue">비밀번호 변경</h3>
+            <h3 className="text-xl font-bold mb-5">비밀번호 변경</h3>
             <div className="space-y-4">
                 <div>
                     <label className="block text-gray-700 font-semibold mb-2">현재 비밀번호</label>
@@ -46,7 +46,7 @@ const PasswordChangeSection = ({
                     />
                 </div>
                 {passwordChangeError && (
-                    <p className="text-red-500 text-sm mt-2">{passwordChangeError}</p>
+                    <p className="text-red-400 text-sm mt-2">{passwordChangeError}</p>
                 )}
                 <div className="flex justify-end">
                     <SpurfyButton variant='outline'

@@ -14,7 +14,7 @@ function SpurfyButton({
 
   // *** 컬러·상태별 스타일
   const variants = {
-    primary: 'bg-[#6DA7FF] text-white hover:bg-[#4D90F0]',
+    primary: 'bg-[#91B2FF] text-white hover:bg-[#80A6FF]',
     danger: 'bg-[#575757] text-white hover:bg-[#444]',
     ai: 'bg-[#67F3EC] text-white hover:bg-[#42e3db]',
     chat: 'bg-[#67F3EC] text-black hover:bg-[#42e3db]',

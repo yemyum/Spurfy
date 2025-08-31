@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
-import Logo from '../assets/Logo.png';
+import { login } from '../api/auth';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
 function Login() {
   const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+  const [form, setForm] = useState({ email: '', password: '' });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }))
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/users/login', form);
-      const token = res.data.data;
-
-      localStorage.setItem('token', token);
+      await login(form.email, form.password);
       alert('로그인 성공');
-
       navigate('/', { replace: true });
     } catch (err) {
       console.error('로그인 실패:', err);
@@ -37,18 +28,18 @@ function Login() {
     <div className="bg-[#F1FAFF] min-h-screen select-none">
       <div className="min-h-screen flex flex-col">
         {/* 헤더 섹션 */}
-        <header className="p-8 flex justify-between items-center">
+        <header className="mt-20 flex justify-center items-center">
           <div
             onClick={() => (window.location.href = '/')}
-            className="cursor-pointer relative z-50 mr-3 font-logo text-4xl font-bold text-[#67C7FF]"
+            className="cursor-pointer relative z-50 ml-2 font-logo text-5xl font-bold bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] bg-clip-text text-transparent"
           >
             SPURFY
           </div>
         </header>
 
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center pb-20">
           <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-sm w-full">
-            <h2 className="font-logo text-[#9EC5FF] text-2xl mt-4 mb-10">Sign in</h2>
+            <h2 className="font-logo text-spurfyColor text-2xl mt-4 mb-10">Sign in</h2>
             <form onSubmit={handleSubmit}>
               <input
                 type="email"
@@ -74,7 +65,7 @@ function Login() {
                 type="submit"
                 className="font-logo text-lg py-2 w-full mt-8 mb-6"
               >
-                Login
+                Sign in
               </SpurfyButton>
 
               <div className="w-full text-sm text-gray-500 mb-4 flex flex-col items-center">

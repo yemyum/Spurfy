@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
-import Logo from '../assets/Logo.png';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
 function Signup() {
@@ -22,6 +21,7 @@ function Signup() {
     const [isNicknameAvailable, setIsNicknameAvailable] = useState(false); // 닉네임 사용 가능한지 여부 (true/false)
     const [isEmailChecked, setIsEmailChecked] = useState(false); // 이메일 중복 확인 했는지 여부 (추가)
     const [isEmailAvailable, setIsEmailAvailable] = useState(false); // 이메일 사용 가능한지 여부 (추가)
+    const [agreeToPrivacy, setAgreeToPrivacy] = useState(false); // 약관 동의 여부
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -41,11 +41,11 @@ function Signup() {
 
     };
 
-    // 이메일 중복 확인 함수 (버튼 클릭 시 실행)
+    // 이메일 중복 확인 함수
     const handleCheckEmail = async () => {
-        const currentEmail = form.email.trim();
+        const currentEmail = form.email.trim().toLowerCase();
 
-        if (currentEmail === '') {
+        if (!currentEmail) {
             setEmailError('이메일을 입력해주세요.');
             setIsEmailAvailable(false);
             setIsEmailChecked(false);
@@ -53,18 +53,23 @@ function Signup() {
         }
 
         try {
-            const response = await api.get(`/users/check-email?email=${currentEmail}`);
-            if (response.data) { // response.data가 true이면 중복
-                setEmailError('이미 사용 중인 이메일이에요.');
+            const response = await api.get(
+                `/users/check-email?email=${encodeURIComponent(currentEmail)}`
+            );
+
+            const isDup = response.data === true;
+            if (isDup) {
+                setEmailError('이미 사용 중인 이메일 입니다.');
                 setIsEmailAvailable(false);
             } else {
-                setEmailError(''); // 중복 아니면 에러 없음
+                setEmailError('');
                 setIsEmailAvailable(true);
             }
-            setIsEmailChecked(true); // 중복 확인 완료
+            setIsEmailChecked(true);
         } catch (error) {
             console.error('이메일 중복 체크 에러:', error);
-            const errorMessage = error.response?.data?.message || '이메일 중복 확인 중 오류가 발생했어요.';
+            const errorMessage =
+                error.response?.data?.message || '이메일 중복 확인 중 오류가 발생했습니다.';
             setEmailError(errorMessage);
             setIsEmailAvailable(false);
             setIsEmailChecked(false);
@@ -83,22 +88,25 @@ function Signup() {
         }
 
         try {
-            const res = await api.get(`/mypage/check-nickname?nickname=${currentNickname}`);
+            const res = await api.get(`/users/me/check-nickname?nickname=${encodeURIComponent(currentNickname)}`);
 
-            if (res.data.code === 'S001') { // 백엔드 응답 코드가 'S001'이면 정상 응답
-                const available = res.data.data; // 실제 중복 여부 (true: 사용 가능, false: 사용 불가)
-                setIsNicknameAvailable(available); // 사용 가능 여부 상태 업데이트
-                setNicknameError(available ? '' : res.data.message); // 사용 가능하면 에러 없음, 아니면 백엔드 메시지 보여줌
-                setIsNicknameChecked(true); // 중복 확인 완료!
-            } else { // 'S001' 코드가 아니면 다른 문제 발생
-                setNicknameError(res.data.message || '닉네임 확인 중 오류가 발생했습니다.');
+            if (res.data.code === 'S001') {
+                const available = res.data.data; // 사용 가능 여부(true/false)
+                setIsNicknameAvailable(available);
+                setNicknameError(
+                    available
+                        ? '' // 사용 가능하면 에러 없음!
+                        : '이미 사용 중인 닉네임 입니다.'
+                );
+                setIsNicknameChecked(true);
+            } else {
+                setNicknameError('닉네임 확인 중 오류가 발생했습니다.');
                 setIsNicknameAvailable(false);
                 setIsNicknameChecked(false);
             }
         } catch (err) {
             console.error('닉네임 중복 확인 실패:', err);
-            const errorMessage = err.response?.data?.message || '닉네임 확인 중 네트워크 오류가 발생했습니다.';
-            setNicknameError(errorMessage);
+            setNicknameError('닉네임 확인 중 네트워크 오류가 발생했습니다.');
             setIsNicknameAvailable(false);
             setIsNicknameChecked(false);
         }
@@ -148,30 +156,30 @@ function Signup() {
         // 모든 검증 통과 후 회원가입 요청
         try {
             const res = await api.post('/users/signup', form);
-            alert(res.data.message);
+            alert(res.data?.message || '회원가입이 완료되었습니다.');
             navigate('/login');
         } catch (err) {
             console.error('회원가입 실패:', err);
-            const errorMessage = err.response?.data?.message || '회원가입 중 오류가 발생했어요';
+            const errorMessage = err.response?.data?.message || '오류가 발생했습니다.';
             alert(errorMessage);
         }
     };
 
 
     return (
-        <div className="bg-gradient-to-br from-white to-[#BAE5FF] min-h-screen select-none">
+        <div className="bg-[#F1FAFF] min-h-screen select-none">
             <div className="min-h-screen flex flex-col">
                 <header className="p-8 flex justify-between items-center">
-                    <img
-                        src={Logo}
-                        alt="Spurfy 로고"
-                        className="w-48 h-14 mr-3 cursor-pointer relative z-50"
-                        onClick={() => navigate('/')}
-                    />
+                    <div
+                        onClick={() => (window.location.href = '/')}
+                        className="cursor-pointer relative z-50 ml-2 font-logo text-4xl font-bold bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] bg-clip-text text-transparent"
+                    >
+                        SPURFY
+                    </div>
                 </header>
                 <div className="flex flex-1 items-center justify-center -mt-20">
                     <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-md">
-                        <h2 className="font-logo text-[#9EC5FF] text-2xl mt-4 mb-10">Sign up</h2>
+                        <h2 className="font-logo text-spurfyColor text-2xl mt-4 mb-10">Sign up</h2>
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"
@@ -201,9 +209,9 @@ function Signup() {
                                     중복 확인
                                 </SpurfyButton>
                             </div>
-                            {nicknameError && <p className="text-red-500 text-sm mb-3 ml-1">{nicknameError}</p>}
+                            {nicknameError && <p className="text-red-400 text-sm mb-3 ml-1">{nicknameError}</p>}
                             {!nicknameError && isNicknameChecked && isNicknameAvailable && (
-                                <p className="text-green-500 text-sm mb-3 ml-1">사용 가능한 닉네임이에요!</p>
+                                <p className="text-blue-400 text-sm mb-3 ml-1">사용 가능한 닉네임 입니다.</p>
                             )}
 
                             <div className="flex items-center w-full mb-4">
@@ -225,9 +233,9 @@ function Signup() {
                                     중복 확인
                                 </SpurfyButton>
                             </div>
-                            {emailError && <p className="text-red-500 text-sm mb-3 ml-1">{emailError}</p>}
+                            {emailError && <p className="text-red-400 text-sm mb-3 ml-1">{emailError}</p>}
                             {!emailError && isEmailChecked && isEmailAvailable && (
-                                <p className="text-green-500 text-sm mb-3 ml-1">사용 가능한 이메일이에요!</p>
+                                <p className="text-green-400 text-sm mb-3 ml-1">사용 가능한 이메일 입니다.</p>
                             )}
 
                             <input
@@ -247,6 +255,20 @@ function Signup() {
                                 onChange={handleChange}
                                 className="w-full bg-[#E2F3FF] rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-100 mb-4"
                             />
+                            <div className="mb-6 flex items-start">
+                                <input
+                                    type="checkbox"
+                                    id="agreeToPrivacy"
+                                    className="accent-[#3B82F6] w-4 h-4 mr-2 mt-1"
+                                    checked={agreeToPrivacy}
+                                    onChange={(e) => setAgreeToPrivacy(e.target.checked)}
+                                    required // 동의는 무조건 체크해야 가입 가능!
+                                />
+                                <label htmlFor="agreeToPrivacy" className="text-sm text-gray-500">
+                                    <span className="font-semibold">[필수] </span>
+                                    개인정보 수집·이용에 동의합니다.
+                                </label>
+                            </div>
                             <SpurfyButton
                                 variant='primary'
                                 type="submit"

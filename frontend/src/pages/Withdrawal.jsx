@@ -1,6 +1,5 @@
-// src/pages/Withdrawal.jsx
 import React, { useState } from 'react';
-import api from '../api/axios';
+import api, { setAccessToken } from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
@@ -22,55 +21,40 @@ function Withdrawal() {
 
   // 탈퇴하기 버튼 클릭 시 실행되는 함수
   const handleWithdrawalSubmit = async (e) => {
-    e.preventDefault(); // 폼 제출 시 페이지 새로고침 방지
+    e.preventDefault();
 
-    // 1. 이용약관 동의 필수 확인
-    if (!agreeToTerms) {
-      setError("이용약관 동의가 필요합니다.");
-      return; // 함수 종료
-    }
-    // 2. 비밀번호 필수 확인
-    if (!password) {
-      setError("비밀번호를 입력해주세요.");
-      return; // 함수 종료
-    }
-    
-    // 최종 확인 알림창
-    if (!window.confirm("정말로 회원 탈퇴를 진행하시겠습니까? 복구할 수 없습니다.")) {
-      return; // '취소' 누르면 함수 종료
-    }
+    if (!agreeToTerms) return setError('이용약관 동의가 필요합니다.');
+    if (!password) return setError('비밀번호를 입력해주세요.');
+    if (!window.confirm('정말 회원 탈퇴를 진행하시겠습니까? 탈퇴 시 복구할 수 없습니다.')) return;
 
     try {
       const res = await api.delete('/users/me/withdrawal', {
-        data: { // DELETE 요청 시 body에 데이터를 담으려면 'data' 필드 사용
+        data: {
           password,
-          // '탈퇴 사유를 선택하거나 입력해주세요.'라는 기본 옵션이 선택되어 있다면 빈 문자열로 전송
-          reason: reason === "탈퇴 사유를 선택하거나 입력해주세요." ? "" : reason,
-          agreeToTerms
-        }
+          reason: reason === '탈퇴 사유를 선택하거나 입력해주세요.' ? '' : reason,
+          agreeToTerms,
+        },
       });
 
-      if (res.data.code === 'S001') {
+      if (res.data?.code === 'S001') {
         alert('회원 탈퇴가 성공적으로 처리되었습니다. 이용해주셔서 감사합니다.');
-
-        localStorage.removeItem('token'); // JWT 토큰 삭제
-        localStorage.removeItem('refreshToken'); // 리프레시 토큰도 삭제!
-
-        navigate('/login'); // 탈퇴 성공 시 로그인 페이지로 이동
-      } else {
-        // 백엔드에서 에러 메시지가 온 경우
-        setError(res.data.message || '회원 탈퇴에 실패했습니다.');
+        // 서버가 refresh 쿠키는 이미 만료시킴. 프론트는 access만 정리하면 끝.
+        setAccessToken(null);                 // <- localStorage/axios 헤더 정리
+        navigate('/login', { replace: true });
+        return;
       }
+
+      setError(res.data?.message || '회원 탈퇴에 실패했습니다.');
     } catch (err) {
-      console.error('회원 탈퇴 실패:', err);
-      // 네트워크 오류나 백엔드에서 예상치 못한 에러가 온 경우
-      setError(err.response?.data?.message || '회원 탈퇴 중 네트워크 오류가 발생했습니다.');
+      const code = err.response?.data?.code;
+      if (code === 'INVALID_PASSWORD') setError('비밀번호가 일치하지 않습니다.');
+      else setError(err.response?.data?.message || '회원 탈퇴 중 네트워크 오류가 발생했습니다.');
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
-      <h2 className="text-2xl font-bold mb-12 mt-4 text-center">회원 탈퇴</h2>
+    <div className="max-w-2xl mx-auto mt-20 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
+      <h2 className="text-2xl font-semibold mb-16 mt-4 text-center">회원 탈퇴</h2>
 
       <form onSubmit={handleWithdrawalSubmit}> {/* 폼 제출 시 handleWithdrawalSubmit 실행 */}
         {/* 비밀번호 입력 필드 */}
@@ -86,6 +70,10 @@ function Withdrawal() {
             onChange={(e) => setPassword(e.target.value)}
             required // 비밀번호는 여전히 필수
           />
+          {/* 🌟 에러 문구 띄우기 */}
+          {error && error.includes("비밀번호") && (
+            <p className="text-red-400 text-sm mt-2">{error}</p>
+          )}
         </div>
 
         {/* 탈퇴 사유 선택/입력 필드 */}
@@ -139,11 +127,6 @@ function Withdrawal() {
             {/* 여기에 실제 약관 내용을 링크하거나 모달로 띄울 수 있어 */}
           </label>
         </div>
-
-        {/* 에러 메시지 표시 */}
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
-        )}
 
         {/* 버튼들: 취소 및 탈퇴하기 */}
         <div className="flex justify-between pt-4">

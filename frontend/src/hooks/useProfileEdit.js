@@ -43,7 +43,7 @@ const useProfileEdit = (navigate) => {
         }, []);
 
     const handleGoToWithdrawal = () => {
-        navigate('/users/me/withdrawal');
+        navigate('/mypage/withdrawal');
     };
 
     const handleCheckNickname = async () => {

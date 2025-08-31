@@ -17,59 +17,64 @@ function MyReviewList() {
     <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 조회</h2>
       <h2 className="text-xl font-bold mb-6">내가 작성한 리뷰 리스트</h2>
-      {reviews.map((r) => (
-        <div
-          key={r.reviewId}
-          className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 break-words"
-          onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
-        >
-          <h3
-            className="font-semibold text-lg hover:underline"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (r.spaSlug) {
-                navigate(`/spalist/slug/${r.spaSlug}`); 
-              } else {
-                // 슬러그가 없으면 기존 ID로라도 이동시키거나, 에러 메시지 표시
-                navigate(`/spalist/${r.serviceId}`); // 임시로 기존 ID 사용하거나,
-                // alert('스파 정보를 찾을 수 없습니다.'); // 사용자에게 알림
-              }
-            }}
-          >
-            {r.serviceName}
-          </h3>
 
-          <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
-          <p className="mt-2 text-gray-800">{r.content}</p>
-          
-          <div className="flex flex-wrap gap-2 mt-4">
-            <SpurfyButton variant="primary"
-            className="px-3 py-1 text-sm"
-            onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } }); 
-          }}
+      {reviews.length === 0 ? (
+          <p className="text-lg font-semibold mt-12 text-gray-400 text-center">아직 작성한 리뷰가 없어요.</p>
+      ) : (
+        reviews.map((r) => (
+          <div
+            key={r.reviewId}
+            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 break-words"
+            onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
           >
-          수정
-          </SpurfyButton>
-            <SpurfyButton variant="danger"
-              className="px-3 py-1 text-sm"
-              onClick={async (e) => {
+            <h3
+              className="font-semibold text-lg hover:underline"
+              onClick={(e) => {
                 e.stopPropagation();
-                if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
-                try {
-                  await api.delete(`/mypage/reviews/${r.reviewId}`);
-                  setReviews((prev) => prev.filter((item) => item.reviewId !== r.reviewId));
-                } catch (err) {
-                  alert("리뷰 삭제 실패");
+                if (r.spaSlug) {
+                  navigate(`/spalist/slug/${r.spaSlug}`);
+                } else {
+                  // 슬러그가 없으면 기존 ID로라도 이동시키거나, 에러 메시지 표시
+                  navigate(`/spalist/${r.serviceId}`); // 임시로 기존 ID 사용하거나,
+                  // alert('스파 정보를 찾을 수 없습니다.'); // 사용자에게 알림
                 }
               }}
             >
-              삭제
-            </SpurfyButton>
+              {r.serviceName}
+            </h3>
+
+            <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
+            <p className="mt-2 text-gray-800">{r.content}</p>
+
+            <div className="flex flex-wrap gap-2 mt-4">
+              <SpurfyButton variant="primary"
+                className="px-3 py-1 text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/mypage/reviews/${r.reviewId}`, { state: { ...r, isEditing: true } });
+                }}
+              >
+                수정
+              </SpurfyButton>
+              <SpurfyButton variant="danger"
+                className="px-3 py-1 text-sm"
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (!window.confirm("정말 이 리뷰를 삭제하시겠습니까?")) return;
+                  try {
+                    await api.delete(`/mypage/reviews/${r.reviewId}`);
+                    setReviews((prev) => prev.filter((item) => item.reviewId !== r.reviewId));
+                  } catch (err) {
+                    alert("리뷰 삭제 실패");
+                  }
+                }}
+              >
+                삭제
+              </SpurfyButton>
+            </div>
           </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   );
 }

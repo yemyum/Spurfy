@@ -92,7 +92,7 @@ function Home() {
           <button
             onClick={handleGoAI}
             className="px-4 py-2 text-lg sm:text-xl shadow-sm font-bold hover:shadow-md
-                 bg-gradient-to-r from-[#90F9BF] to-[#67F3EC] rounded-lg text-white">
+                 bg-gradient-to-r from-[#90F9BF] to-[#67F3EC] rounded-lg text-white transition duration-300">
             추천받으러 가기
           </button>
         </div>
@@ -104,7 +104,7 @@ function Home() {
             src={SpurfyCA}
             alt="AI 분석 강아지"
             className="h-auto object-contain md:object-contain
-                 max-w-[320px] sm:max-w-[380px] md:max-w-[560px]"
+                 max-w-[320px] sm:max-w-[380px] md:max-w-[580px]"
             loading="lazy"
           />
         </div>

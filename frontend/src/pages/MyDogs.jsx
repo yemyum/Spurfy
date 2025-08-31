@@ -40,29 +40,32 @@ function MyDogs() {
       <div className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 케어</div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">나의 반려견 리스트</h2>
-       <SpurfyButton variant='outline' 
-        className="whitespace-nowrap px-4 py-2 shadow-sm text-sm"
-        onClick={() => navigate('/mypage/dogs/register')}>
-        반려견 등록하기
-       </SpurfyButton>
+        <SpurfyButton variant='outline'
+          className="whitespace-nowrap px-4 py-2 shadow-sm text-sm"
+          onClick={() => navigate('/mypage/dogs/register')}>
+          반려견 등록하기
+        </SpurfyButton>
       </div>
 
       {dogs.length === 0 ? (
-        <p>등록된 강아지가 없어요!</p>
+        <div className="mt-12 text-gray-400 text-center">
+          <p className="text-lg font-semibold">아직 등록된 강아지가 없어요.</p>
+          <p className="mt-2">지금 바로 반려견을 등록하고 관리해보세요!</p>
+        </div>
       ) : (
         <ul>
           {dogs.map((dog) => (
-            <li key={dog.dogId} 
-                onClick={() => navigate(`/mypage/dogs/${dog.dogId}`)}
-                className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex flex-col gap-4">
-                {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
-                <div className="flex items-stretch gap-4">
+            <li key={dog.dogId}
+              onClick={() => navigate(`/mypage/dogs/${dog.dogId}`)}
+              className="border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex flex-col gap-4">
+              {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
+              <div className="flex items-stretch gap-4">
                 <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
-                    {dog.imageUrl ? (
-                    <img 
-                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`} 
-                      alt={`${dog.name}의 사진`} 
-                      className="w-full h-full object-cover" 
+                  {dog.imageUrl ? (
+                    <img
+                      src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`}
+                      alt={`${dog.name}의 사진`}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-gray-500 text-sm">이미지 없음</span>
@@ -75,27 +78,27 @@ function MyDogs() {
                   <p>견종: {dog.breed}</p>
                   <p>성별: {dog.gender === 'M' ? '남아' : '여아'}</p>
                 </div>
-               </div>
+              </div>
 
               {/* ⭐ 3. 오른쪽: 수정/삭제 버튼 영역 - 강아지 정보 영역 내부에 배치 ⭐ */}
               <div className="flex gap-2 self-start">
                 <SpurfyButton variant="danger"
-                    className="px-3 py-1 text-sm"
-                    onClick={(e) => {
+                  className="px-3 py-1 text-sm"
+                  onClick={(e) => {
                     e.stopPropagation();
                     handleDelete(dog.dogId, dog.name);
-                   }}
+                  }}
                 >
                   삭제
                 </SpurfyButton>
                 <SpurfyButton variant="primary"
-                    className="px-3 py-1 text-sm"
-                    onClick={(e) => {
+                  className="px-3 py-1 text-sm"
+                  onClick={(e) => {
                     e.stopPropagation(); // 이벤트 버블링 방지!
                     navigate(`/mypage/dogs/${dog.dogId}/edit`);
-                }}
+                  }}
                 >
-                수정
+                  수정
                 </SpurfyButton>
               </div>
             </li>

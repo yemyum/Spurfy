@@ -217,7 +217,7 @@ function DogRegister() {
                   id="weight"
                   step="0.1"
                   name="weight"
-                  placeholder="몸무게(kg)"
+                  placeholder="(kg)"
                   value={form.weight}
                   onChange={handleChange}
                   required
@@ -232,7 +232,7 @@ function DogRegister() {
               <textarea
                 id="notes"
                 name="notes"
-                placeholder="특이사항 (알레르기, 습관, 주의할 점 등)"
+                placeholder="(알레르기, 건강상태, 주의할 점 등)"
                 value={form.notes}
                 onChange={handleChange}
                 rows={5}

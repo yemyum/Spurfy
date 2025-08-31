@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
-import api from '../api/axios';
+import { logout } from '../api/auth';
 import Home from '../pages/Home';
 
 function RootLayout() {
@@ -13,18 +13,10 @@ function RootLayout() {
     setIsAuthenticated(!!token); // 토큰이 있으면 true, 없으면 false
   }, []);
 
-  const handleLogout = () => {
-    if (!window.confirm("로그아웃 하시겠습니까?")) {
-      return;
-    }
-    // 1. 토큰 지우고,
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    // 2. 상태도 false로
-    setIsAuthenticated(false);
-    // 3. 안내 및 이동
-    alert('로그아웃 되었습니다.');
-    navigate('/');
+
+  const handleLogout = async () => {
+    if (!window.confirm('로그아웃 하시겠습니까?')) return;
+    await logout(); // auth.js에서 처리
   };
 
   return (
@@ -35,13 +27,15 @@ function RootLayout() {
           {/* 1. 로고 */}
           <div className="flex-1 flex items-center">
             <Link to="/"
-              className="cursor-poiter font-logo text-3xl font-bold text-spurfyLogo">SPURFY
+              className="cursor-pointer text-4xl font-logo font-bold bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] bg-clip-text text-transparent"
+            >
+              SPURFY
             </Link>
           </div>
 
           {/* 2. 중앙 메뉴 */}
           <nav className="flex-1 flex justify-center">
-            <div className="flex space-x-20 bg-white bg-opacity-80 backdrop-blur-md rounded-full border border-gray-200 text-gray-700 text-sm font-semibold px-12 py-3 shadow-sm items-center">
+            <div className="flex space-x-24 text-stone-700 text-sm font-semibold items-center">
               <Link to="/" className="hover:underline">Home</Link>
               <Link to="/spalist" className="hover:underline">Spa</Link>
               <Link to="/mypage/profile" className="hover:underline">Mypage</Link>
@@ -50,20 +44,20 @@ function RootLayout() {
           </nav>
 
           {/* 3. 로그인/로그아웃 */}
-          <div className="flex-1 flex justify-end items-center font-semibold">
+          <div className="flex-1 flex justify-end items-center font-semibold text-lg">
             {isAuthenticated ? (
               <button
                 onClick={handleLogout}
                 className="px-5 py-2 font-logo bg-white border-2 border-gray-200 text-gray-700 rounded-lg shadow-sm transition hover:shadow-md hover:scale-105 transition duration-300"
               >
-                Logout
+                Sign out
               </button>
             ) : (
               <button
                 onClick={() => navigate('/login')}
                 className="px-6 py-2 font-logo bg-gradient-to-r from-[#8EFAF5] via-[#54DAFF] to-[#91B2FF] rounded-lg text-white shadow-sm transition hover:shadow-md hover:scale-105 transition duration-300"
               >
-                Login
+                Sign in
               </button>
             )}
           </div>

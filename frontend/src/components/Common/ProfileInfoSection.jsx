@@ -39,7 +39,7 @@ const ProfileInfoSection = ({
 
             {/* 정보 리스트 또는 수정 폼 */}
             <div className="space-y-6 mt-20">
-                <h3 className="text-xl font-bold text-spurfyBlue mb-5">내 정보</h3>
+                <h3 className="text-xl font-bold mb-5">내 정보</h3>
                 {/* 1. 이름 정보 */}
                 <div className="mb-4">
                     <ProfileInfoRow label="이름" value={profile.name} isEditing={isEditing} editedValue={editedName} onEditChange={setEditedName} type="text" />
