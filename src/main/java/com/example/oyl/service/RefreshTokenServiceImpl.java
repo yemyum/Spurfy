@@ -6,11 +6,13 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.jwt.JwtUtil;
 import com.example.oyl.repository.RefreshTokenRepository;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,10 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     private final JwtUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+
+    @Value("${app.cookie.secure:true}") private boolean cookieSecure;
+    @Value("${app.cookie.domain:}")    private String cookieDomain;
+    private String blankToNull(String v){ return (v==null||v.isBlank())?null:v; }
 
     // 토큰 원문 해시 처리 (보안 강화)
     private String sha256(String s) {
@@ -93,17 +99,69 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     // 재발급: Optional 안 쓰는 현재 시그니처 기준
     @Override
     public String issueNewAccessToken(String refreshToken, HttpServletResponse response) {
-        // 0. JWT 자체 검증
+        // 0) JWT 자체 검증(서명/만료)
         jwtUtil.validateTokenOrThrow(refreshToken);
 
-        // 1. DB 유효 토큰 조회
+        // 1) DB 유효 토큰 조회 (revoked=false && exp>now && hash 일치)
         RefreshToken token = findValidToken(refreshToken);
         if (token == null) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
-        // 2. 새 AccessToken 발급
         User user = token.getUser();
-        return jwtUtil.createAccessToken(user);
+
+        // 2) 새 Access 발급
+        String newAccess = jwtUtil.createAccessToken(user);
+
+        // 3) ★ 회전: 기존 refresh revoke + 새 refresh 발급/저장 + 쿠키 교체
+        String newRefresh = jwtUtil.createRefreshToken(user);
+        revokeToken(refreshToken);           // 기존 것 무효화
+        save(user, newRefresh);              // DB 저장(해시/만료일은 save 내부)
+
+        long maxAge = jwtUtil.getRefreshExpDays() * 24L * 60 * 60; // 초 단위
+        setRefreshCookie(response, newRefresh, maxAge);            // 새 쿠키 심기
+
+        return newAccess;
+    }
+
+    @Override
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = extractRefreshToken(request);
+        if (refreshToken != null) {
+            try { revokeToken(refreshToken); } catch (Exception ignore) {}
+        }
+        expireRefreshCookie(response); // 브라우저 쿠키 만료
+    }
+
+    private void setRefreshCookie(HttpServletResponse resp, String value, long maxAgeSec) {
+        ResponseCookie c = ResponseCookie.from("refreshToken", value)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .path("/")
+                .maxAge(maxAgeSec)
+                .sameSite("None")
+                .domain(blankToNull(cookieDomain))
+                .build();
+        resp.addHeader(HttpHeaders.SET_COOKIE, c.toString());
+    }
+
+    public void expireRefreshCookie(HttpServletResponse resp) {
+        setRefreshCookie(resp, "", 0);
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        var cookies = request.getCookies();
+        if (cookies == null) return null;
+        for (var c : cookies) {
+            if ("refreshToken".equals(c.getName())) {
+                // 인코딩 안 했으면 아래 try/catch 통과해도 원문 그대로 돌아옴
+                try {
+                    return java.net.URLDecoder.decode(c.getValue(), java.nio.charset.StandardCharsets.UTF_8);
+                } catch (Exception ignore) {
+                    return c.getValue();
+                }
+            }
+        }
+        return null;
     }
 }

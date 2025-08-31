@@ -10,9 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,15 +26,6 @@ public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
     private final UserService userService; // 로그인/유저 로직
-    // 기타 필요 서비스 추가하기
-
-    // 배포 환경에서 true (프로필로 분기 권장)
-    @Value("${app.cookie.secure:true}")
-    private boolean cookieSecure;
-
-    // 프론트가 다른 도메인/서브도메인이면 설정 (예: example.com)
-    @Value("${app.cookie.domain:}")
-    private String cookieDomain;
 
     /* ===================== 리프레시 토큰 재발급 ===================== */
     @PostMapping("/refresh-token")
@@ -81,24 +69,15 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        String refreshToken = extractRefreshToken(request);
-        if (refreshToken != null) {
-            refreshTokenService.revokeToken(refreshToken); // DB 토큰 무효화
-        }
-
-        // 쿠키 삭제 (ResponseCookie 사용)
-        ResponseCookie expired = ResponseCookie.from("refreshToken", "")
-                .httpOnly(true)
-                .secure(cookieSecure)
-                .path("/")
-                .maxAge(0)                 // 즉시 만료
-                .sameSite("None")          // 크로스도메인 대비
-                .domain(blankToNull(cookieDomain))
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, expired.toString());
+        // ★ 서비스가 쿠키 추출 + DB revoke + 쿠키 만료까지 전부 수행
+        refreshTokenService.logout(request, response);
 
         return ResponseEntity.ok(
-                ApiResponse.<Void>builder().code("S003").message("로그아웃 완료!").data(null).build()
+                ApiResponse.<Void>builder()
+                        .code("S003")
+                        .message("로그아웃 완료!")
+                        .data(null)
+                        .build()
         );
     }
 
@@ -113,10 +92,6 @@ public class AuthController {
             }
         }
         return null;
-    }
-
-    private String blankToNull(String v) {
-        return (v == null || v.isBlank()) ? null : v;
     }
 
 }

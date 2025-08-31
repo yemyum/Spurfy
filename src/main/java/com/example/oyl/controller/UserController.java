@@ -53,7 +53,7 @@ public class UserController {
         String encoded = URLEncoder.encode(loginResult.getRefreshToken(), StandardCharsets.UTF_8);
         ResponseCookie cookie = ResponseCookie.from("refreshToken", encoded)
                 .httpOnly(true)
-                .secure(isProd)
+                .secure(isProd) // true
                 .path("/")
                 .maxAge(Duration.ofDays(7))
                 .sameSite("None")

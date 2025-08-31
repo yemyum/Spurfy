@@ -8,9 +8,14 @@ import com.example.oyl.dto.UserUpdateRequestDTO;
 import com.example.oyl.dto.WithdrawalRequestDTO;
 import com.example.oyl.repository.UserRepository;
 import com.example.oyl.service.MypageService;
+import com.example.oyl.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class MypageController {
 
     private final MypageService mypageService;
+    private final RefreshTokenService refreshTokenService;
 
     @GetMapping("/profile")
     @PreAuthorize("isAuthenticated()")
@@ -86,9 +92,15 @@ public class MypageController {
     // 회원 탈퇴 엔드포인트
     @DeleteMapping("/withdrawal")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ApiResponse<Void>> withdrawUser(@RequestBody @Valid WithdrawalRequestDTO request) {
+    public ResponseEntity<ApiResponse<Void>> withdrawUser(
+            @RequestBody @Valid WithdrawalRequestDTO request,
+            HttpServletResponse response
+    ) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        mypageService.withdrawUser(email, request);
+        mypageService.withdrawUser(email, request); // 내부에서 revokeAllTokensForUser 호출
+
+        // 🔥 이 한 줄만 남겨 (서비스에서 쿠키 옵션 동일하게 처리)
+        refreshTokenService.expireRefreshCookie(response);
 
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()

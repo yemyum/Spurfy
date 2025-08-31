@@ -2,6 +2,7 @@ package com.example.oyl.service;
 
 import com.example.oyl.domain.RefreshToken;
 import com.example.oyl.domain.User;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.time.LocalDateTime;
@@ -24,4 +25,8 @@ public interface RefreshTokenService {
 
     // 새 AccessToken 발급
     String issueNewAccessToken(String refreshToken, HttpServletResponse response);
+
+    void logout(HttpServletRequest request, HttpServletResponse response);
+
+    void expireRefreshCookie(HttpServletResponse response);
 }
