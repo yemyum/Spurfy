@@ -4,10 +4,10 @@ import api, { setAccessToken } from './axios';
 // 로그인
 export async function login(email, password) {
   const res = await api.post('/users/login', { email, password });
-  const token = res?.data?.accessToken; // 백엔드 응답 키 확인
+  const token = res?.data?.data ?? res?.data?.accessToken; // ApiResponse<String> or {accessToken}
   if (!token) throw new Error('로그인 응답에 accessToken 없음');
   setAccessToken(token);
-  return res.data; // 필요하면 user 정보 포함
+  return res.data;
 }
 
 // 로그아웃

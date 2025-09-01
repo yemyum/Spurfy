@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, errorMessage }) {
   const bubbleClasses = isUser
-    ? "bg-[#00D8C2] text-white rounded-bl-xl rounded-tl-xl rounded-br-xl self-end"
-    : "bg-gray-200 text-gray-800 rounded-br-xl rounded-bl-xl rounded-tr-xl self-start";
+    ? "bg-[#67F3EC] rounded-bl-xl rounded-tl-xl rounded-br-xl self-end"
+    : "bg-gray-200 rounded-br-xl rounded-bl-xl rounded-tr-xl self-start";
 
   const renderedMarkdown = useMemo(() => {
     if (!text) return null;

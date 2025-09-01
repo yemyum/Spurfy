@@ -21,7 +21,7 @@ const DogImageAnalysisPage = () => {
   const [showToast, setShowToast] = useState(false);
 
   // 대화/체크리스트 훅
-  const { chatMessages, addMessage, replaceMessage, removeMessage } = useChatHistory();
+  const { chatMessages, isLoading, addMessage, replaceMessage, removeMessage } = useChatHistory();
 
   const {
     sheetOpen, setSheetOpen,
@@ -248,20 +248,24 @@ const DogImageAnalysisPage = () => {
       </div>
 
       {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
-      <div className="flex-1 bg-gray-50 overflow-y-auto p-6 flex flex-col space-y-2">
-        {chatMessages.length > 0 ? (
+      <div className="flex-1 min-h-[120px] bg-gray-50 overflow-y-auto p-6 flex flex-col space-y-2">
+        {isLoading ? (
+          null
+        ) : chatMessages.length > 0 ? (
           chatMessages.map((m) => (
             <MessageBubble
               key={m.id}
               text={m.text}
               isUser={m.isUser}
-              imageUrl={m.imageUrl ?? m.image_url ?? null} // snake_case 대비
+              imageUrl={m.imageUrl ?? m.image_url ?? null}
               spaSlug={m.spaSlug}
               onGoToSpaDetail={handleGoToSpaDetail}
             />
           ))
         ) : (
-          <p className="text-center text-gray-500 p-20">AI 챗봇과 대화를 시작해보세요!</p>
+          <p className="text-center text-gray-500 p-20 empty-hint">
+            AI 챗봇과 대화를 시작해보세요!
+          </p>
         )}
         <div ref={messagesEndRef} />
       </div>
@@ -321,7 +325,7 @@ const DogImageAnalysisPage = () => {
       {showToast && (
         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50"
           role="alert" aria-live="assertive">
-          <div className="px-4 py-2 rounded-full bg-red-500 text-white text-sm shadow-md">
+          <div className="px-4 py-2 rounded-full bg-red-50 border-2 border-red-300 text-red-400 font-semibold text-sm shadow-sm">
             {errorMessage}
           </div>
         </div>

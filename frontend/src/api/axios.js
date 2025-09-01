@@ -9,14 +9,14 @@ const api = axios.create({
 const PUBLIC_PATHS = [
   /^\/users\/signup$/,
   /^\/users\/login$/,
-  /^\/users\/refresh-token$/,   // ★ 리프레시 엔드포인트 일치!
-  /^\/images\/.*/,              // /api/images/**
-  /^\/dog-images\/.*/,          // /dog-images/**
+  /^\/users\/refresh-token$/,
+  /^\/images\/.*/,
+  /^\/dog-images\/.*/,
   /^\/users\/check-email$/,
   /^\/users\/me\/check-nickname$/,
-  /^\/spa-services\/.*/,        // /api/spa-services/**
-  /^\/service-info\/?$/,        // /api/service-info
-  /^\/reviews\/public\/.*/,     // /api/reviews/public/**
+  /^\/spa-services\/.*/,
+  /^\/service-info\/?$/,
+  /^\/reviews\/public\/.*/,
 ];
 
 const isPublicPath = (url) => { // ← 타입 표기 제거
@@ -85,12 +85,10 @@ let queue = [];
 
 async function callRefresh() {
   // ★ 백엔드 경로/키 이름 맞추기
-  const resp = await axios.post(
-    `${import.meta.env.VITE_API_BASE_URL}/api/users/refresh-token`,
-    {},
-    { withCredentials: true }
-  );
-  const newToken = resp?.data?.accessToken; // ← 키 바뀌면 여기 수정
+  const resp = await api.post('/users/refresh-token', {}, { withCredentials: true });
+  const newToken = resp?.data?.data?.accessToken
+    ?? resp?.data?.accessToken
+    ?? resp?.data?.data; // (혹시 data가 문자열인 경우까지)
   if (!newToken) throw new Error('No accessToken in refresh response');
   setAccessToken(newToken);
   return newToken;
@@ -138,7 +136,7 @@ api.interceptors.response.use(
           if (!window.__alreadyRedirected) {
             window.__alreadyRedirected = true;
             alert('로그인 시간이 만료되었습니다. 다시 로그인해주세요.');
-            setTimeout(() => (window.location.href = '/login'), 50);
+            window.location.href = '/login';
           }
           return Promise.reject(e);
         } finally {

@@ -5,12 +5,20 @@ import SpurfyButton from "../components/Common/SpurfyButton";
 
 function MyReviewList() {
   const [reviews, setReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    setIsLoading(true);
     api.get("/reviews/my")
       .then((res) => setReviews(res.data.data))
-      .catch((err) => console.error("리뷰 목록 조회 실패:", err));
+      .catch((err) => {
+        console.error("리뷰 목록 조회 실패:", err);
+        setReviews([]); // 에러 시에도 빈 배열로 설정
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   return (
@@ -18,8 +26,10 @@ function MyReviewList() {
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 조회</h2>
       <h2 className="text-xl font-bold mb-6">내가 작성한 리뷰 리스트</h2>
 
-      {reviews.length === 0 ? (
-          <p className="text-lg font-semibold mt-12 text-gray-400 text-center">아직 작성한 리뷰가 없어요.</p>
+      {isLoading ? (
+        null
+      ) : reviews.length === 0 ? (
+        <p className="text-lg font-semibold mt-12 text-gray-400 text-center">아직 작성한 리뷰가 없어요.</p>
       ) : (
         reviews.map((r) => (
           <div

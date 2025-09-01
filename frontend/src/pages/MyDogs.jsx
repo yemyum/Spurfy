@@ -6,6 +6,7 @@ import SpurfyButton from '../components/Common/SpurfyButton';
 function MyDogs() {
   const navigate = useNavigate();
   const [dogs, setDogs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchDogs = async () => {
     try {
@@ -15,10 +16,13 @@ function MyDogs() {
     } catch (err) {
       console.error('강아지 목록 조회 실패:', err);
       // alert('불러오기를 실패하였습니다.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
+    setIsLoading(true);
     fetchDogs();
   }, []);
 
@@ -47,7 +51,9 @@ function MyDogs() {
         </SpurfyButton>
       </div>
 
-      {dogs.length === 0 ? (
+      {isLoading ? (
+        null
+      ) : dogs.length === 0 ? (
         <div className="mt-12 text-gray-400 text-center">
           <p className="text-lg font-semibold">아직 등록된 강아지가 없어요.</p>
           <p className="mt-2">지금 바로 반려견을 등록하고 관리해보세요!</p>

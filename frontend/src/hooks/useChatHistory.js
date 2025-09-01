@@ -33,6 +33,7 @@ const formatAiMessage = (result) => {
 
 export const useChatHistory = () => {
   const [chatMessages, setChatMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const MAX_LOCAL_ITEMS = 200;
 
   const sentRef = useRef(false);
@@ -97,6 +98,8 @@ export const useChatHistory = () => {
       let serverMsgs = [];
       let localMsgs = [];
 
+       setIsLoading(true);
+
       try {
         const { data } = await api.get("/recommendations/history");
         const items = data?.data ?? [];
@@ -137,6 +140,8 @@ export const useChatHistory = () => {
         localMsgs = localMsgsFromStorage;
       } catch (e) {
         console.error("AI 기록 불러오기 실패:", e);
+      } finally {
+        setIsLoading(false);
       }
 
       // ✅ SSOT: 서버가 진실. 로컬은 버리기!
@@ -160,5 +165,5 @@ export const useChatHistory = () => {
     loadAndMergeMessages();
   }, []);
 
-  return { chatMessages, addMessage, replaceImageUrl, replaceMessage, removeMessage };
+  return { chatMessages, isLoading, addMessage, replaceImageUrl, replaceMessage, removeMessage };
 };

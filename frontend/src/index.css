@@ -12,10 +12,10 @@
 }
 
 @font-face {
-    font-family: 'Mungyeong-Gamhong-Apple';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-2@1.0/Mungyeong-Gamhong-Apple.woff2') format('woff2');
-    font-weight: normal;
-    font-display: swap;
+  font-family: 'Mungyeong-Gamhong-Apple';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-2@1.0/Mungyeong-Gamhong-Apple.woff2') format('woff2');
+  font-weight: normal;
+  font-display: swap;
 }
 
 @layer base {
@@ -44,6 +44,11 @@ body.loading {
   /* 마우스 커서를 로딩 중으로 변경 */
   overflow: hidden;
   /* 로딩 중일 때 스크롤 방지 */
+}
+
+/* 로딩 중엔 빈 상태 문구 숨기기 */
+body.loading .empty-hint {
+  display: none !important;
 }
 
 /* 2. 콘텐츠 위에 깔리는 반투명 오버레이 (::before 가상 요소) */
