@@ -87,8 +87,7 @@ public class AuthController {
         if (cookies == null) return null;
         for (Cookie c : cookies) {
             if ("refreshToken".equals(c.getName())) {
-                // 로그인 시 인코딩해서 심었으니 여기서 디코딩
-                return URLDecoder.decode(c.getValue(), StandardCharsets.UTF_8);
+                return c.getValue();
             }
         }
         return null;

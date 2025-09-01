@@ -48,15 +48,15 @@ public class UserController {
         // userService.login()에서 AccessToken, RefreshToken 둘 다 발급
         LoginResult loginResult = userService.login(requestDTO);
 
-        boolean isProd = true; // TODO: 프로필 보고 결정
+        boolean isProd = false; // 로컬 개발중: HTTP라 false
 
-        String encoded = URLEncoder.encode(loginResult.getRefreshToken(), StandardCharsets.UTF_8);
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", encoded)
+        String refreshToken = loginResult.getRefreshToken();
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .secure(isProd) // true
-                .path("/")
+                .path("/api/users")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("None")
+                .secure(isProd ? true : false)
+                .sameSite(isProd ? "None" : "Lax")
                 // .domain("your-domain.com")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

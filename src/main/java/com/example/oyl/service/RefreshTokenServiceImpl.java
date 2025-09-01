@@ -134,15 +134,21 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     private void setRefreshCookie(HttpServletResponse resp, String value, long maxAgeSec) {
-        ResponseCookie c = ResponseCookie.from("refreshToken", value)
+        ResponseCookie.ResponseCookieBuilder b = ResponseCookie.from("refreshToken", value)
                 .httpOnly(true)
-                .secure(cookieSecure)
-                .path("/")
-                .maxAge(maxAgeSec)
-                .sameSite("None")
-                .domain(blankToNull(cookieDomain))
-                .build();
-        resp.addHeader(HttpHeaders.SET_COOKIE, c.toString());
+                .path("/api/users")
+                .maxAge(maxAgeSec);
+
+        if (cookieSecure) {
+            b.secure(true).sameSite("None");      // ✅ 배포(HTTPS)
+        } else {
+            b.secure(false).sameSite("Lax");      // ✅ 로컬(HTTP localhost)
+        }
+
+        String domain = blankToNull(cookieDomain);
+        if (domain != null) b.domain(domain);
+
+        resp.addHeader(HttpHeaders.SET_COOKIE, b.build().toString());
     }
 
     public void expireRefreshCookie(HttpServletResponse resp) {

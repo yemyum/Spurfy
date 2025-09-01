@@ -20,8 +20,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.Key;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -77,11 +75,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(jwtUtil.getSigningKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+            Claims claims = jwtUtil.parseClaims(token);
 
                 String email = claims.getSubject();
 
