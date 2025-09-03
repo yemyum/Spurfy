@@ -11,8 +11,8 @@ import java.nio.file.Paths;
 public class WebConfig implements WebMvcConfigurer {
 
     // application.yml에서 AI 챗봇 이미지 경로를 가져옴
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Value("${ai-chatbot.upload-dir}")
+    private String aiChatbotUploadDir;
 
     // application.yml에서 강아지 이미지 경로를 가져옴
     @Value("${dog.upload-dir}")
@@ -22,9 +22,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
         // AI 챗봇 이미지 파일 경로 매핑
-        // "/api/images/**" URL 요청을 실제 파일 시스템의 "uploads" 폴더로 연결
+        // "/api/images/**" URL 요청을 실제 파일 시스템의 "ai_chatbot_images" 폴더로 연결
         registry.addResourceHandler("/api/images/**")
-                .addResourceLocations("file:///" + uploadDir);
+                .addResourceLocations("file:///" + aiChatbotUploadDir);
 
         // 강아지 이미지 파일 경로 매핑
         // "/dog-images/**" URL 요청을 실제 파일 시스템의 "dog_images" 폴더로 연결

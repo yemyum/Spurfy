@@ -30,13 +30,13 @@ public class ImageCleanupScheduler {
     // 생성자에서 값 세팅!
     public ImageCleanupScheduler(
             @Value("${app.image.retention-hours:1h}") String retentionDurationRaw, // String으로 받아야 함!!
-            @Value("${file.upload-dir:uploads}") String uploadDirRaw,
+            @Value("${ai-chatbot.upload-dir:ai_chatbot_images}") String aiChatbotUploadRaw,
             @Value("${app.image.api-base-url:/api/images/}") String imageApiBaseUrl,
             AiRecommendHistoryRepository aiRecommendHistoryRepository
     ) throws IOException {
         // String → Duration으로 직접 변환
         this.imageRetentionDuration = parseDuration(retentionDurationRaw);
-        this.uploadPath = Paths.get(uploadDirRaw).toAbsolutePath().normalize();
+        this.uploadPath = Paths.get(aiChatbotUploadRaw).toAbsolutePath().normalize();
         this.aiRecommendHistoryRepository = aiRecommendHistoryRepository; // 주입받은 객체 저장
         this.imageApiBaseUrl = imageApiBaseUrl; // 주입받은 객체 저장
 
@@ -47,7 +47,7 @@ public class ImageCleanupScheduler {
     }
 
     // 스케줄러: 주기적으로 파일 삭제
-    @Scheduled(fixedRateString = "${app.image.cleanup-interval-ms:3600000}")
+    @Scheduled(fixedRateString = "${app.image.cleanup-interval-ms:2592000000}")
     public void cleanupOldImages() {
         log.info("⏰ 이미지 정리 스케줄러 시작...");
         LocalDateTime now = LocalDateTime.now();

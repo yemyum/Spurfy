@@ -3,7 +3,6 @@ package com.example.oyl.service;
 import com.example.oyl.client.GoogleVisionClient;
 import com.example.oyl.client.GptClient;
 import com.example.oyl.domain.AiRecommendHistory;
-import com.example.oyl.domain.SpaService;
 import com.example.oyl.dto.GptSpaRecommendationResponseDTO;
 import com.example.oyl.dto.SpaLabelRecommendationRequestDTO;
 import com.example.oyl.dto.SpaRecommendationRequestDTO;
@@ -26,12 +25,11 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class DogImageService {
+public class AIRecommendationService {
 
     private final GoogleVisionClient googleVisionClient;
     private final GptClient gptClient;
@@ -40,8 +38,9 @@ public class DogImageService {
     private final ObjectMapper objectMapper;
 
     // 파일 업로드
-    private static final String UPLOAD_DIRECTORY = "uploads";
+    private static final String AI_CHATBOT_IMAGE_DIRECTORY = "ai_chatbot_images";
     private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
+    private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
 
     // ===== constants =====
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
@@ -52,7 +51,7 @@ public class DogImageService {
             "clothes", "costume", "pet supply", "clothing", "supply"
     );
     private static final float DOG_OBJECT_MIN_SCORE = 0.6f;
-    private static final String IMAGE_BASE_PATH = "/api/images/";
+    private static final String AI_IMAGE_BASE_PATH = "/api/images/";
 
     // 라벨 도메인 신호(개/견 관련, 속성 관련)
     private static final List<String> POSITIVE_LABEL_HINTS = List.of(
@@ -95,7 +94,7 @@ public class DogImageService {
     }
 
     // AI 호출 횟수
-    private static final int MAX_DAILY_AI_CALLS = 10;  // 실제 서비스는 5번 이하로 수정해두기
+    private static final int MAX_DAILY_AI_CALLS = 5;  // 실제 서비스는 5번 이하로 수정해두기
 
     // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
     public GptSpaRecommendationResponseDTO analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {
@@ -117,7 +116,12 @@ public class DogImageService {
 
 
         // ✅ 이미지 파일을 서버에 저장하는 로직 시작
-        Path uploadPath = Paths.get(UPLOAD_DIRECTORY).toAbsolutePath().normalize();
+        if (dogImageFile.getSize() > MAX_FILE_SIZE) {
+            throw new CustomException(ErrorCode.FILE_SIZE_LIMIT_EXCEEDED,
+                    "파일 크기는 50MB를 초과할 수 없습니다.");
+        }
+
+        Path uploadPath = Paths.get(AI_CHATBOT_IMAGE_DIRECTORY).toAbsolutePath().normalize();
         String savedFileName;
 
         try {
@@ -166,9 +170,9 @@ public class DogImageService {
                         "REQUEST에 OBJECT_LOCALIZATION 피처가 빠졌을 수 있어요.");
             }
 
-            // 1) 강아지 여부 1차 필터 (라벨 보조) -> !isDog()일 때 예외
+            // 1) 강아지 여부 1차 필터 : "강아지가 맞는가?" (라벨 보조) -> !isDog()일 때 예외
             if (!visionResult.isDog()) {
-                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속 강아지를 찾아볼 수 없어요. 강아지 사진을 다시 올려주세요!");
+                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속에서 반려견을 찾지 못했어요. AI가 헷갈리지 않도록 반려견의 정면이 잘 보이는 사진으로 다시 부탁드릴게요!");
             }
 
             // 2) 객체탐지 결과로 마릿수 판단
@@ -197,7 +201,7 @@ public class DogImageService {
             if (dogBoxCount > 1 || (dogBoxCount == 0 && pluralSignal)) {
                 throw new CustomException(
                         ErrorCode.INVALID_INPUT,
-                        "여러 마리 강아지가 감지되었어요. 반려견의 정면이 담긴 단독 사진이여야 AI가 정확하게 인식해요!"
+                        "여러 마리의 반려견이 감지되었어요. AI가 정확하게 인식할 수 있도록 한 마리의 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!"
                 );
             }
 
@@ -210,7 +214,7 @@ public class DogImageService {
             log.warn("Vision 분석 실패 → {}", e.getMessage());
 
             // 실패 기록 저장
-            final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
+            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             AiRecommendHistory history = AiRecommendHistory.builder()
                     .userId(userEmail)
                     .imageUrl(imageUrlForHistory)
@@ -317,11 +321,12 @@ public class DogImageService {
                 .map(s -> norm(s))
                 .anyMatch(d -> POSITIVE_LABEL_HINTS.stream().anyMatch(d::contains));
 
+        // AI가 견종도 모르겠고, 다른 강아지 관련 단서(라벨)도 못 찾았을 때 : "강아지 사진은 맞는데, 내가 추천을 해줄 만큼 정보가 충분한지?"
         if (!hasUsableBreed && !labelsUsable) {
             log.info("GPT 차단: breed/labels 부적합 → 안내만 반환");
-            final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
+            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             return GptSpaRecommendationResponseDTO.createFailureResponse(
-                    "사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
+                    "사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
             );
         }
 
@@ -342,7 +347,7 @@ public class DogImageService {
                 if (!labelsUsable) {
 
                     // 실패 기록 저장
-                    final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
+                    final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
                     AiRecommendHistory history = AiRecommendHistory.builder()
                             .userId(userEmail)
                             .imageUrl(imageUrlForHistory)
@@ -350,12 +355,12 @@ public class DogImageService {
                             .isDog(true) // 여기선 강아지 인식은 됐으니 true
                             .recommendResult(null)
                             .prompt(question)
-                            .errorMessage("사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!")
+                            .errorMessage("사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!")
                             .build();
                     aiRecommendHistoryRepository.save(history);
 
                     return GptSpaRecommendationResponseDTO.createFailureResponse(
-                            "사진 정보가 부족합니다. 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
+                            "사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
                     );
                 }
 
@@ -430,7 +435,7 @@ public class DogImageService {
 
         // ✅ AI 추천 기록을 DB에 저장하는 로직 시작
         try {
-            final String imageUrlForHistory = IMAGE_BASE_PATH + savedFileName;
+            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             spaRecommendationDto.setImageUrl(imageUrlForHistory); // 프론트로 보낼 URL
 
             AiRecommendHistory history = AiRecommendHistory.builder()

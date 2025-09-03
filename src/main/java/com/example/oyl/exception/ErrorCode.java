@@ -34,6 +34,7 @@ public enum ErrorCode {
     GPT_RECOMMENDATION_FAILED("AI02", "GPT 추천 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
     NOT_A_DOG_IMAGE("AI03", "사진에서 강아지를 인식할 수 없습니다. 강아지 사진을 다시 업로드해주세요.", HttpStatus.BAD_REQUEST),
     CONVERSATION_LIMIT_EXCEEDED("E005", "오늘 하루 AI 대화 횟수 제한을 초과했습니다.", HttpStatus.TOO_MANY_REQUESTS),
+    FILE_SIZE_LIMIT_EXCEEDED("E003", "파일 크기는 50MB를 초과할 수 없습니다.", HttpStatus.BAD_REQUEST),
     INVALID_REFRESH_TOKEN("AUTH401", "유효하지 않은 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),
     EXPIRED_REFRESH_TOKEN("AUTH402", "리프레시 토큰이 만료되었습니다.", HttpStatus.UNAUTHORIZED),
     REVOKED_REFRESH_TOKEN("AUTH403", "이미 만료(로그아웃)된 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),

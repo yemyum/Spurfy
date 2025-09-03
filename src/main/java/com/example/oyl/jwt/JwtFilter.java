@@ -80,8 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
 
             userRepository.findByEmail(email).ifPresent(user -> {
-                // int -> "ROLE_USER" 같은 문자열 반환
-                String authority = UserRole.fromCode(user.getUserRole());
+                String authority = user.getUserRole().getRoleName();
 
                 var auth = new UsernamePasswordAuthenticationToken(
                         email,

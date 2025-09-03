@@ -12,6 +12,10 @@ public enum UserRole {
         this.roleName = roleName;
     }
 
+    public String getRoleName() {
+        return roleName;
+    }
+
     public static String fromCode(int code) {
         for (UserRole role : values()) {
             if (role.code == code) return role.roleName;

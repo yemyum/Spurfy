@@ -3,7 +3,7 @@ package com.example.oyl.controller;
 import com.example.oyl.common.ApiResponse;
 import com.example.oyl.dto.GptSpaRecommendationResponseDTO;
 import com.example.oyl.exception.CustomException;
-import com.example.oyl.service.DogImageService;
+import com.example.oyl.service.AIRecommendationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,12 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/dog-image")
+@RequestMapping("/api/ai-recommendation")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
-public class AiSpaRecommendationController {
+public class AiRecommendationController {
 
-    private final DogImageService dogImageService;
+    private final AIRecommendationService dogImageService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<GptSpaRecommendationResponseDTO>> uploadDogImages(

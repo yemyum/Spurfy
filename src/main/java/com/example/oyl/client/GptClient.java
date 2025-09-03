@@ -100,7 +100,14 @@ public class GptClient {
         promptBuilder.append("[응답 규칙] 반드시 순수 JSON 객체만 응답할 것. 마크다운 코드 블록(```), 백틱(`), 설명, 주석, 자연어는 절대 포함하지 말 것.\n");
         promptBuilder.append("응답은 반드시 '{' 로 시작하고 '}' 로 끝나는 JSON 객체여야 함.\n");
         promptBuilder.append("{\n");
-        promptBuilder.append("  \"intro\": \"사진 속 아이는 **%s**(으)로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n\",\n".formatted(dto.getBreed()));
+        String introMessage = "";
+        if (dto.getBreed() != null && !dto.getBreed().isBlank()) {
+            introMessage = "사진 속 아이는 **%s**(으)로 보이네요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n".formatted(dto.getBreed());
+        } else {
+            // 혹시라도 견종 정보 없이 이 메서드가 호출되면, 지피티가 엉뚱한 말을 하지 않도록 안전장치를 넣기
+            introMessage = "제공해주신 정보를 바탕으로, 사랑스러운 반려견에게 어울리는 스파를 추천해드릴게요. 😉\\n";
+        }
+        promptBuilder.append("  \"intro\": \"" + introMessage + "\",\n");
         promptBuilder.append("  \"compliment\": \"이 견종의 성격, 분위기, 보호자에게 어필할만한 특징을 1~2줄로 요약\\n\\n\",\n");
         promptBuilder.append("  \"recommendationHeader\": \"이 아이에게 추천하는 스파는\\n\\n\",\n");
         promptBuilder.append("  \"spaName\": \"**%s**에요!\\n\\n\",\n".formatted("스파 이름(이모지 포함)"));
@@ -239,7 +246,7 @@ public class GptClient {
                 (dto.getAgeGroup() != null && !dto.getAgeGroup().isBlank()) ||
                         (dto.getActivityLevel() != null && !dto.getActivityLevel().isBlank()) ||
                         (dto.getHealthIssues() != null && !dto.getHealthIssues().isEmpty());
-        String introMessage;
+        String introMessage = "";
         if (hasUserBreed) {
             introMessage = "보호자님이 알려주신 견종은 **%s**(이)군요!\\n소중한 반려견의 정보를 알려주셔서 감사합니다. 😊\\n"
                     .formatted(userBreed);
@@ -292,8 +299,8 @@ public class GptClient {
             String cleanedJson = gptRawResponse.trim();
 
             // 백틱 감싸짐 제거
-            if (cleanedJson.startsWith("```") && cleanedJson.endsWith("```")) {
-                cleanedJson = cleanedJson.substring(3, cleanedJson.length() - 3).trim();
+            if (cleanedJson.startsWith("```json") && cleanedJson.endsWith("```")) {
+                cleanedJson = cleanedJson.substring(cleanedJson.indexOf("{"), cleanedJson.lastIndexOf("}") + 1);
             } else if (cleanedJson.startsWith("`") && cleanedJson.endsWith("`")) {
                 cleanedJson = cleanedJson.substring(1, cleanedJson.length() - 1).trim();
             }
@@ -344,7 +351,7 @@ public class GptClient {
                 response.getChoices().get(0).getMessage().getContent() == null ||
                 response.getChoices().get(0).getMessage().getContent().toLowerCase().contains("i'm sorry")) {
             log.error("GPT API 호출 결과 실패 또는 빈 응답: {}", response);
-            return "죄송해요! 지금은 스파 추천이 어려워요. \n조금 뒤에 다시 시도해 주세요!";
+            return "죄송해요! 지금은 스파 추천이 어려워요. 조금 뒤에 다시 시도해 주세요!";
         }
         log.info("Raw content from GPT API: {}", response.getChoices().get(0).getMessage().getContent());
         return response.getChoices().get(0).getMessage().getContent();

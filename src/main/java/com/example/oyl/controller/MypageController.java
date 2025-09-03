@@ -99,7 +99,7 @@ public class MypageController {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         mypageService.withdrawUser(email, request); // 내부에서 revokeAllTokensForUser 호출
 
-        // 🔥 이 한 줄만 남겨 (서비스에서 쿠키 옵션 동일하게 처리)
+        // (서비스에서 쿠키 옵션 동일하게 처리)
         refreshTokenService.expireRefreshCookie(response);
 
         return ResponseEntity.ok(

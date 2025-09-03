@@ -119,7 +119,7 @@ public class MypageServiceImpl implements MypageService {
         refreshTokenService.revokeAllTokensForUser(user);
 
         // 3. 유저 비활성화
-        user.deactivate();
+        user.deactivate(request.getReason());
         userRepository.save(user);
     }
 

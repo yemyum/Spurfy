@@ -1,5 +1,6 @@
 package com.example.oyl.dto;
 
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,5 +14,6 @@ public class WithdrawalRequestDTO {
     private String reason;
 
     @NotNull(message = "이용약관 동의가 필요합니다.")
+    @AssertTrue(message = "이용약관에 동의해야 합니다.")
     private Boolean agreeToTerms; // 이용약관 동의 여부
 }

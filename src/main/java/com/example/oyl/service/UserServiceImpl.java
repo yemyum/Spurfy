@@ -1,6 +1,8 @@
 package com.example.oyl.service;
 
 import com.example.oyl.domain.User;
+import com.example.oyl.domain.UserRole;
+import com.example.oyl.domain.UserStatus;
 import com.example.oyl.dto.LoginResult;
 import com.example.oyl.dto.UserLoginRequestDTO;
 import com.example.oyl.dto.UserSignupRequestDTO;
@@ -55,8 +57,8 @@ public class UserServiceImpl implements UserService{
                 .nickname(requestDTO.getNickname())
                 .phone(requestDTO.getPhone())
                 .profileImage(null)
-                .userStatus(1)  // 기본값: 활성
-                .userRole(1)    // 기본값: 일반 사용자
+                .userStatus(UserStatus.ACTIVE)  // 기본값: 활성
+                .userRole(UserRole.USER)    // 기본값: 일반 사용자
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
