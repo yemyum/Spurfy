@@ -30,7 +30,7 @@ function Home() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center mt-10 mb-10">
+    <div className="w-full flex flex-col items-center">
       {/* 1. 상단 메인 배너 섹션 (왼쪽 텍스트 + 오른쪽 강아지 이미지) */}
       <div className="relative w-full overflow-hidden flex md:flex-row flex-col items-center min-h-[500px] md:h-[580px]">
         <div className="w-full md:w-1/3 h-full bg-white flex flex-col justify-center items-center md:items-start text-center md:text-left px-8 py-8 z-10 absolute md:static">
@@ -60,11 +60,10 @@ function Home() {
       </div>
 
       {/* 2. AI 맞춤 분석 서비스 강조 섹션 */}
-      {/* 2. AI 맞춤 분석 서비스 강조 섹션 */}
       <div className="w-full min-h-[500px] md:h-[580px]
                 flex flex-col md:flex-row md:items-stretch
                 md:p-28 bg-gradient-to-r from-white to-[#67F3EC]
-                mt-16 mb-16 md:gap-10">
+                mt-12 mb-16 md:gap-10">
 
         {/* 왼쪽 텍스트 */}
         <div className="flex-1 md:basis-[420px] md:shrink-0

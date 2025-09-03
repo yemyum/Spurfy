@@ -59,14 +59,14 @@ function DogDetail() {
 
   return (
 
-    <div className="mx-auto p-8 mb-6 select-none">
+    <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 정보</h2>
 
-      <div className="border border-gray-200 py-6 rounded-md shadow-sm bg-white mb-6">
+      <div className="border border-gray-200 py-6 rounded-xl shadow-sm bg-white mb-6">
 
         <div className="pb-4 mb-4 border-b border-gray-200 px-6">
           <h2 className="text-2xl font-bold">
-            <span className="bg-[#9EC5FF] text-white px-3 py-1 rounded-full shadow-sm text-xl">
+            <span className="bg-spurfyBlue/70 text-white px-3 py-1 rounded-full shadow-sm text-2xl">
               {dog.name}
             </span>{' '}
             의 상세 정보

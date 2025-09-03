@@ -105,7 +105,7 @@ function MyReviewDetail() {
   }
 
   return (
-    <div className="mx-auto p-8 mb-6 select-none">
+    <div className="mx-auto p-8 select-none">
       <div className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 관리</div>
 
       <div className="border border-gray-200 py-5 rounded-md shadow-sm bg-white mb-6">

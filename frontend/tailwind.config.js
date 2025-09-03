@@ -11,7 +11,7 @@ export default {
         point: ['Mungyeong-Gamhong-Apple'],
       },
       colors: {
-        spurfyBlue: '#4A90FF',
+        spurfyBlue: '#80A6FF',
         spurfyLogo: '#67C7FF',
         spurfyColor: '#9EC5FF',
         spurfyNavy: '#7FA3DA',

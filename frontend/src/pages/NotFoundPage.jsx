@@ -31,7 +31,7 @@ function NotFoundPage() {
 
 
   return (
-    <div className='bg-gradient-to-br from-white to-[#BAE5FF] min-h-screen'>
+    <div className='bg-[#F1FAFF] min-h-screen'>
       <div className="min-h-screen flex flex-col justify-center">
     <div className="flex flex-col items-center border border-gray-200 rounded-xl shadow-md bg-white/60 mx-auto -mt-40 p-28">
       <h1 className="text-[#67F3EC] font-logo text-[60px] mb-8">{errorStatus}</h1>

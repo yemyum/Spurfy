@@ -131,9 +131,9 @@ function DogEdit() {
   }
 
   return (
-    <div className="mx-auto p-8 mb-6 select-none">
+    <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 정보 수정</h2>
-      <form onSubmit={handleSubmit} className="w-full border border-gray-200 p-8 rounded-md shadow-sm bg-white mb-6 break-words">
+      <form onSubmit={handleSubmit} className="w-full border border-gray-200 p-8 rounded-xl shadow-sm bg-white mb-6 break-words">
 
         <div className="flex flex-col md:flex-row">
           <div className="flex flex-col flex-shrink-0 w-full md:w-64 mb-6 md:mb-0 md:mr-6">

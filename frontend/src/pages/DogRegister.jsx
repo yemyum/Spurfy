@@ -89,7 +89,7 @@ function DogRegister() {
   };
 
   return (
-    <div className="mx-auto p-8 mb-6 select-none">
+    <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 등록</h2>
       <form onSubmit={handleSubmit} className="w-full border border-gray-200 p-8 rounded-lg shadow-sm bg-white mb-6 break-words">
 

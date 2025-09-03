@@ -137,10 +137,10 @@ function MyReservationDetail() {
   const canWriteReview = reservation.reservationStatus === "COMPLETED" && !reservation.hasReview;
 
     return (
-        <div className="mx-auto p-8 mb-6 select-none">
+        <div className="mx-auto p-8 select-none">
           <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 상세</h2>
 
-          <div className="border border-gray-200 py-5 rounded-md shadow-sm bg-white mb-6 relative">
+          <div className="border border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6 relative">
                 <span
                   className={`absolute top-4 right-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusLabel[reservation.reservationStatus]?.tagClass || 'bg-red-100 text-red-500'}`}
                 >

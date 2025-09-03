@@ -11,7 +11,7 @@ import { useChatHistory } from "../hooks/useChatHistory";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import { useChecklist } from "../hooks/useChecklist";
 
-const DogImageAnalysisPage = () => {
+const AIRecommendationPage = () => {
   const navigate = useNavigate();
   const messagesEndRef = useRef(null);
 
@@ -142,7 +142,7 @@ const DogImageAnalysisPage = () => {
         formData.append("checklist", JSON.stringify(payloadChecklist));
       }
 
-      const response = await api.post("/dog-image", formData, {
+      const response = await api.post("/ai-recommendation", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -334,4 +334,4 @@ const DogImageAnalysisPage = () => {
   );
 };
 
-export default DogImageAnalysisPage;
+export default AIRecommendationPage;

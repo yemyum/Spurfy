@@ -24,7 +24,7 @@ import PaymentPage from './pages/PaymentPage';
 import MyReservationDetail from './pages/MyReservationDetail';
 import WithdrawalPage from './pages/Withdrawal';
 import SpaReviewsPage from './pages/SpaReviewsPage';
-import DogImageAnalysisPage from './pages/DogImageAnalysisPage';
+import AIRecommendationPage from './pages/AIRecommendationPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const router = createBrowserRouter([
@@ -61,7 +61,7 @@ const router = createBrowserRouter([
   { path: '/payment', element: <PaymentPage /> },
   { path: '/payment/:reservationId', element: <PaymentPage /> },
   { path: '/review/write', element: <ReviewWrite /> },
-  { path: '/dog-spa-ai', element: <DogImageAnalysisPage /> },
+  { path: '/dog-spa-ai', element: <AIRecommendationPage /> },
   { path: '/spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
 
   { path: '*', element: <NotFoundPage /> }

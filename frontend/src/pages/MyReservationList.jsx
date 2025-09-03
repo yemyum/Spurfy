@@ -116,7 +116,7 @@ function MyReservationList() {
         reservations.map((r) => (
           <div
             key={r.reservationId}
-            className="w-full border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 flex items-stretch gap-4"
+            className="w-full border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-50 flex items-stretch gap-4"
             onClick={() => handleItemClick(r.reservationId)}
           >
             {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}

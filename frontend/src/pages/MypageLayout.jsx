@@ -9,7 +9,7 @@ function MypageLayout() {
   ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto">
       {/* 모바일 탭 */}
       <nav className="grid grid-cols-4 gap-2 lg:hidden mb-4">
         {menu.map(m => (
@@ -17,8 +17,8 @@ function MypageLayout() {
             key={m.path}
             to={m.path}
             className={({ isActive }) =>
-              `text-center text-sm py-2 rounded-lg transition bg-white shadow-sm
-               ${isActive ? "border border-gray-200 font-semibold" : "border border-gray-200 hover:bg-gray-50"}`
+              `text-center p-2 rounded-lg transition bg-white
+               ${isActive ? "bg-spurfyBlue/80 font-semibold text-white shadow-md" : "border border-gray-200 hover:bg-spurfyBlue/20 shadow-sm"}`
             }
           >
             {m.label}
@@ -29,18 +29,18 @@ function MypageLayout() {
       <div className="lg:grid lg:grid-cols-[220px,1fr] gap-6">
         {/* 사이드바 */}
         <aside className="hidden lg:block">
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 py-6 sticky top-24">
-            <h2 className="text-lg font-bold mb-4 px-2">마이페이지</h2>
+          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-4 py-5 sticky top-24">
+            <h2 className="text-lg font-bold mb-4 px-2 border-b-2 pb-2 border-b-gray-200">마이페이지</h2>
             <ul className="space-y-2">
               {menu.map(m => (
                 <li key={m.path}>
                   <NavLink
                     to={m.path}
                     className={({ isActive }) =>
-                      `block w-full rounded-xl px-3 py-2 text-sm transition
+                      `block w-full rounded-xl px-3 py-2 transition
                        ${isActive
-                         ? "bg-blue-50 text-spurfyBlue font-semibold"
-                         : "hover:bg-gray-50"}`
+                         ? "bg-spurfyBlue/80 text-white font-semibold shadow-md"
+                         : "hover:bg-spurfyBlue/20"}`
                     }
                   >
                     {m.label}
@@ -53,7 +53,7 @@ function MypageLayout() {
 
         {/* 본문 */}
         <main className="min-h-[560px]">
-          <div className="rounded-2xl border border-gray-200 bg-white shadow-sm p-6">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
             <Outlet />
           </div>
         </main>

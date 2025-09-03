@@ -179,7 +179,7 @@ function Signup() {
                 </header>
                 <div className="flex flex-1 items-center justify-center -mt-20">
                     <div className="min-h-[380px] bg-white/60 flex flex-col items-center border border-gray-200 rounded-xl shadow-md p-8 max-w-md">
-                        <h2 className="font-logo text-spurfyColor text-2xl mt-4 mb-10">Sign up</h2>
+                        <h2 className="font-logo text-spurfyBlue text-2xl mt-4 mb-10">Sign up</h2>
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"

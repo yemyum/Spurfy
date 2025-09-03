@@ -9,6 +9,7 @@ function Withdrawal() {
   const [reason, setReason] = useState(''); // 탈퇴 사유 입력 상태 (초기값 빈 문자열)
   const [agreeToTerms, setAgreeToTerms] = useState(false); // 약관 동의 체크박스 상태
   const [error, setError] = useState(null); // 에러 메시지 상태
+  const [otherReason, setOtherReason] = useState("");
 
   // 탈퇴 사유 드롭다운 옵션들
   const reasonsOptions = [ // 'reasons'가 아니라 'reasonsOptions'로 이름 변경해서 혼동 줄이기
@@ -25,21 +26,21 @@ function Withdrawal() {
 
     if (!agreeToTerms) return setError('이용약관 동의가 필요합니다.');
     if (!password) return setError('비밀번호를 입력해주세요.');
+    // 모달을 띄우는 코드가 여기에 들어와야 함!
     if (!window.confirm('정말 회원 탈퇴를 진행하시겠습니까? 탈퇴 시 복구할 수 없습니다.')) return;
 
     try {
       const res = await api.delete('/users/me/withdrawal', {
         data: {
           password,
-          reason: reason === '탈퇴 사유를 선택하거나 입력해주세요.' ? '' : reason,
+          reason: reason === '기타 (직접 입력)' ? otherReason : reason,
           agreeToTerms,
         },
       });
 
       if (res.data?.code === 'S001') {
-        alert('회원 탈퇴가 성공적으로 처리되었습니다. 이용해주셔서 감사합니다.');
-        // 서버가 refresh 쿠키는 이미 만료시킴. 프론트는 access만 정리하면 끝.
-        setAccessToken(null);                 // <- localStorage/axios 헤더 정리
+        alert('회원 탈퇴가 성공적으로 처리되었습니다. 이용해주셔서 감사합니다.'); // 나중에 모달로 바꾸기
+        setAccessToken(null);
         navigate('/login', { replace: true });
         return;
       }
@@ -83,7 +84,7 @@ function Withdrawal() {
           </label>
           <select
             id="reason"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 mb-2"
+            className="w-full p-2 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 mb-2"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           >
@@ -95,10 +96,11 @@ function Withdrawal() {
           {/* '기타 (직접 입력)' 옵션이 선택되면 텍스트 에리어 보여주기 */}
           {reason === "기타 (직접 입력)" && (
             <textarea
-              className="appearance-none border border-gray-300 rounded w-full py-2 px-3 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-100"
-              placeholder="기타 사유를 입력해주세요."
-              value={reason.startsWith("기타: ") ? reason.substring(6) : ""} // '기타: ' 접두사 제거하고 보여주기
-              onChange={(e) => setReason("기타: " + e.target.value)} // '기타: ' 접두사 붙여서 상태에 저장
+              className="appearance-none border border-gray-300 rounded w-full px-3 py-3 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-100"
+              placeholder="기타 사유를 입력해주세요. (최대 100자)"
+              maxLength={100}
+              value={otherReason}
+              onChange={(e) => setOtherReason(e.target.value)}
             />
           )}
         </div>
