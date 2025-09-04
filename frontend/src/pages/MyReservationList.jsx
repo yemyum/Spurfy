@@ -25,7 +25,7 @@ function MyReservationList() {
 
   useEffect(() => {
     setIsLoading(true);
-    api.get("/reservation/mypage/reservations")
+    api.get("/reservation/my")
       .then(res => {
         setReservations(res.data.data || []);
       })

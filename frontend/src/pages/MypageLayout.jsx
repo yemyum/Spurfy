@@ -18,7 +18,7 @@ function MypageLayout() {
             to={m.path}
             className={({ isActive }) =>
               `text-center p-2 rounded-lg transition bg-white
-               ${isActive ? "bg-spurfyBlue/80 font-semibold text-white shadow-md" : "border border-gray-200 hover:bg-spurfyBlue/20 shadow-sm"}`
+               ${isActive ? "bg-spurfyBlue font-semibold text-white shadow-md" : "border border-gray-200 hover:bg-blue-100 shadow-sm"}`
             }
           >
             {m.label}
@@ -39,8 +39,8 @@ function MypageLayout() {
                     className={({ isActive }) =>
                       `block w-full rounded-xl px-3 py-2 transition
                        ${isActive
-                         ? "bg-spurfyBlue/80 text-white font-semibold shadow-md"
-                         : "hover:bg-spurfyBlue/20"}`
+                         ? "bg-spurfyBlue text-white font-semibold shadow-md"
+                         : "hover:bg-blue-100"}`
                     }
                   >
                     {m.label}

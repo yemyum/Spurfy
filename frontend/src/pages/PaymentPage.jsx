@@ -15,7 +15,7 @@ function PaymentPage() {
 
   // 💡 로그인 유저 정보 로딩
   useEffect(() => {
-    api.get('/mypage/profile')
+    api.get('/users/me/profile')
       .then((res) => setUser(res.data.data))
       .catch(() => alert('유저 정보 불러오기 실패'));
   }, []);
@@ -79,11 +79,11 @@ function PaymentPage() {
             <span className="font-semibold">{reservation.dogName}</span>
           </div>
           <div className="flex justify-between mb-2 text-lg">
-            <span>예약일시</span>
+            <span>예약 일시</span>
             <span className="font-semibold">{reservation.reservationDate} {reservation.reservationTime}</span>
           </div>
-          <div className="border-t my-4 pt-4 flex justify-between mb-2 text-lg">
-            <span>결제금액</span>
+          <div className="border-t-2 my-4 pt-4 flex justify-between mb-2 text-lg">
+            <span>결제 금액</span>
             <span className="font-semibold text-spurfyBlue">{reservation?.amount?.toLocaleString()}원</span>
           </div>
         </div>
@@ -107,12 +107,12 @@ function PaymentPage() {
 
   // 결제 진행 화면
   return (
-    <div className="w-2/3 mx-auto select-none mt-10 mb-10 bg-gray-50 rounded-2xl shadow-md overflow-hidden">
-      <h2 className="bg-[#9EC5FF] text-white font-bold text-xl text-center py-4 rounded-t-2xl">예약하기</h2>
+    <div className="w-2/3 mx-auto select-none mt-12 mb-10 bg-gray-50 rounded-2xl shadow-md overflow-hidden">
+      <h2 className="bg-spurfyBlue text-white font-bold text-xl text-center py-3 rounded-t-2xl">결제 정보</h2>
       <div className='p-4 space-y-6'>
         {/* 스파 서비스 정보 */}
         <div className="border-none rounded-md bg-white p-4">
-          <h3 className="text-lg font-semibold">스파 서비스 정보</h3>
+          <h3 className="text-lg font-semibold">스파 서비스</h3>
           <p>{state?.spaName || state?.serviceId}</p>
           <p>{state?.date} {state?.time}</p>
           <p>반려견: {state?.dogName || state?.dogId}</p>
@@ -121,14 +121,14 @@ function PaymentPage() {
 
         {/* 결제자 정보 */}
         <div className="border-none rounded-md bg-white  p-4 space-y-2">
-          <h3 className="text-lg font-semibold">결제자 정보</h3>
+          <h3 className="text-lg font-semibold">결제자</h3>
           <p>{user.name}</p>
           <p>{user.phone}</p>
         </div>
 
         {/* 결제수단 */}
         <div className="border-none rounded-md bg-white  p-4 space-y-2">
-          <h3 className="text-lg font-semibold">결제수단</h3>
+          <h3 className="text-lg font-semibold">결제 수단</h3>
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="radio"
               name="payment"
@@ -142,13 +142,13 @@ function PaymentPage() {
               name="payment"
               checked={selectedPaymentMethod === 'EASY_PAY'}
               onChange={() => setSelectedPaymentMethod('EASY_PAY')}
-              className="accent-[#3B82F6] w-4 h-4" /> 간편결제
+              className="accent-[#3B82F6] w-4 h-4" /> 간편 결제
           </label>
         </div>
 
         {/* 결제 금액 */}
         <div className="border-none rounded-md bg-white p-4 space-y-2">
-          <h3 className="text-lg font-semibold">결제금액</h3>
+          <h3 className="text-lg font-semibold">결제 금액</h3>
           <div className="flex justify-between">
             <span>스파 서비스 금액</span>
             <span>{state?.amount?.toLocaleString()}원</span>
@@ -170,7 +170,7 @@ function PaymentPage() {
         {/* 버튼 */}
         <div className="pb-2">
           <SpurfyButton variant="primary"
-            className="w-full py-3 text-xl"
+            className="w-full py-2 text-xl"
             onClick={handlePayment}
           >
             결제하기
