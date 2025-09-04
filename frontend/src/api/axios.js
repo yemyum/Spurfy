@@ -28,7 +28,14 @@ const isPublicPath = (url) => {
     return PUBLIC_PATHS.some((re) => re.test(url));
   }
 };
-const isRefreshPath = (url) => /\/users\/refresh-token$/.test(url || '');
+const isRefreshPath = (url) => {
+  try {
+    const p = new URL(url, 'http://dummy').pathname;
+    return /\/users\/refresh-token\/?$/.test(p);
+  } catch {
+    return /\/users\/refresh-token\/?$/.test(url || '');
+  }
+};
 
 // ===== 토큰 보관소 =====
 let accessToken = null;
@@ -142,8 +149,8 @@ api.interceptors.response.use(
       return Promise.reject(err);
     }
 
-    // 401/403 → 아직 재시도 안 했으면 리프레시 시도
-    if ((status === 401 || status === 403) && !original._retry) {
+    // 401 → 아직 재시도 안 했으면 리프레시 시도
+    if (status === 401 && !original._retry) {
       original._retry = true;
 
       if (!isRefreshing) {

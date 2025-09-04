@@ -1,35 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import api from "../api/axios";
 import { toAbs } from '../utils/url';
-import { upsert } from '../utils/upsert';
-
-const formatAiMessage = (result) => {
-  const s = (t) => (t ? t.replace(/\\n/g, "\n").replace(/\r\n/g, "\n").trim() : "");
-  const parseTs = (v) => {
-    if (typeof v === "number" && Number.isFinite(v)) return v;
-    const t = Date.parse(v);
-    return Number.isFinite(t) ? t : Date.now();
-  };
-  const spaDesc =
-    Array.isArray(result.spaDescription) && result.spaDescription.length
-      ? result.spaDescription.map((line) => `- ${s(line).replace(/^- /, "")}`).join("\n")
-      : "";
-
-  const text = result.errorMessage
-    ? s(result.errorMessage)
-    : [s(result.intro), s(result.compliment), s(result.recommendationHeader), s(result.spaName), spaDesc, s(result.closing)]
-      .filter(Boolean)
-      .join("\n\n");
-
-  return {
-    text: text,
-    spaSlug: result.spaSlug ?? null,
-    id: result.id,
-    timestamp: parseTs(result.createdAt),
-    imageUrl: result.imageUrl ?? null,
-    errorMessage: result.errorMessage ?? null,
-  };
-};
+import { formatAiMessage } from "../utils/formatAiMessage";
 
 export const useChatHistory = () => {
   const [chatMessages, setChatMessages] = useState([]);
@@ -96,7 +68,6 @@ export const useChatHistory = () => {
 
     const loadAndMergeMessages = async () => {
       let serverMsgs = [];
-      let localMsgs = [];
 
        setIsLoading(true);
 
@@ -130,14 +101,6 @@ export const useChatHistory = () => {
           return msgs;
         });
         serverMsgs = serverMsgsFromApi;
-
-        const savedLocal = JSON.parse(localStorage.getItem("chatMessages") || "[]");
-        const localMsgsFromStorage = savedLocal.map((m) => ({
-          ...m,
-          id: m.id,
-          imageUrl: m.imageUrl ? toAbs(m.imageUrl) : null,
-        }));
-        localMsgs = localMsgsFromStorage;
       } catch (e) {
         console.error("AI 기록 불러오기 실패:", e);
       } finally {
@@ -153,7 +116,7 @@ export const useChatHistory = () => {
 
       setChatMessages(finalMessages);
 
-      // 유저 메시지만 다시 저장(선택)
+      // 유저 메시지만 다시 저장
       const store = finalMessages
         .filter(m => m.isUser)
         .map(sanitizeForStorage)

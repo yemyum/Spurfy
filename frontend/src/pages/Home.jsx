@@ -31,38 +31,50 @@ function Home() {
 
   return (
     <div className="w-full flex flex-col items-center">
-      {/* 1. 상단 메인 배너 섹션 (왼쪽 텍스트 + 오른쪽 강아지 이미지) */}
-      <div className="relative w-full overflow-hidden flex md:flex-row flex-col items-center min-h-[500px] md:h-[580px]">
-        <div className="w-full md:w-1/3 h-full bg-white flex flex-col justify-center items-center md:items-start text-center md:text-left px-8 py-8 z-10 absolute md:static">
-          <div className="md:ml-12 px-8">
-            <h1 className="text-3xl md:text-3xl font-point text-stone-700 mb-10 leading-tight">
-              우리 아이에게도 <br />
-              하루쯤은 <span className="text-spurfyAI">스파데이</span>
-            </h1>
-            <p className="text-xl md:text-lg text-stone-400 font-semibold mb-20">
-              매일 같은 일상 속, <br />
-              오늘은 반려견에게 특별한 하루를 선물하세요.
-            </p>
-            <Link to="/spalist">
-              <SpurfyButton
-                variant="primary"
-                className="px-4 py-2 text-2xl shadow-sm font-bold hover:shadow-md"
-              >
-                예약하러 가기
-              </SpurfyButton>
-            </Link>
-          </div>
+      {/* 1. 상단 메인 배너 섹션 */}
+      <div className="w-full min-h-[500px] md:h-[580px]
+              flex flex-col md:flex-row md:items-stretch
+              md:p-28 bg-gradient-to-r from-[#FFFCEB] to-[#FFCDEB]
+              md:gap-10">
+
+        {/* 왼쪽 텍스트 */}
+        <div className="flex-1 md:basis-[420px] md:shrink-0
+                text-center md:text-left mt-6 px-6 md:px-0
+                break-keep whitespace-normal leading-snug">
+          <h1 className="text-3xl md:text-3xl font-point text-stone-700 mt-6 mb-10 leading-tight">
+            우리 아이에게도 <br />
+            하루쯤은 <span className="bg-gradient-to-r from-[#FFE29F] to-[#FF719A] bg-clip-text text-transparent">스파데이</span>
+          </h1>
+          <p className="text-xl md:text-lg text-stone-500 font-semibold mb-20">
+            매일 같은 일상 속, <br />
+            오늘은 반려견에게 특별한 하루를 선물하세요.
+          </p>
+          <Link to="/spalist">
+            <SpurfyButton
+              variant="first"
+              className="px-4 py-2 text-2xl shadow-sm font-bold mb-6 md:mb-0"
+            >
+              예약하러 가기
+            </SpurfyButton>
+          </Link>
         </div>
 
-        <div className="w-full md:w-2/3 h-[300px] md:h-full flex-shrink-0 overflow-hidden">
-          <img src={SpurfyDog} alt="스파하는 귀여운 강아지" className="w-full h-full object-cover object-center" />
+        {/* 오른쪽 이미지 */}
+        <div className="flex justify-center md:justify-end items-center
+        flex-1 md:flex-1 md:min-w-0 px-6 md:px-0">
+          <img
+            src={SpurfyDog}
+            alt="스파하는 귀여운 강아지"
+            className="h-auto object-contain md:object-contain
+               max-w-[380px] sm:max-w-[380px] md:max-w-[655px]"
+          />
         </div>
       </div>
 
       {/* 2. AI 맞춤 분석 서비스 강조 섹션 */}
       <div className="w-full min-h-[500px] md:h-[580px]
                 flex flex-col md:flex-row md:items-stretch
-                md:p-28 bg-gradient-to-r from-white to-[#67F3EC]
+                md:p-28 bg-gradient-to-r from-[#F4FFF9] to-[#67F8F1]
                 mt-12 mb-16 md:gap-10">
 
         {/* 왼쪽 텍스트 */}
@@ -88,12 +100,12 @@ function Home() {
             </ol>
           </div>
 
-          <button
+          <SpurfyButton
+            variant="second"
             onClick={handleGoAI}
-            className="px-4 py-2 text-lg sm:text-xl shadow-sm font-bold hover:shadow-md
-                 bg-gradient-to-r from-[#90F9BF] to-[#67F3EC] rounded-lg text-white transition duration-300">
+            className="px-4 py-2 text-2xl shadow-sm font-bold">
             추천받으러 가기
-          </button>
+          </SpurfyButton>
         </div>
 
         {/* 오른쪽 이미지 */}
@@ -108,7 +120,7 @@ function Home() {
           />
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 

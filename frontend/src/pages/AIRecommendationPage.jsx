@@ -6,6 +6,7 @@ import SpurfyButton from "../components/Common/SpurfyButton";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { formatAiMessage, sanitizeText } from "../utils/formatAiMessage";
 
 import { useChatHistory } from "../hooks/useChatHistory";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
@@ -34,13 +35,6 @@ const AIRecommendationPage = () => {
 
   useBodyScrollLock(sheetOpen);
 
-  // 안전한 timestamp 파서
-  const parseTs = (v) => {
-    if (typeof v === "number" && Number.isFinite(v)) return v;
-    const t = Date.parse(v);
-    return Number.isFinite(t) ? t : Date.now();
-  };
-
   useEffect(() => {
     if (!errorMessage) return;
     setShowToast(true);
@@ -61,39 +55,6 @@ const AIRecommendationPage = () => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });
   }, [chatMessages]);
-
-  const sanitizeText = (t) =>
-    t ? t.replace(/\\n/g, "\n").replace(/\r\n/g, "\n").trim() : "";
-
-  const formatAiMessage = (result) => {
-    const spaDescription =
-      result.spaDescription && result.spaDescription.length > 0
-        ? result.spaDescription
-          .map((line) => `- ${sanitizeText(line).replace(/^- /, "")}`)
-          .join("\n")
-        : "";
-
-    return {
-      // ✅ 에러 메시지가 있으면 그것만 text로 사용
-      text: result.errorMessage
-        ? sanitizeText(result.errorMessage)
-        : [
-          sanitizeText(result.intro),
-          sanitizeText(result.compliment),
-          sanitizeText(result.recommendationHeader),
-          sanitizeText(result.spaName),
-          spaDescription,
-          sanitizeText(result.closing),
-        ]
-          .filter(Boolean)
-          .join("\n\n"),
-      spaSlug: result.spaSlug,
-      id: result.id,
-      timestamp: parseTs(result.createdAt),
-      imageUrl: result.imageUrl || null,
-      errorMessage: result.errorMessage || null, // ✅ errorMessage도 추가
-    };
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
@@ -168,7 +129,6 @@ const AIRecommendationPage = () => {
         isUser: false,
         imageUrl: null,
         id: aiResponseId, // 서버에서 받은 ID로 AI 메시지 ID 생성
-        timestamp: parseTs(payload.createdAt),
       });
 
     } catch (error) {

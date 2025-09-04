@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';
-import { formatDuration } from '../constants/formatDuration';
 
 function SpaDetail() {
   const navigate = useNavigate();
