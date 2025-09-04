@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -50,56 +51,81 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        String uri = request.getRequestURI();
-        String ctx = request.getContextPath();
-        String path = uri.substring(ctx.length());
+        // 경로 추출은 일관되게: getServletPath()가 혼동 적음
+        final String path = request.getServletPath();
+        final String method = request.getMethod();
 
-        log.info("JwtFilter.shouldNotFilter uri={}, ctx={}, path={}", uri, ctx, path);
+        // 1) OPTIONS는 프리플라이트라 스킵 (정상)
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            log.info("SKIP (OPTIONS) path={}", path);
+            return true;
+        }
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) return true;
-        return SKIP_PATHS.stream().anyMatch(p -> matcher.match(p, path));
+        for (String p : SKIP_PATHS) {
+            if (matcher.match(p, path)) {
+                log.info("SKIP (WHITELIST) pattern={} path={}", p, path);
+                return true;
+            }
+        }
+
+        log.info("FILTER (PROTECTED) path={}", path);
+        return false;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        final String path = req.getServletPath();
+        final boolean isPublic = SKIP_PATHS.stream().anyMatch(p -> matcher.match(p, path));
 
-        // 토큰 없으면 인증만 세팅 안하고 통과
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
+        final String authHeader = req.getHeader("Authorization");
+
+        // 보호 경로인데 토큰 자체가 없으면 바로 401
+        if (!isPublic && (authHeader == null || !authHeader.startsWith("Bearer "))) {
+            res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            res.setContentType("application/json;charset=UTF-8");
+            res.getWriter().write("{\"code\":\"A401\",\"message\":\"인증이 필요합니다.\"}");
             return;
         }
 
-        String token = authHeader.substring(7);
-        try {
-            Claims claims = jwtUtil.parseClaims(token);
+        // 토큰이 있으면 검증 시도
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            try {
+                Claims claims = jwtUtil.parseClaims(token);
 
-                String email = claims.getSubject();
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    String email = claims.getSubject();
 
-            userRepository.findByEmail(email).ifPresent(user -> {
-                String authority = user.getUserRole().getRoleName();
-
-                var auth = new UsernamePasswordAuthenticationToken(
-                        email,
-                        null,
-                        List.of(new SimpleGrantedAuthority(authority))
-                );
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                request.setAttribute("username", email);
-            });
-
+                    userRepository.findByEmail(email).ifPresent(user -> {
+                        String role = user.getUserRole().getRoleName(); // "ROLE_USER" 형태 권장
+                        var auth = new UsernamePasswordAuthenticationToken(
+                                email, null, List.of(new SimpleGrantedAuthority(role))
+                        );
+                        auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(req));
+                        SecurityContextHolder.getContext().setAuthentication(auth);
+                    });
+                }
             } catch (ExpiredJwtException e) {
-                log.debug("JWT expired: {}", e.getMessage());
-                SecurityContextHolder.clearContext();     // 익명으로 진행
+                SecurityContextHolder.clearContext();
+                if (!isPublic) {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter().write("{\"code\":\"A401\",\"message\":\"토큰이 만료되었습니다.\"}");
+                    return;
+                }
             } catch (Exception e) {
-                log.debug("Invalid JWT: {}", e.getMessage());
-                SecurityContextHolder.clearContext();     // 익명으로 진행
+                SecurityContextHolder.clearContext();
+                if (!isPublic) {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json;charset=UTF-8");
+                    res.getWriter().write("{\"code\":\"A401\",\"message\":\"유효하지 않은 토큰입니다.\"}");
+                    return;
+                }
             }
+        }
 
-        // 무조건 다음 필터로 넘기기
-        filterChain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 }
