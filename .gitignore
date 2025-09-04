@@ -38,7 +38,7 @@ build/
 application-secret.properties
 
 # uploads 폴더 무시
-uploads/
+ai_chatbot_images/
 
 # dog_images 저장 폴더 무시
 dog_images/
