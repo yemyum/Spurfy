@@ -46,14 +46,14 @@ public class ReservationController {
     }
 
     // ✅ 내 예약 리스트 조회 (마이페이지)
-    @GetMapping("/mypage/reservations")
+    @GetMapping("/my")
     public ResponseEntity<ApiResponse<List<ReservationResponseDTO>>> getMyReservations() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         List<ReservationResponseDTO> dtoList = reservationService.getMyReservations(email);
         return ResponseEntity.ok(
                 ApiResponse.<List<ReservationResponseDTO>>builder()
                         .code("S001")
-                        .message("예약 리스트 조회 성공!")
+                        .message("나의 예약 목록 조회 성공!")
                         .data(dtoList)
                         .build()
         );
