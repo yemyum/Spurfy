@@ -42,3 +42,6 @@ ai_chatbot_images/
 
 # dog_images 저장 폴더 무시
 dog_images/
+
+# 프론트 assets 폴더 무시
+/src/assets/
