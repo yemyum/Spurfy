@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import SpurfyButton from '../components/Common/SpurfyButton';
+import WelcomeDog from '../assets/WelcomeDog.png';
+import PremiumDog from '../assets/PremiumDog.png';
+import RelaxingDog from '../assets/RelaxingDog.png';
+import CalmingDog from '../assets/CalmingDog.png';
 
 function SpaList() {
   const [list, setList] = useState([]);
@@ -11,6 +15,20 @@ function SpaList() {
       .then((res) => setList(res.data.data))
       .catch(() => alert('목록 불러오기 실패'));
   }, []);
+
+  const spaImageMap = {
+    "welcome-spa": WelcomeDog,
+    "premium-brushing-spa": PremiumDog,
+    "relaxing-therapy-spa": RelaxingDog,
+    "calming-skin-spa": CalmingDog,
+  };
+
+  const spaBgColorMap = {
+    'welcome-spa': 'bg-[#FFE4EC]',
+    'premium-brushing-spa': 'bg-[#A4F0DF]',
+    'relaxing-therapy-spa': 'bg-[#FFF9D8]',
+    'calming-skin-spa': 'bg-[#E2E2FC]',
+  };
 
   return (
     <div className="w-full mx-auto select-none bg-white rounded-xl shadow-md border border-gray-200 p-8">
@@ -23,8 +41,20 @@ function SpaList() {
             className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-sky-100 transition-all duration-300 ease-in-out"
           >
             {/* 이미지 영역 */}
-            <div className="h-40 bg-gray-100 rounded mb-4 flex items-center justify-center text-gray-400">
-              이미지 준비 중
+            <div
+              className={`w-full h-[220px] sm:h-[380px] flex items-center justify-center rounded-xl mb-2
+                ${spaBgColorMap[spa.slug] || 'bg-gray-100'}`}
+            >
+              {spaImageMap[spa.slug] ? (
+                <img
+                  src={spaImageMap[spa.slug]}
+                  alt={`${spa.name} 썸네일`}
+                  className="h-full object-contain"
+                  style={{ maxWidth: "100%", maxHeight: "100%" }}
+                />
+              ) : (
+                <span className="text-gray-400">이미지 준비중</span>
+              )}
             </div>
 
             {/* 이름 + 가격 */}

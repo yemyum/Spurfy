@@ -3,6 +3,10 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';
+import welcomeSpa from '../assets/welcomeSpa.png';
+import PremiumbrushingSpa from '../assets/PremiumbrushingSpa.png';
+import RelaxingtherapySpa from '../assets/RelaxingtherapySpa.png';
+import CalmingskinSpa from '../assets/CalmingskinSpa.png';
 
 function SpaDetail() {
   const navigate = useNavigate();
@@ -17,6 +21,13 @@ function SpaDetail() {
   const [reviews, setReviews] = useState([]);
   const [averageRating, setAverageRating] = useState(0);
   const [serviceInfos, setServiceInfos] = useState([]);
+
+  const spaDetailImageMap = {
+    'welcome-spa': welcomeSpa,
+    'premium-brushing-spa': PremiumbrushingSpa,
+    'relaxing-therapy-spa': RelaxingtherapySpa,
+    'calming-skin-spa': CalmingskinSpa,
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -115,12 +126,20 @@ function SpaDetail() {
     <div className="w-full mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-6">
       <div className="flex flex-col">
         {/* 1. 스파 사진 영역 (임시) */}
-        <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">
-          이미지 준비중
+        <div className="w-full h-[220px] sm:h-[420px] bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+          {spa && spaDetailImageMap[spa.slug] ? (
+            <img
+              src={spaDetailImageMap[spa.slug]}
+              alt={`${spa.name} 상세 이미지`}
+              className="w-full h-[220px] sm:h-[420px] object-cover"
+            />
+          ) : (
+            <span className="text-gray-400">이미지 준비중</span>
+          )}
         </div>
 
         {/* 2. 이름 + 가격 */}
-        <div className="py-6">
+        <div className="py-4">
           <h2 className="text-2xl font-semibold text-spurfyBlue">{spa.name}
           </h2>
           <p className="font-semibold text-gray-800 text-lg">
