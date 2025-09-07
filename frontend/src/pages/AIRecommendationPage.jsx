@@ -191,7 +191,7 @@ const AIRecommendationPage = () => {
     <div className="w-full h-screen mx-auto bg-white flex flex-col overflow-hidden">
       {/* 1. 고정될 헤더 영역 */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center relative">
-        <h2 className="text-2xl font-bold text-spurfyAI">SPURFY AI Chat</h2>
+        <h2 className="text-2xl font-bold text-spurfyAI">Spurfy AI Chat</h2>
         {/* 오른쪽 끝 이모지 버튼 */}
         <button
           onClick={() => setSheetOpen(true)}
@@ -235,7 +235,7 @@ const AIRecommendationPage = () => {
         <form onSubmit={handleImageAnalysis} className="w-full flex items-center gap-4">
           <label htmlFor="dogImageFileInput" className="cursor-pointer">
             <input type="file" id="dogImageFileInput" accept="image/*" onChange={handleFileChange} className="hidden" />
-            <span className="p-2 rounded-full bg-[#67F3EC] text-black hover:bg-[#42e3db] transition">
+            <span className="p-2 rounded-full bg-[#67F3EC] hover:bg-[#42e3db] transition">
               <FontAwesomeIcon icon={faCamera} />
             </span>
           </label>
@@ -262,12 +262,12 @@ const AIRecommendationPage = () => {
               e.target.style.height = e.target.scrollHeight + 'px';
             }}
           ></textarea>
-          <SpurfyButton variant="chat" type="submit" className="py-2 px-4 text-sm font-semibold">
+          <button type="submit" className="py-2 px-4 bg-[#67F3EC] hover:bg-[#42e3db] text-sm rounded-lg transition font-semibold duration-300">
             전송
-          </SpurfyButton>
+          </button>
         </form>
       </div>
-      <p className="text-center bg-gray-100 pt-2 pb-1 text-[12px] leading-none text-gray-400 select-none pointer-events-none">
+      <p className="text-center bg-gray-100 pt-2 pb-1 text-[12px] leading-none text-gray-500 select-none pointer-events-none">
         스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
         스피는 아직 배우는 중이라서 답변이 정확하지 않을 수 있어요.
       </p>

@@ -69,7 +69,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
             onClick={() => onGoToSpaDetail(spaSlug)}
             className="py-2 px-3 text-sm self-start"
           >
-            해당 스파로 예약하러 가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs" />
+            추천받은 스파 보러가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs" />
           </SpurfyButton>
         )}
       </div>
