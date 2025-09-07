@@ -42,7 +42,7 @@ public class AIRecommendationService {
     private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
 
-    // ===== constants =====
+    // 견종 관련
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
     private static final String DEFAULT_AGE_GROUP = "성견";
     private static final String DEFAULT_ACTIVITY_LEVEL = "보통";
@@ -94,7 +94,7 @@ public class AIRecommendationService {
     }
 
     // AI 호출 횟수
-    private static final int MAX_DAILY_AI_CALLS = 5;  // 실제 서비스는 5번 이하로 수정해두기
+    private static final int MAX_DAILY_AI_CALLS = 10;  // 실제 서비스는 5번 이하로 수정해두기
 
     // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
     public GptSpaRecommendationResponseDTO analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {

@@ -73,7 +73,9 @@ public class GptClient {
         promptBuilder.append(commonPromptCore()).append("\n");
 
         // ✅ JSON 계약 주입 (성공 버전 → fallbackTone=false)
-        String introMessage = buildIntroForBreed(dto.getBreed());
+        String introMessage = "사진 속 아이는 **%s**(으)로 보이네요!\\n소중한 정보를 제공해주셔서 감사합니다. 😊\\n\\n"
+                .formatted(dto.getBreed());
+
         promptBuilder.append(jsonContractBlock(introMessage, /*fallbackTone*/ false));
 
         GptRequestDTO.Message message = new GptRequestDTO.Message();
@@ -162,7 +164,12 @@ public class GptClient {
                 (dto.getAgeGroup() != null && !dto.getAgeGroup().isBlank()) ||
                         (dto.getActivityLevel() != null && !dto.getActivityLevel().isBlank()) ||
                         (dto.getHealthIssues() != null && !dto.getHealthIssues().isEmpty());
-        String introMessage = buildIntroForLabels(hasUserBreed, userBreed, breedUnknown, hasUserInfo);
+
+        // 사용자 견종 선택 여부 기준으로 introMessage 분기
+        String introMessage = hasUserBreed
+                ? "보호자님께서 알려주신 견종은 **%s**(이)군요!\\n소중한 정보를 제공해주셔서 감사합니다. 😊\\n\\n".formatted(userBreed)
+                : "정확한 견종은 찾지 못했지만,\\n제공해주신 정보를 바탕으로 반려견에게 어울리는 스파를 추천해드릴게요! 😉\\n\\n";
+
         promptBuilder.append(jsonContractBlock(introMessage, /*fallbackTone*/ true));
 
         GptRequestDTO.Message message = new GptRequestDTO.Message();
@@ -259,7 +266,6 @@ public class GptClient {
 ⚠️ 아래는 강제 규칙. 하나라도 어기면 출력은 무효이며, 재요청 대상임.
 
 - "견종: ~", "추천 스파: ~"와 같은 템플릿형 요약 문장은 금지. → 자연스럽고 대화하듯 서술형 문장으로 작성할 것.
-- "견종을 알 수 없다", "알 수 없는 견종", "입력된 정보에 따르면", "제가 보기엔", "제 생각에는" 등 설명/메타 발화 금지. → 대신 아이의 인상이나 분위기 중심으로 표현할 것.
 - "추천 스파: ~", "요약: ~"처럼 '~~: ~~' 형태의 요약 문장 금지.
 - "성견이신 것 같아요", "주요 라벨", "고령견", "시니어", "old dog" 등 GPT 내부 추론 또는 연령 언급 문구 금지.
 
@@ -313,24 +319,6 @@ public class GptClient {
         b.append("- 소중한 반려견과 함께, 오늘은 특별한 스파 데이 어떠세요? 💙\n");
         b.append("- 우리 아이의 힐링 타임, 스퍼피가 언제나 함께할게요. 🐾\n");
         return b.toString();
-    }
-
-    private static String buildIntroForBreed(String breed) {
-        if (breed != null && !breed.isBlank()) {
-            return "사진 속 아이는 **%s**(으)로 보이네요!\\n소중한 정보를 제공해주셔서 감사합니다. 😊\\n\\n".formatted(breed);
-        }
-        return "제공해주신 정보들을 바탕으로\\n반려견에게 알맞은 스파를 추천해드릴게요! 😉\\n\\n";
-    }
-
-    private static String buildIntroForLabels(boolean hasUserBreed, String userBreed,
-                                              boolean breedUnknown, boolean hasUserInfo) {
-        if (hasUserBreed) {
-            return "보호자님께서 알려주신 견종은 **%s**(이)군요!\\n소중한 정보를 제공해주셔서 감사합니다. 😊\\n\\n".formatted(userBreed);
-        } else if (breedUnknown && !hasUserInfo) {
-            return "정확한 견종 정보를 확인하지 못했어요. 😢\\n하지만 걱정 마세요! 스피가 최적의 스파를 추천해드릴게요. 🤩\\n\\n";
-        } else {
-            return "제공해주신 정보들을 바탕으로\\n반려견에게 알맞은 스파를 추천해드릴게요! 😉\\n\\n";
-        }
     }
 
 }
