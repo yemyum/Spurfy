@@ -23,8 +23,8 @@ function MyReviewList() {
 
   return (
     <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 조회</h2>
-      <h2 className="text-xl font-bold mb-6">내가 작성한 리뷰 리스트</h2>
+      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 내역</h2>
+      <h2 className="text-xl font-bold mb-6">내가 작성한 리뷰 목록</h2>
 
       {isLoading ? (
         null
@@ -34,7 +34,7 @@ function MyReviewList() {
         reviews.map((r) => (
           <div
             key={r.reviewId}
-            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-md shadow-sm cursor-pointer hover:bg-blue-50 break-words"
+            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-50 break-words"
             onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
           >
             <h3

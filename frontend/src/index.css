@@ -20,7 +20,7 @@
 
 @layer base {
   body {
-    @apply font-body;
+    @apply font-body font-medium;
   }
 }
 

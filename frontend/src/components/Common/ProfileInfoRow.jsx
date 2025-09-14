@@ -7,17 +7,17 @@ function ProfileInfoRow({ label, value, isEditing, editedValue, onEditChange, ty
     }
     return (
         <div>
-            <label className="block text-gray-800 font-semibold mb-2">{label}</label>
+            <label className="block mb-2">{label}</label>
             {isEditing && onEditChange ? (
                 <input
                     type={type}
-                    className="appearance-none w-full text-gray-900 leading-tight focus:outline-none mb-2"
+                    className="appearance-none w-full leading-tight focus:outline-none mb-2"
                     value={editedValue}
                     onChange={(e) => onEditChange(e.target.value)}
                     readOnly={label === "이메일"} // 이메일은 readOnly로 고정
                 />
             ) : (
-                <p className={`text-lg ${label === "이메일" ? "text-gray-400" : "text-gray-900"}`}>{value}</p>
+                <p className={`text-lg ${label === "이메일" ? "text-gray-400" : "text-gray-800"}`}>{value}</p>
             )}
         </div>
     );

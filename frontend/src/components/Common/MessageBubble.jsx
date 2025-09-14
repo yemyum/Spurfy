@@ -31,27 +31,23 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
   const resolvedSrc = useMemo(() => toAbs(imageUrl), [imageUrl]);
 
   if (isUser) {
-    // 디버그: 이미지가 안 보이면 이 로그로 src 확인
-    if (imageUrl) console.log('MessageBubble user image:', { imageUrl, resolvedSrc });
-
     return (
-      <div className="flex items-start flex-row-reverse gap-2">
+      <div className="flex flex-col items-end gap-2">
+        {/* 이미지: 말풍선 밖 */}
+        {resolvedSrc && (
+          <div className="w-80 h-80 overflow-hidden rounded-md">
+            <img
+              src={resolvedSrc}
+              alt="사용자가 첨부한 사진"
+              className="w-full h-full object-cover"
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </div>
+        )}
+
+        {/* 텍스트 말풍선 */}
         <div className={`max-w-[70%] p-4 flex flex-col ${bubbleClasses} relative`}>
-
-          {/* 사진 영역 */}
-          {resolvedSrc && (
-            <div className="w-52 h-52 mb-2 overflow-hidden rounded-md">
-              <img
-                src={resolvedSrc}
-                alt="사용자가 첨부한 사진"
-                className="w-full h-full object-cover"
-                loading="lazy"
-                onError={(e) => { e.currentTarget.style.display = 'none'; }}
-              />
-            </div>
-          )}
-
-          {/* 텍스트 영역 */}
           {text && <div className="whitespace-pre-wrap">{text}</div>}
         </div>
       </div>
@@ -67,9 +63,9 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
           <SpurfyButton
             variant="primary"
             onClick={() => onGoToSpaDetail(spaSlug)}
-            className="py-2 px-3 text-sm self-start"
+            className="py-2 px-4 text-sm self-start"
           >
-            추천받은 스파 보러가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs" />
+            추천받은 스파 보러가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs ml-4" />
           </SpurfyButton>
         )}
       </div>

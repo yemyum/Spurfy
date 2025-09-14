@@ -100,7 +100,7 @@ function SpaDetail() {
 
     // 2) 로그인은 됐는데 필수값 누락
     if (!selectedDogId || !date || !time) {
-      alert('강아지, 날짜, 시간을 모두 선택해주세요!');
+      alert('날짜, 시간, 반려견을 모두 선택해주세요!');
       return;
     }
 

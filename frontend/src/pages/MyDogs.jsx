@@ -80,9 +80,9 @@ function MyDogs() {
 
                 {/* ⭐ 2. 중간: 강아지 정보 영역 - flex-grow로 남은 공간 다 차지 ⭐ */}
                 <div className="flex-grow flex flex-col mt-1">
-                  <h3 className="font-semibold text-lg">{dog.name}</h3>
-                  <p>견종: {dog.breed}</p>
-                  <p>성별: {dog.gender === 'M' ? '남아' : '여아'}</p>
+                  <h3 className="font-semibold text-xl">{dog.name}</h3>
+                  <p>견종 : {dog.breed}</p>
+                  <p>성별 : {dog.gender === 'M' ? '남아' : '여아'}</p>
                 </div>
               </div>
 

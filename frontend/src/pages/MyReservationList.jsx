@@ -94,7 +94,7 @@ function MyReservationList() {
   return (
     <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 내역</h2>
-      <h2 className="text-xl font-bold mb-6">나의 예약 리스트</h2>
+      <h2 className="text-xl font-bold mb-6">나의 예약 목록</h2>
 
       {/* 1. 아직 데이터를 불러오지 않았다면 (API 요청 중) 아무것도 렌더링하지 않음 */}
       {isLoading ? (
@@ -129,7 +129,7 @@ function MyReservationList() {
               <div> {/* 서비스명 */}
                 <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
                 {/* 날짜, 가격 */}
-                <p className="text-gray-500 text-sm mb-4">예약날짜: {r.reservationDate} {r.reservationTime}</p>
+                <p className="text-gray-500 text-sm mb-4">예약날짜 : {r.reservationDate} {r.reservationTime}</p>
                 <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
               </div>
             </div>

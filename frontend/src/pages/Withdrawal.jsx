@@ -54,19 +54,19 @@ function Withdrawal() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-20 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
-      <h2 className="text-2xl font-semibold mb-16 mt-4 text-center">회원 탈퇴</h2>
+    <div className="max-w-4xl mx-auto mt-4 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
+      <h2 className="text-4xl font-bold mb-20 mt-4 text-center">회원 탈퇴</h2>
 
       <form onSubmit={handleWithdrawalSubmit}> {/* 폼 제출 시 handleWithdrawalSubmit 실행 */}
         {/* 비밀번호 입력 필드 */}
         <div className="mb-4">
-          <label htmlFor="password" className="block font-semibold mb-2">
+          <label htmlFor="password" className="block text-lg text-gray-600 mb-2">
             비밀번호 확인
           </label>
           <input
             type="password"
             id="password"
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+            className="w-full p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required // 비밀번호는 여전히 필수
@@ -78,13 +78,13 @@ function Withdrawal() {
         </div>
 
         {/* 탈퇴 사유 선택/입력 필드 */}
-        <div className="mb-4">
-          <label htmlFor="reason" className="block font-semibold mb-2">
-            탈퇴 사유 (선택 사항)
+        <div className="mb-2">
+          <label htmlFor="reason" className="block text-lg text-gray-600 mb-2">
+            탈퇴 사유 (선택사항)
           </label>
           <select
             id="reason"
-            className="w-full p-2 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 mb-2"
+            className="w-full p-2 py-3 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 mb-2"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           >
@@ -96,7 +96,7 @@ function Withdrawal() {
           {/* '기타 (직접 입력)' 옵션이 선택되면 텍스트 에리어 보여주기 */}
           {reason === "기타 (직접 입력)" && (
             <textarea
-              className="appearance-none border border-gray-300 rounded w-full px-3 py-3 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-100"
+              className="appearance-none border border-gray-200 rounded-md w-full px-3 py-3 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-100"
               placeholder="기타 사유를 입력해주세요. (최대 100자)"
               maxLength={100}
               value={otherReason}
@@ -104,7 +104,7 @@ function Withdrawal() {
             />
           )}
         </div>
-        <div className="border border-gray-200 bg-gray-100 p-4 rounded-md mb-4 max-h-48 overflow-y-auto">
+        <div className="border border-gray-200 bg-gray-50 p-4 rounded-md mb-4 max-h-48 overflow-y-auto">
           <p className="font-semibold text-gray-700 mb-2">회원 탈퇴 약관 및 유의사항</p>
           <ul className="list-disc list-inside text-sm text-gray-500">
             <li>탈퇴 시, 회원님의 개인정보 및 이용 기록은 즉시 삭제됩니다.</li>
@@ -131,11 +131,11 @@ function Withdrawal() {
         </div>
 
         {/* 버튼들: 취소 및 탈퇴하기 */}
-        <div className="flex justify-between pt-4">
+        <div className="flex justify-between pt-6">
           <button
             type="button" // 폼 제출이 아닌 일반 버튼
             onClick={() => navigate(-1)} // 이전 페이지로 돌아가기
-            className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"
+            className="px-6 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"
           >
             취소
           </button>

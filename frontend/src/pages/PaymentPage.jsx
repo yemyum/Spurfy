@@ -79,7 +79,7 @@ function PaymentPage() {
             <span className="font-semibold">{reservation.dogName}</span>
           </div>
           <div className="flex justify-between mb-2 text-lg">
-            <span>예약 일시</span>
+            <span>이용 일시</span>
             <span className="font-semibold">{reservation.reservationDate} {reservation.reservationTime}</span>
           </div>
           <div className="border-t-2 my-4 pt-4 flex justify-between mb-2 text-lg">
