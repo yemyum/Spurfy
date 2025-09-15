@@ -46,7 +46,6 @@ RESTful API + JWT 기반 인증
 - `POST /api/users/signup`: 회원가입
 - `POST /api/reservations`: 예약 생성
 - `PATCH /api/reservations/{id}/cancel`: 예약 취소
-- `POST /api/admin/services`: 관리자 서비스 등록
 
 ---
 
