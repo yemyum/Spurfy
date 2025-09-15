@@ -140,87 +140,89 @@ function MyReservationDetail() {
     <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 상세</h2>
 
-      <div className="border-2 border-gray-100 py-5 rounded-xl shadow-sm bg-white mb-6 relative">
+      <div className="border-2 border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6 relative">
         <span
           className={`absolute top-4 right-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusLabel[reservation.reservationStatus]?.tagClass || 'bg-red-100 text-red-500'}`}
         >
           {statusLabel[reservation.reservationStatus]?.text || reservation.reservationStatus}
         </span>
-        <div className="pb-4 mb-4 border-b-2 border-gray-100 px-6">
+        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
           <p className="text-xl font-semibold">
             <span className="text-gray-500">예약번호 | </span>
             <span className="text-lg font-medium">{reservation.reservationId}</span>
           </p>
         </div>
 
-        <div className="pb-2 mb-4 border-b-2 border-gray-100 px-6">
-          <p className="mb-4">
-            <span className="text-gray-500">스파 서비스명 : </span>
-            <span>{reservation.serviceName}</span>
-          </p>
-          <p className="mb-4">
-            <span className="text-gray-500">이용 날짜 : </span>
-            {reservation.reservationDate} {reservation.reservationTime}
-          </p>
-          <p className="mb-2">
-            <span className="text-gray-500">반려견 : </span>
-            <span>{reservation.dogName}</span>
-          </p>
-        </div>
-        {/* 결제 수단 (paymentMethod) */}
-        <div className="grid grid-cols-2 gap-x-8 mb-2 px-6">
-          {reservation.paymentMethod && ( // paymentMethod 값이 있을 때만 표시
+        <div className="px-6">
+          <div className="pb-2 mb-4 border-b-2 border-gray-200">
             <p className="mb-4">
-              <span className="text-gray-500">결제 수단 : </span>
-              <span>{paymentMethodLabel[reservation.paymentMethod] || reservation.paymentMethod}</span>
+              <span className="text-gray-500">스파 서비스명 : </span>
+              <span>{reservation.serviceName}</span>
             </p>
-          )}
-          {reservation.createdAt && (
             <p className="mb-4">
-              <span className="text-gray-500">결제 일시 : </span>
-              <span>{formatKoreanDateTime(reservation.createdAt)}</span>
+              <span className="text-gray-500">이용 날짜 : </span>
+              {reservation.reservationDate} {reservation.reservationTime}
             </p>
-          )}
-          {/* 기존 가격 (서비스 자체의 정가) */}
-          <p className="mb-2">
-            <span className="text-gray-500">서비스 금액 : </span>
-            <span>{reservation.price ? reservation.price.toLocaleString() : "정보 없음"}원</span>
-          </p>
-          {/* 실제 결제 금액과 결제 수단 */}
-          {/* 실제 결제 금액 (amount) */}
-          {reservation.amount !== null && reservation.amount !== undefined && ( // amount 값이 있을 때만 표시
             <p className="mb-2">
-              <span className="text-gray-500">결제 금액 : </span>
-              <span className="font-semibold text-spurfyBlue">{reservation.amount.toLocaleString()}원</span>
+              <span className="text-gray-500">반려견 : </span>
+              <span>{reservation.dogName}</span>
             </p>
-          )}
-        </div>
-        {(reservation.cancelReason || reservation.refundStatus !== 'NONE' || reservation.refundedAt) && (
-          <div className="pt-4 mb-4 px-6 border-t-2 border-gray-100">
-            {reservation.cancelReason && (
+          </div>
+          {/* 결제 수단 (paymentMethod) */}
+          <div className="grid grid-cols-2 gap-x-8 mb-2">
+            {reservation.paymentMethod && ( // paymentMethod 값이 있을 때만 표시
               <p className="mb-4">
-                <span className="text-gray-500">취소 사유 : </span>
-                <span>{reservation.cancelReason}</span>
+                <span className="text-gray-500">결제 수단 : </span>
+                <span>{paymentMethodLabel[reservation.paymentMethod] || reservation.paymentMethod}</span>
               </p>
             )}
-            {/* 환불 정보 */}
-            {reservation.refundStatus && reservation.refundStatus !== "NONE" && (
+            {reservation.createdAt && (
               <p className="mb-4">
-                <span className="text-gray-500">환불 상태 : </span>
-                <span className="font-semibold">{refundStatusLabel[reservation.refundStatus] || reservation.refundStatus}</span>
+                <span className="text-gray-500">결제 일시 : </span>
+                <span>{formatKoreanDateTime(reservation.createdAt)}</span>
               </p>
             )}
-            {reservation.refundedAt && (
+            {/* 기존 가격 (서비스 자체의 정가) */}
+            <p className="mb-2">
+              <span className="text-gray-500">서비스 금액 : </span>
+              <span>{reservation.price ? reservation.price.toLocaleString() : "정보 없음"}원</span>
+            </p>
+            {/* 실제 결제 금액과 결제 수단 */}
+            {/* 실제 결제 금액 (amount) */}
+            {reservation.amount !== null && reservation.amount !== undefined && ( // amount 값이 있을 때만 표시
               <p className="mb-2">
-                <span className="text-gray-500">환불 일시 : </span>
-                <span>{formatKoreanDateTime(reservation.refundedAt)}</span>
+                <span className="text-gray-500">결제 금액 : </span>
+                <span className="font-semibold text-spurfyBlue">{reservation.amount.toLocaleString()}원</span>
               </p>
             )}
           </div>
-        )}
+          {(reservation.cancelReason || reservation.refundStatus !== 'NONE' || reservation.refundedAt) && (
+            <div className="pt-4 mb-4 border-t-2 border-gray-200">
+              {reservation.cancelReason && (
+                <p className="mb-4">
+                  <span className="text-gray-500">취소 사유 : </span>
+                  <span>{reservation.cancelReason}</span>
+                </p>
+              )}
+              {/* 환불 정보 */}
+              {reservation.refundStatus && reservation.refundStatus !== "NONE" && (
+                <p className="mb-4">
+                  <span className="text-gray-500">환불 상태 : </span>
+                  <span className="font-semibold">{refundStatusLabel[reservation.refundStatus] || reservation.refundStatus}</span>
+                </p>
+              )}
+              {reservation.refundedAt && (
+                <p className="mb-2">
+                  <span className="text-gray-500">환불 일시 : </span>
+                  <span>{formatKoreanDateTime(reservation.refundedAt)}</span>
+                </p>
+              )}
+            </div>
+          )}
+        </div>
 
         {/* 세 번째 섹션: 버튼들 */}
-        <div className="flex justify-between pt-5 px-6 border-t-2 border-gray-100">
+        <div className="flex justify-between px-6 pt-5 border-t-2 border-gray-200">
           <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition duration-300"

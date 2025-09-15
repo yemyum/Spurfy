@@ -105,7 +105,7 @@ function ReviewWrite() {
           value={form.content}
           onChange={(e) => setForm({ ...form, content: e.target.value })}
         ></textarea>
-        <button className="w-full px-2 py-2 mt-2 mb-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white hover:bg-gray-50 transition duration-300">
+        <button className="w-full px-2 py-2 mt-2 mb-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white">
           <FontAwesomeIcon icon={faCamera} /> 사진 첨부하기
         </button>
 

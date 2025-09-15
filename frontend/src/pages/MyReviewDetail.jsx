@@ -108,8 +108,8 @@ function MyReviewDetail() {
     <div className="mx-auto p-8 select-none">
       <div className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 관리</div>
 
-      <div className="border-2 border-gray-100 py-5 rounded-xl shadow-sm bg-white mb-6">
-        <div className="pb-4 mb-4 border-b-2 border-gray-100 px-6">
+      <div className="border-2 border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6">
+        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
         <h3 className='text-xl font-semibold'>{reviewDetail.serviceName}</h3>
         <p className='text-lg font-semibold'>{reviewDetail.price}원</p>
         <p className='text-gray-400'>{reviewDetail.dogName} | 작성일 {reviewDetail.createdAt}</p>
@@ -128,7 +128,7 @@ function MyReviewDetail() {
         {/* 리뷰 내용 */}
         {isEditing ? (
           <textarea
-            className="w-full p-2 border-2 border-gray-100 rounded-lg mt-2 min-h-24 resize-y focus:outline-none"
+            className="w-full p-2 border-2 border-gray-200 rounded-lg mt-2 min-h-24 resize-y focus:outline-none"
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             rows="5"
@@ -141,7 +141,7 @@ function MyReviewDetail() {
         {/* 이미지 URL 입력 */}
         {isEditing && (
           <div className="mt-2 mb-2">
-            <button className="w-full px-2 py-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white hover:bg-blue-50 transition duration-300">
+            <button className="w-full px-2 py-2 text-spurfyBlue font-semibold rounded-md shadow-sm border-2 border-blue-200 bg-white">
               <FontAwesomeIcon icon={faCamera} /> 사진 첨부하기
             </button>
           </div>
@@ -174,7 +174,7 @@ function MyReviewDetail() {
         )}
 
         {/* 버튼 */}
-        <div className="mt-6 flex justify-between pt-5 px-6 border-t-2 border-gray-100">
+        <div className="mt-6 flex justify-between pt-5 px-6 border-t-2 border-gray-200">
           {isEditing ? (
             <>
               <button onClick={handleCancelEdit} className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300">취소</button>

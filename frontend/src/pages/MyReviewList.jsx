@@ -34,7 +34,7 @@ function MyReviewList() {
         reviews.map((r) => (
           <div
             key={r.reviewId}
-            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-50 break-words"
+            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 break-words"
             onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
           >
             <h3
@@ -53,7 +53,7 @@ function MyReviewList() {
               {r.serviceName}
             </h3>
 
-            <p className="text-sm text-gray-400">작성일: {r.createdAt}</p>
+            <p className="text-sm text-gray-400">작성일 : {r.createdAt}</p>
             <p className="mt-2 text-gray-800">{r.content}</p>
 
             <div className="flex flex-wrap gap-2 mt-4">

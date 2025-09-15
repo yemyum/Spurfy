@@ -116,7 +116,7 @@ function MyReservationList() {
         reservations.map((r) => (
           <div
             key={r.reservationId}
-            className="w-full border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-50 flex items-stretch gap-4"
+            className="w-full border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex items-stretch gap-4"
             onClick={() => handleItemClick(r.reservationId)}
           >
             {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
@@ -129,7 +129,7 @@ function MyReservationList() {
               <div> {/* 서비스명 */}
                 <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
                 {/* 날짜, 가격 */}
-                <p className="text-gray-500 text-sm mb-4">예약날짜 : {r.reservationDate} {r.reservationTime}</p>
+                <p className="text-gray-400 text-sm mb-4">예약날짜 : {r.reservationDate} {r.reservationTime}</p>
                 <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
               </div>
             </div>

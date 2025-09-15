@@ -62,9 +62,9 @@ function DogDetail() {
     <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 정보</h2>
 
-      <div className="border-2 border-gray-100 py-6 rounded-xl shadow-sm bg-white mb-6">
+      <div className="border-2 border-gray-200 py-6 rounded-xl shadow-sm bg-white mb-6">
 
-        <div className="pb-4 mb-4 border-b-2 border-gray-100 px-6">
+        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
           <h2 className="text-xl font-semibold">
             <span className="text-2xl font-bold">
               "{dog.name}"
@@ -102,7 +102,7 @@ function DogDetail() {
           </div>
         </div>
 
-        <div className="flex justify-between mt-6 pt-5 px-6 border-t-2 border-gray-100">
+        <div className="flex justify-between mt-6 pt-5 px-6 border-t-2 border-gray-200">
           <SpurfyButton variant='danger'
             onClick={handleDelete}
             className="px-4 py-2"

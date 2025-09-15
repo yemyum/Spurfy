@@ -63,7 +63,7 @@ function MyDogs() {
           {dogs.map((dog) => (
             <li key={dog.dogId}
               onClick={() => navigate(`/mypage/dogs/${dog.dogId}`)}
-              className="border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-blue-50 flex flex-col gap-4">
+              className="border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex flex-col gap-4">
               {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
               <div className="flex items-stretch gap-4">
                 <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">

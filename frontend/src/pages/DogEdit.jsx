@@ -133,7 +133,7 @@ function DogEdit() {
   return (
     <div className="mx-auto p-8 select-none">
       <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 정보 수정</h2>
-      <form onSubmit={handleSubmit} className="w-full border-2 border-gray-100 p-8 rounded-xl shadow-sm bg-white mb-6 break-words">
+      <form onSubmit={handleSubmit} className="w-full border-2 border-gray-200 p-8 rounded-xl shadow-sm bg-white mb-6 break-words">
 
         <div className="flex flex-col md:flex-row">
           <div className="flex flex-col flex-shrink-0 w-full md:w-64 mb-6 md:mb-0 md:mr-6">
@@ -159,7 +159,7 @@ function DogEdit() {
             
             <button
               type="button"
-              className="w-56 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border border-gray-200 bg-white"
+              className="w-56 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border-2 border-gray-200 bg-white"
               onClick={handleEditImageClick}
             >
               <FontAwesomeIcon icon={faCamera} className="mr-2" />사진 편집하기
@@ -168,7 +168,7 @@ function DogEdit() {
 
           <div className="flex-grow">
             <div className="space-y-6">
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">이름</label>
                 <input
                   type="text"
@@ -177,12 +177,12 @@ function DogEdit() {
                   value={form.name}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                   placeholder="반려견 이름"
                 />
               </div>
 
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="breed" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">견종</label>
                 <select
                   id="breed"
@@ -190,9 +190,9 @@ function DogEdit() {
                   value={form.breed}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 >
-                  <option value="">견종을 선택하세요</option>
+                  <option value="">견종을 선택하세요.</option>
                   {BREED_OPTIONS.map((breed) => (
                     <option key={breed} value={breed}>
                       {breed}
@@ -201,7 +201,7 @@ function DogEdit() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="birthDate" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">생일</label>
                 <input
                   type="date"
@@ -210,11 +210,11 @@ function DogEdit() {
                   value={form.birthDate}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="gender" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">성별</label>
                 <select
                   id="gender"
@@ -222,9 +222,9 @@ function DogEdit() {
                   value={form.gender}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 >
-                  <option value="">성별을 선택하세요</option>
+                  <option value="">성별을 선택하세요.</option>
                   {GENDER_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -233,7 +233,7 @@ function DogEdit() {
                 </select>
               </div>
 
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="weight" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">몸무게</label>
                 <input
                   type="number"
@@ -244,7 +244,7 @@ function DogEdit() {
                   value={form.weight}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 />
               </div>
             </div>
@@ -254,11 +254,11 @@ function DogEdit() {
               <textarea
                 id="notes"
                 name="notes"
-                placeholder="특이사항 (알레르기, 습관, 주의할 점 등)"
+                placeholder="(알레르기, 습관, 주의할 점 등)"
                 value={form.notes}
                 onChange={handleChange}
                 rows={5}
-                className="w-full p-2 border-2 border-gray-100 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-gray-100"
+                className="w-full p-2 border-2 border-gray-200 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-gray-100"
               />
             </div>
           </div>
