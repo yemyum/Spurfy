@@ -55,7 +55,7 @@ public class AiRecommendHistoryService {
             closing = jsonNode.has("closing") ? jsonNode.get("closing").asText() : null;
             spaSlug = jsonNode.has("spaSlug") ? jsonNode.get("spaSlug").asText() : null;
 
-            // spaDescription은 배열일 수 있으니 특별히 처리
+            // spaDescription은 배열이라 특별히 처리
             if (jsonNode.has("spaDescription") && jsonNode.get("spaDescription").isArray()) {
                 for (JsonNode descNode : jsonNode.get("spaDescription")) {
                     spaDescription.add(descNode.asText());

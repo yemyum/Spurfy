@@ -11,6 +11,10 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.AiRecommendHistoryRepository;
 import com.example.oyl.repository.SpaServiceRepository;
+import com.example.oyl.util.ChecklistParser;
+import com.example.oyl.util.ChecklistResult;
+import com.example.oyl.util.ImageStorageUtil;
+import com.example.oyl.util.TextUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,12 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Slf4j
@@ -36,22 +35,15 @@ public class AIRecommendationService {
     private final AiRecommendHistoryRepository aiRecommendHistoryRepository;
     private final SpaServiceRepository spaServiceRepository;
     private final ObjectMapper objectMapper;
-
-    // 파일 업로드
-    private static final String AI_CHATBOT_IMAGE_DIRECTORY = "ai_chatbot_images";
-    private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
-    private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
+    private final ImageStorageUtil imageStorageUtil;
 
     // 견종 관련
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
-    private static final String DEFAULT_AGE_GROUP = "성견";
-    private static final String DEFAULT_ACTIVITY_LEVEL = "보통";
 
     private static final List<String> BANNED_LABELS = List.of(
             "clothes", "costume", "pet supply", "clothing", "supply"
     );
     private static final float DOG_OBJECT_MIN_SCORE = 0.6f;
-    private static final String AI_IMAGE_BASE_PATH = "/api/images/";
 
     // 라벨 도메인 신호(개/견 관련, 속성 관련)
     private static final List<String> POSITIVE_LABEL_HINTS = List.of(
@@ -60,7 +52,6 @@ public class AIRecommendationService {
             "small","medium","large","소형","중형","대형"
     );
 
-    // ===== tiny utils (only what we actually use) =====
     private static String norm(String s) { return s == null ? "" : s.trim(); }
 
     // Vision unknown 판정: 상수/한글/영문 변형 커버
@@ -73,24 +64,6 @@ public class AIRecommendationService {
         if (compact.contains("알수없는")) return true;
 
         return t.contains("unknown") || t.contains("unidentified");
-    }
-
-    private static String truncate(String s, int max) {
-        if (s == null) return null;
-        return s.length() <= max ? s : s.substring(0, max) + "...(truncated)";
-    }
-
-    @SuppressWarnings("unchecked")
-    private static java.util.List<String> safeGetList(Object v) {
-        if (v instanceof java.util.List<?> l) {
-            return l.stream()
-                    .filter(java.util.Objects::nonNull)
-                    .map(String::valueOf)
-                    .map(String::trim)
-                    .filter(x -> !x.isEmpty())
-                    .toList(); // 자바 17 OK
-        }
-        return java.util.List.of();
     }
 
     // AI 호출 횟수
@@ -115,40 +88,9 @@ public class AIRecommendationService {
         }
 
 
-        // ✅ 이미지 파일을 서버에 저장하는 로직 시작
-        if (dogImageFile.getSize() > MAX_FILE_SIZE) {
-            throw new CustomException(ErrorCode.FILE_SIZE_LIMIT_EXCEEDED,
-                    "파일 크기는 50MB를 초과할 수 없습니다.");
-        }
-
-        Path uploadPath = Paths.get(AI_CHATBOT_IMAGE_DIRECTORY).toAbsolutePath().normalize();
-        String savedFileName;
-
-        try {
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            String originalFileName = dogImageFile.getOriginalFilename();
-            String fileExtension = "";
-            int dotIndex = originalFileName.lastIndexOf('.');
-
-            if (dotIndex > 0) {
-                fileExtension = originalFileName.substring(dotIndex);
-                originalFileName = originalFileName.substring(0, dotIndex);
-            }
-
-            savedFileName = originalFileName + "_" +
-                    LocalDateTime.now().format(DateTimeFormatter.ofPattern(IMAGE_FILE_NAME_FORMAT)) + fileExtension;
-
-            Path filePath = uploadPath.resolve(savedFileName);
-            Files.copy(dogImageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            log.info("이미지 저장 완료 → {}", filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new CustomException(ErrorCode.INTERNAL_ERROR, "파일 저장 중 오류 발생: " + e.getMessage());
-        }
+        // ✅ 파일 저장
+        String savedFileName = imageStorageUtil.save(dogImageFile);
+        final String imageUrlForHistory = "/api/images/" + savedFileName;
 
 
         // ✅ Google Vision API를 호출하여 이미지 분석하는 로직 시작
@@ -172,20 +114,20 @@ public class AIRecommendationService {
 
             // 1) 강아지 여부 1차 필터 : "강아지가 맞는가?" (라벨 보조) -> !isDog()일 때 예외
             if (!visionResult.isDog()) {
-                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속에서 반려견을 찾지 못했어요. AI가 헷갈리지 않도록 반려견의 정면이 잘 보이는 사진으로 다시 부탁드릴게요!");
+                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속에서 반려견을 찾지 못했어요. AI가 헷갈리지 않도록 반려견의 정면이 잘 보이는 사진으로 다시 부탁드려요!");
             }
 
-            // 2) 객체탐지 결과로 마릿수 판단
+            // 2) 객체탐지 결과로 마릿수 판단, 0.6 이상 점수인 것만 카운트
             long dogBoxCount = Optional.ofNullable(visionResult.getObjects())
                     .orElse(List.of())
                     .stream()
                     .filter(o -> o.getName() != null && o.getName().equalsIgnoreCase("Dog"))
-                    .filter(o -> o.getScore() == null || o.getScore() >= DOG_OBJECT_MIN_SCORE) // ← 0.6f 상수 쓰기
+                    .filter(o -> o.getScore() == null || o.getScore() >= DOG_OBJECT_MIN_SCORE)
                     .count();
 
             log.info("객체탐지 Dog 박스 수: {}", dogBoxCount);
 
-            // 2-1) 보조 규칙: ban 라벨 제거(+원본 케이스 유지)
+            // 2-1) 라벨 중 금지어 제거
             visionLabels = Optional.ofNullable(visionResult.getLabels()).orElse(List.of())
                     .stream()
                     .map(l -> l.getDescription())
@@ -214,7 +156,6 @@ public class AIRecommendationService {
             log.warn("Vision 분석 실패 → {}", e.getMessage());
 
             // 실패 기록 저장
-            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             AiRecommendHistory history = AiRecommendHistory.builder()
                     .userId(userEmail)
                     .imageUrl(imageUrlForHistory)
@@ -235,59 +176,22 @@ public class AIRecommendationService {
 
 
         // ✅ 사용자 체크리스트를 파싱하고 GPT에 전달할 최종 값 결정하는 로직 시작
-        // Checklist에서 파싱할 정보들
-        String userSelectedBreed = null;
-        String userSelectedAgeGroup = DEFAULT_AGE_GROUP; // "성견"을 상수로 대체
-        String userSelectedActivityLevel = DEFAULT_ACTIVITY_LEVEL; // "보통"을 상수로 대체
-        List<String> userSelectedHealthIssues = new ArrayList<>(); // 사용자 선택 건강 문제
+        ChecklistResult checklistResult = ChecklistParser.parse(checklist);
 
-        log.info("[Checklist] raw(len={}): {}", checklist == null ? 0 : checklist.length(), truncate(checklist, 500));
+        String userSelectedBreed = checklistResult.breed;
+        String userSelectedAgeGroup = checklistResult.ageGroup;
+        String userSelectedActivityLevel = checklistResult.activityLevel;
+        List<String> userSelectedHealthIssues = checklistResult.healthIssues;
 
-        if (checklist != null && !checklist.trim().isEmpty()) {
-            try {
-                Map<String, Object> parsedChecklist = objectMapper.readValue(checklist, Map.class);
-                log.info("[Checklist] parsed: {}", parsedChecklist);
-
-                String v;
-
-                v = (String) parsedChecklist.get("selectedBreed");
-                if (v != null && !v.isBlank() && !"선택 안 함".equals(v)) {
-                    userSelectedBreed = v.trim();
-                }
-
-                v = (String) parsedChecklist.get("ageGroup");
-                if (v != null && !v.isBlank()) {
-                    userSelectedAgeGroup = v.trim();
-                }
-
-                v = (String) parsedChecklist.get("activityLevel");
-                if (v != null && !v.isBlank()) {
-                    userSelectedActivityLevel = v.trim();
-                }
-
-                Object hiObj = parsedChecklist.get("healthIssues");
-                if (hiObj instanceof List<?> l && !l.isEmpty()) {
-                    userSelectedHealthIssues = l.stream()
-                            .filter(Objects::nonNull)
-                            .map(String::valueOf)
-                            .map(String::trim)
-                            .filter(s -> !s.isEmpty())
-                            .toList(); // 자바 17 OK
-                }
-
-            } catch (IOException e) {
-                log.error("체크리스트 JSON 파싱 실패: {}", checklist, e);
-            }
-        }
         log.info("[Checklist] decided → breed='{}', age='{}', act='{}', issues={}",
                 userSelectedBreed, userSelectedAgeGroup, userSelectedActivityLevel,
                 userSelectedHealthIssues == null ? 0 : userSelectedHealthIssues.size());
 
 
-        // ✅ Vision 자체가 유효한가? (먼저 계산)
+        // ✅ Vision이 뱉은 견종이 "모름(unknown)"이 아니면 가능
         boolean visionBreedUsable = !isUnknownBreed(detectedBreed);
 
-        // ✅ 견종: Vision 결과가 유효하면 우선, 아니면 사용자 선택
+        // ✅ Vision > 사용자 선택 > 모름 순서로 우선권
         String finalBreedToUse;
         if (visionBreedUsable) {
             finalBreedToUse = norm(detectedBreed);               // Vision 우선
@@ -302,15 +206,16 @@ public class AIRecommendationService {
         String finalAgeGroupToUse = norm(userSelectedAgeGroup);
         String finalActivityLevelToUse = norm(userSelectedActivityLevel);
 
-        // 3) 건강 이슈: 사용자 선택 입력만 사용
+        // 3) 건강 이슈: 사용자 선택 입력만 사용, 없으면 빈 리스트
         List<String> finalHealthIssuesToUse =
                 new ArrayList<>(Optional.ofNullable(userSelectedHealthIssues).orElse(List.of()));
 
         // 4) 보조 필드
-        String finalAdjActivity = toAdjective(finalActivityLevelToUse); // "활발함" → "활발한"
+        // 활동성 형용사화
+        String finalAdjActivity = TextUtils.toAdjective(finalActivityLevelToUse);
         String breedForPrompt = finalBreedToUse; // 재선언 금지: 위에서 hasUsableBreed 이미 계산됨
 
-        // 5) 로그 최소화
+        // 5) GPT 호출 전에 지금 뭐 들고 있는지
         log.info("[GPT-IN] breed='{}'(usable={}), age='{}', act='{}', issues={}",
                 breedForPrompt, hasUsableBreed, finalAgeGroupToUse, finalAdjActivity, finalHealthIssuesToUse);
 
@@ -324,7 +229,6 @@ public class AIRecommendationService {
         // AI가 견종도 모르겠고, 다른 강아지 관련 단서(라벨)도 못 찾았을 때 : "강아지 사진은 맞는데, 내가 추천을 해줄 만큼 정보가 충분한지?"
         if (!hasUsableBreed && !labelsUsable) {
             log.info("GPT 차단: breed/labels 부적합 → 안내만 반환");
-            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             return GptSpaRecommendationResponseDTO.createFailureResponse(
                     "사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
             );
@@ -340,14 +244,13 @@ public class AIRecommendationService {
                     finalHealthIssuesToUse != null ? finalHealthIssuesToUse.size() : 0);
 
             // Vision API 결과에 따라 다른 GPT 클라이언트를 호출
-            if (!visionBreedUsable) { // Vision unknown → 라벨 기반(추천스파 by labels)
+            if (!visionBreedUsable) { // Vision이 견종 모름 → 라벨 기반 GPT 호출
                 log.info("Calling gptClient.recommendSpaByLabels...");
 
-                // (보너스 안전망) 라벨 비었으면 여기서도 한번 더 컷
+                // Vision도 모름 + 라벨 단서도 없음 -> 실패 처리
                 if (!labelsUsable) {
 
                     // 실패 기록 저장
-                    final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
                     AiRecommendHistory history = AiRecommendHistory.builder()
                             .userId(userEmail)
                             .imageUrl(imageUrlForHistory)
@@ -378,7 +281,7 @@ public class AIRecommendationService {
 
                 spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto);
 
-            } else {  // 견종 확정됨 → 견종 기반
+            } else {  // Vision이 견종 확정 → 견종 기반 GPT 호출
                 log.info("Calling gptClient.recommendSpa...");
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
                         .breed(detectedBreed)
@@ -393,16 +296,16 @@ public class AIRecommendationService {
                 spaRecommendationDto = gptClient.recommendSpa(request);
             }
 
-            // 3) 널 가드
+            // 3) 널 가드 (GPT가 응답을 안 준 경우)
             if (spaRecommendationDto == null) {
                 throw new CustomException(ErrorCode.GPT_RECOMMENDATION_FAILED,
                         "AI 추천 결과를 가져오지 못했어요. 잠시 후 다시 시도해주세요.");
             }
 
-            // 4) spaSlug 보정 (DB lookup)
+            // 4) spaSlug 보정 (DB lookup, GPT가 slug를 안줬다면 DB에서 찾아 채움)
             Optional.ofNullable(spaRecommendationDto).ifPresent(dto -> {
                 if (dto.getSpaSlug() == null && dto.getSpaName() != null) {
-                    String cleanSpaName = normalizeSpaName(dto.getSpaName());
+                    String cleanSpaName = TextUtils.normalizeSpaName(dto.getSpaName());
                     spaServiceRepository.findByName(cleanSpaName).ifPresent(spa ->
                             dto.setSpaSlug(spa.getSlug())
                     );
@@ -410,18 +313,20 @@ public class AIRecommendationService {
             });
 
             // 5) 출력 문구 후처리 (중복 수식어 정리)
-            spaRecommendationDto.setIntro(dedupeKo(spaRecommendationDto.getIntro()));
-            spaRecommendationDto.setCompliment(dedupeKo(spaRecommendationDto.getCompliment()));
-            spaRecommendationDto.setRecommendationHeader(dedupeKo(spaRecommendationDto.getRecommendationHeader()));
-            spaRecommendationDto.setSpaName(dedupeKo(spaRecommendationDto.getSpaName()));
+            spaRecommendationDto.setIntro(TextUtils.dedupeKo(spaRecommendationDto.getIntro()));
+            spaRecommendationDto.setCompliment(TextUtils.dedupeKo(spaRecommendationDto.getCompliment()));
+            spaRecommendationDto.setRecommendationHeader(TextUtils.dedupeKo(spaRecommendationDto.getRecommendationHeader()));
+            spaRecommendationDto.setSpaName(TextUtils.dedupeKo(spaRecommendationDto.getSpaName()));
+
             if (spaRecommendationDto.getSpaDescription() != null) {
                 spaRecommendationDto.setSpaDescription(
                         spaRecommendationDto.getSpaDescription().stream()
-                                .map(this::dedupeKo)
+                                .map(TextUtils::dedupeKo)
                                 .toList()
                 );
             }
-            spaRecommendationDto.setClosing(dedupeKo(spaRecommendationDto.getClosing()));
+
+            spaRecommendationDto.setClosing(TextUtils.dedupeKo(spaRecommendationDto.getClosing()));
 
         } catch (Exception e) {
             log.error("예상치 못한 GPT 호출 실패", e);
@@ -435,7 +340,6 @@ public class AIRecommendationService {
 
         // ✅ AI 추천 기록을 DB에 저장하는 로직 시작
         try {
-            final String imageUrlForHistory = AI_IMAGE_BASE_PATH + savedFileName;
             spaRecommendationDto.setImageUrl(imageUrlForHistory); // 프론트로 보낼 URL
 
             AiRecommendHistory history = AiRecommendHistory.builder()
@@ -465,29 +369,6 @@ public class AIRecommendationService {
         }
 
         return spaRecommendationDto; // 그대로 반환
-    }
-
-    // 활동성 어미 정규화: 활발함→활발한, 차분함→차분한
-    private String toAdjective(String s) {
-        if (s == null) return "";
-        return s.replaceAll("함$", "한");
-    }
-
-    // 한국어 중복 수식어 제거: "활발하고 활발한" → "활발한"
-    private String dedupeKo(String text) {
-        if (text == null) return null;
-        text = text.replaceAll("([가-힣]+)\\s*하고\\s*\\1(한|인|함)", "$1$2");
-        text = text.replaceAll("([가-힣]+)\\s*하고\\s*\\1\\b", "$1");
-        text = text.replaceAll("(\\b[가-힣]+)\\s+\\1(한|인|함)?", "$1$2");
-        return text;
-    }
-
-    // spaName 정리: 마크다운/이모지/따옴표/끝맺음 표현/여러 공백 제거
-    private String normalizeSpaName(String raw) {
-        if (raw == null) return null;
-        return raw.replaceAll("(\\*\\*|[🧘‍♀️🌸🛁🌿]|\"|에?요!?)", "")
-                .replaceAll("\\s+", " ")
-                .trim();
     }
 
 }

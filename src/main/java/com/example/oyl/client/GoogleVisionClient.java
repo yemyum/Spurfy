@@ -50,7 +50,7 @@ public class GoogleVisionClient {
         return compact.contains("알수없는");
     }
 
-    // === 임계값/상수 ===
+    // 임계값/상수
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
 
     // 라벨 필터용: 범주/배경/엉뚱 키워드(부분일치 기준, 공백 무시/소문자 비교)
@@ -68,10 +68,9 @@ public class GoogleVisionClient {
         labelFeature.setType("LABEL_DETECTION");
         labelFeature.setMaxResults(50); // 넉넉히
 
-        // 3) 객체 로컬라이제이션(마릿수/박스용) 추가
+        // 3) 객체 탐지 요청
         GoogleVisionRequestDTO.Request.Feature objectFeature = new GoogleVisionRequestDTO.Request.Feature();
         objectFeature.setType("OBJECT_LOCALIZATION");
-        // objectFeature는 maxResults 불필요
 
         // 4) 요청 조립: features에 두 개를 함께 넣기
         GoogleVisionRequestDTO.Request request = new GoogleVisionRequestDTO.Request();
@@ -91,8 +90,8 @@ public class GoogleVisionClient {
                 .bodyValue(body)
                 .retrieve()
                 .bodyToMono(GoogleVisionResponseDTO.class)
-                .timeout(java.time.Duration.ofSeconds(6))            // ★ 추가: 6초 타임아웃
-                .retryWhen(reactor.util.retry.Retry.fixedDelay(2,    // ★ (선택) 2회 재시도
+                .timeout(java.time.Duration.ofSeconds(6))            // 6초 타임아웃
+                .retryWhen(reactor.util.retry.Retry.fixedDelay(2,    // 2회 재시도
                                 java.time.Duration.ofMillis(200))
                         .filter(ex -> ex instanceof org.springframework.web.reactive.function.client.WebClientRequestException)
                 )
@@ -106,7 +105,7 @@ public class GoogleVisionClient {
 
             GoogleVisionResponseDTO response = analyzeImage(base64Image);
 
-            // --- NPE 가드: 응답/라벨/오브젝트 ---
+            // 구글에서 응답이 없으면 바로 에러
             var responses = Optional.ofNullable(response.getResponses()).orElse(List.of());
             if (responses.isEmpty()) {
                 throw new RuntimeException("Vision 응답 비어있음");
@@ -115,7 +114,7 @@ public class GoogleVisionClient {
             var labels = Optional.ofNullable(res.getLabelAnnotations()).orElse(List.of());
             var objs   = Optional.ofNullable(res.getLocalizedObjectAnnotations()).orElse(List.of());
 
-            // --- 개 존재 여부(라벨 기준; 점수 없으면 0으로 간주) ---
+            // 점수 0.7 이상 있으면 “강아지 맞음” 판정
             boolean isDogDetected = labels.stream().anyMatch(label -> {
                 String d = norm(label.getDescription());                 // 소문자+공백제거
                 Float scObj = label.getScore();                          // Vision은 Float/float
@@ -125,7 +124,7 @@ public class GoogleVisionClient {
                         && sc >= 0.7f;
             });
 
-            // --- 객체 탐지 결과 매핑 ---
+            // 객체 탐지 결과 매핑
             List<VisionAnalysisResult.DetectedObject> mappedObjects = objs.stream()
                     .map(o -> {
                         VisionAnalysisResult.DetectedObject v = new VisionAnalysisResult.DetectedObject();
@@ -134,7 +133,7 @@ public class GoogleVisionClient {
                         return v;
                     }).toList();
 
-            // --- 품종 라벨 추출(정규화 + 부분일치 금지어 + 점수 임계) ---
+            // 품종 라벨 추출(정규화 + 부분일치 금지어 + 점수 임계)
             Optional<GoogleVisionResponseDTO.Response.LabelAnnotation> detectedBreedLabel = labels.stream()
                     // 1) 점수 높은 순으로 정렬
                     .sorted(Comparator.comparing(GoogleVisionResponseDTO.Response.LabelAnnotation::getScore).reversed())
