@@ -18,7 +18,7 @@ public class SpaService {
 
     @Id
     @Column(name = "service_id")
-    private String serviceId; // ex: spa_001
+    private String serviceId;
 
     private String name;
     private String description;

@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -16,8 +17,8 @@ import java.time.LocalDate;
 public class Dog {
 
     @Id
-    @Column(name = "dog_id")
-    private String dogId; // ex: dog_001
+    @Column(name = "dog_id", length = 36)
+    private String dogId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

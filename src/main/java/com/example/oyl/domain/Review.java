@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Review {
 
     @Id
-    @Column(name = "review_id")
+    @Column(name = "review_id", length = 36)
     private String reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)

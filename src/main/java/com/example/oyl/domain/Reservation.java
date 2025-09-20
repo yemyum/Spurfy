@@ -16,6 +16,7 @@ import java.time.LocalTime;
 public class Reservation {
 
     @Id
+    @Column(name = "reservation_id", length = 36)
     private String reservationId;
 
     @ManyToOne
