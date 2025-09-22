@@ -35,7 +35,8 @@ build/
 ### 민감 정보 (.env, DB 설정 등) ###
 .env
 .env.*
-application-secret.properties
+application-secret-local.properties
+application-secret-prod.properties
 
 # uploads 폴더 무시
 ai_chatbot_images/
