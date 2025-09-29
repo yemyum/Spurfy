@@ -1,9 +1,4 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
+# IDE 및 빌드 도구 설정
 ### STS ###
 .apt_generated
 .classpath
@@ -14,10 +9,13 @@ target/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
+
+### VS Code ###
+.vscode/
 
 ### NetBeans ###
 /nbproject/private/
@@ -25,30 +23,30 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+### Maven/Gradle 빌드 결과물 제외 (중복 제거) ###
+/target/
+/build/
+*.jar
+*.war
 
-### 민감 정보 (.env, DB 설정 등) ###
+# Maven Wrapper 제외 규칙
+HELP.md
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# 민감 정보
 .env
 .env.*
 application-secret-local.properties
 application-secret-prod.properties
 
-# uploads 폴더 무시
+# 백엔드/프론트엔드에서 생성하는 업로드/임시 폴더 무시
 ai_chatbot_images/
-
-# dog_images 저장 폴더 무시
 dog_images/
 
-# 프론트 assets 폴더 무시
+# 프론트엔드 빌드 결과 및 Node modules 무시 (Vite + React 기준)
+frontend/node_modules/
+frontend/dist/ 
 frontend/src/assets/
-
-# 빌드 결과물 제외
-*.jar
-*.war
-/build/
-/target/
