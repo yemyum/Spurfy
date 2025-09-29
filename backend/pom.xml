@@ -56,6 +56,14 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- 개발 편의성 (핫 리로드 등) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- 테스트 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
