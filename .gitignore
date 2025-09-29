@@ -46,3 +46,9 @@ dog_images/
 
 # 프론트 assets 폴더 무시
 frontend/src/assets/
+
+# 빌드 결과물 제외
+*.jar
+*.war
+/build/
+/target/
