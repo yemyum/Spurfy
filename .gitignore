@@ -41,6 +41,7 @@ HELP.md
 .env.*
 application-secret-local.properties
 application-secret-prod.properties
+/secrets/
 
 # 백엔드/프론트엔드에서 생성하는 업로드/임시 폴더 무시
 ai_chatbot_images/
@@ -48,5 +49,5 @@ dog_images/
 
 # 프론트엔드 빌드 결과 및 Node modules 무시 (Vite + React 기준)
 frontend/node_modules/
-frontend/dist/ 
+frontend/dist/
 frontend/src/assets/
