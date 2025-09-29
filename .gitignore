@@ -25,8 +25,8 @@
 /.nb-gradle/
 
 ### Maven/Gradle 빌드 결과물 제외 (중복 제거) ###
-/target/
-/build/
+target/
+build/
 *.jar
 *.war
 
