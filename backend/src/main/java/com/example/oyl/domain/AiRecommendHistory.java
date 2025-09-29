@@ -2,7 +2,6 @@ package com.example.oyl.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.apache.jasper.util.UniqueAttributesImpl;
 
 import java.time.LocalDateTime;
 

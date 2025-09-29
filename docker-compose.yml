@@ -1,14 +1,16 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: ./backend
     env_file:
       - ./backend/.env
     volumes:
       - ./secrets:/app/secrets
+      - C:/Users/smile/IdeaProjects/Spurfy/ai_chatbot_images:/app/images/ai-chatbot
+      - C:/Users/smile/IdeaProjects/Spurfy/dog_images:/app/images/dog
+
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
@@ -19,6 +21,12 @@ services:
       - spurfy_data:/var/lib/mysql
     ports:
       - "3306:3306"
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u$$MYSQL_USER", "-p$$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5    
 
 volumes:
   spurfy_data:

@@ -56,30 +56,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- JSP 지원 -->
-		<dependency>
-			<groupId>org.apache.tomcat.embed</groupId>
-			<artifactId>tomcat-embed-jasper</artifactId>
-		</dependency>
-
-		<!-- JSTL -->
-		<dependency>
-			<groupId>jakarta.servlet.jsp.jstl</groupId>
-			<artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.web</groupId>
-			<artifactId>jakarta.servlet.jsp.jstl</artifactId>
-		</dependency>
-
-		<!-- 개발 편의성 (핫 리로드 등) -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
-			<optional>true</optional>
-		</dependency>
-
 		<!-- 테스트 -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -132,12 +108,6 @@
 			<groupId>com.google.cloud</groupId>
 			<artifactId>google-cloud-vision</artifactId>
 			<version>3.64.0</version>
-		</dependency>
-		<!-- Google Cloud Core (Vision API가 의존하는 기본 라이브러리) -->
-		<dependency>
-			<groupId>com.google.cloud</groupId>
-			<artifactId>google-cloud-core</artifactId>
-			<version>2.58.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
