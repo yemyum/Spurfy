@@ -5,8 +5,8 @@ services:
       - ./backend/.env
     volumes:
       - ./secrets:/app/secrets
-      - C:/Users/smile/IdeaProjects/Spurfy/ai_chatbot_images:/app/images/ai-chatbot
-      - C:/Users/smile/IdeaProjects/Spurfy/dog_images:/app/images/dog
+      - spurfy_ai_images:/app/images/ai-chatbot
+      - spurfy_dog_images:/app/images/dog
 
     depends_on:
       db:
