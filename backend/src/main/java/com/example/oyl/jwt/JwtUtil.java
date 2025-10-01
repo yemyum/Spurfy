@@ -8,6 +8,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,17 +22,21 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private final Key key;
-    private final long accessExpSeconds;
-    private final long refreshExpDays;
+    // 💡 추가: 설정 파일에서 'jwt.secret-key' 값을 주입받을 필드
+    @Value("${jwt.secret-key}")
+    private String secretKeyString;
 
-    public JwtUtil(
-            @Value("${jwt.access-exp-seconds}") long accessExpSeconds,
-            @Value("${jwt.refresh-exp-days}") long refreshExpDays
-    ) {
-        this.key = Keys.hmacShaKeyFor("my-super=secret-key-for-jwt-encoding!!".getBytes(StandardCharsets.UTF_8));
-        this.accessExpSeconds = accessExpSeconds;
-        this.refreshExpDays = refreshExpDays;
+    private Key key;
+
+    @Value("${jwt.access-exp-seconds}")
+    private long accessExpSeconds;
+
+    @Value("${jwt.refresh-exp-days}")
+    private long refreshExpDays;
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
     }
 
     // 토큰 발급
@@ -61,10 +66,9 @@ public class JwtUtil {
     }
 
     // 검증/파싱
-    // 유효하지 않으면 CustomException 던짐 (리프레시 검증에 그대로 사용)
     public void validateTokenOrThrow(String token) {
         try {
-            parseClaims(token); // 파싱 성공 = 유효
+            parseClaims(token);
         } catch (JwtException e) {
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
