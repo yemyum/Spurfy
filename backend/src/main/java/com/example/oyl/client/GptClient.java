@@ -185,9 +185,15 @@ public class GptClient {
     // GPT 응답을 파싱하고 최종 문자열로 포맷
     private GptSpaRecommendationResponseDTO parseAndFormatGptResponse(String gptRawResponse) {
         log.info("Received raw GPT response: {}", gptRawResponse);
+        String cleanedJson = gptRawResponse.trim();
+
         try {
-            // 전처리 단계
-            String cleanedJson = gptRawResponse.trim();
+            // 1-1. ASCII 제어 문자 제거 (NULL, Tab, LF, CR 등)
+            cleanedJson = cleanedJson.replaceAll("[\\x00-\\x1F\\x7F]", "");
+
+            // 1-2. 문자열 내의 이스케이프 안된 줄바꿈을 이스케이프된 줄바꿈으로 대체
+            // GPT 응답에서 'spaDescription' 같은 배열 요소 안에 \n이 들어가는 것을 방지
+            cleanedJson = cleanedJson.replace("\r", "\\r").replace("\n", "\\n");
 
             //  파서의 백틱 처리 보강
             if (cleanedJson.startsWith("```")) {
@@ -217,16 +223,12 @@ public class GptClient {
         } catch (Exception e) {
             log.error("GPT 응답 JSON 파싱 또는 포맷팅 실패: {}", gptRawResponse, e);
 
-            // 파싱 실패 시 기본 오류 메시지를 담은 DTO 반환
-            GptSpaRecommendationResponseDTO errorResponse = new GptSpaRecommendationResponseDTO();
-            errorResponse.setIntro("죄송해요! 스파 추천 정보를 처리하는 데 문제가 발생했어요.");
-            errorResponse.setCompliment("조금 뒤에 다시 시도해 주세요!");
-            errorResponse.setRecommendationHeader("");
-            errorResponse.setSpaName("");
-            errorResponse.setSpaSlug("");
-            errorResponse.setSpaDescription(List.of());
-            errorResponse.setClosing("");
-            return errorResponse;
+            // (3개 인자 함수 호출)
+            return GptSpaRecommendationResponseDTO.createFailureResponse(
+                    "죄송해요! 스파 추천 정보를 처리하는 데 문제가 발생했어요.",
+                    null,
+                    "JSON_PARSE_ERROR"
+            );
         }
     }
 

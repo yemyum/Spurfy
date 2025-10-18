@@ -22,15 +22,26 @@ public class GptSpaRecommendationResponseDTO {
     private String errorMessage;
     private String reasonCode;   // (옵션) "MULTI_DOG", "NO_DOG" 등
 
-    // imageUrl도 받도록 함수를 수정
     public static GptSpaRecommendationResponseDTO createFailureResponse(String errorMessage, String imageUrl) {
+        return createFailureResponse(errorMessage, imageUrl, "VISION_RULE");
+    }
+
+    public static GptSpaRecommendationResponseDTO createFailureResponse(String errorMessage, String imageUrl, String reasonCode) {
         GptSpaRecommendationResponseDTO res = new GptSpaRecommendationResponseDTO();
+
+        // 성공 시 필드들은 비워두거나 null 처리
         res.setIntro(null);
         res.setCompliment(null);
-        // 에러 메시지는 'errorMessage'에 담아서 보냄
+        res.setRecommendationHeader(null);
+        res.setSpaName(null);
+        res.setSpaSlug(null);
+        res.setSpaDescription(List.of());
+        res.setClosing(null);
+
+        // 에러 관련 필드에 값 할당
         res.setErrorMessage(errorMessage);
-        res.setImageUrl(imageUrl); // imageUrl을 DTO에 포함
-        res.setReasonCode("VISION_RULE");
+        res.setImageUrl(imageUrl);
+        res.setReasonCode(reasonCode);
         return res;
     }
 }

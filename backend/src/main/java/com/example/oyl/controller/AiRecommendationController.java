@@ -10,10 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -24,6 +21,36 @@ import org.springframework.web.multipart.MultipartFile;
 public class AiRecommendationController {
 
     private final AIRecommendationService dogImageService;
+
+    @GetMapping("/call-count")
+    public ResponseEntity<ApiResponse<Integer>> getAiCallCount() {
+        try {
+            // 1. 현재 로그인된 유저의 이메일을 가져옴
+            String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+            // 2. 서비스에서 오늘 호출 횟수를 가져옴
+            int todayCount = dogImageService.getTodayAiCallCount(userEmail);
+
+            // 3. 성공 응답으로 횟수를 리턴
+            return ResponseEntity.ok(
+                    ApiResponse.<Integer>builder()
+                            .code("S005")
+                            .message("AI 추천 호출 횟수 조회 완료")
+                            .data(todayCount)
+                            .build()
+            );
+
+        } catch (Exception e) {
+            log.error("AI 호출 횟수 조회 중 예상치 못한 오류 발생", e);
+            return ResponseEntity.internalServerError().body(
+                    ApiResponse.<Integer>builder()
+                            .code("E998")
+                            .message("AI 호출 횟수 조회에 실패했습니다.")
+                            .data(0)
+                            .build()
+            );
+        }
+    }
 
     @PostMapping
     public ResponseEntity<ApiResponse<GptSpaRecommendationResponseDTO>> uploadDogImages(

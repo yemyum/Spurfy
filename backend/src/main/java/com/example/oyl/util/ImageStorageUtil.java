@@ -2,6 +2,7 @@ package com.example.oyl.util;
 
 import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,12 @@ import java.time.format.DateTimeFormatter;
 public class ImageStorageUtil {
     private static final String IMAGE_FILE_NAME_FORMAT = "yyyyMMdd_HHmmssSSS";
     private static final long MAX_FILE_SIZE = 50 * 1024 * 1024;
-    private static final String DIRECTORY = "ai_chatbot_images";
+
+    private final String uploadDir;
+
+    public ImageStorageUtil(@Value("${ai-chatbot.upload-dir}") String uploadDir) {
+        this.uploadDir = uploadDir;
+    }
 
     public String save(MultipartFile file) {
         if (file.getSize() > MAX_FILE_SIZE) {
@@ -25,7 +31,7 @@ public class ImageStorageUtil {
         }
 
         try {
-            Path uploadPath = Paths.get(DIRECTORY).toAbsolutePath().normalize();
+            Path uploadPath = Paths.get(this.uploadDir).toAbsolutePath().normalize();
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }

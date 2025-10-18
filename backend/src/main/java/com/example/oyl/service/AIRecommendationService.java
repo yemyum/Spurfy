@@ -65,8 +65,20 @@ public class AIRecommendationService {
         return t.contains("unknown") || t.contains("unidentified");
     }
 
+    public int getTodayAiCallCount(String userEmail) {
+        // analyzeAndRecommendSpa와 동일한 로직으로 오늘 날짜 범위 설정
+        LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
+
+        // Repository를 사용해 오늘 횟수 조회
+        long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetween(userEmail, startOfDay, endOfDay);
+
+        // 서비스 로직을 그대로 재활용하는 것이 핵심!
+        return (int) todayCount;
+    }
+
     // AI 호출 횟수
-    private static final int MAX_DAILY_AI_CALLS = 10;  // 실제 서비스는 5번 이하로 수정해두기
+    private static final int MAX_DAILY_AI_CALLS = 3;  // 실제 서비스는 5번 이하로 수정해두기
 
     // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
     public GptSpaRecommendationResponseDTO analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {
@@ -142,7 +154,7 @@ public class AIRecommendationService {
             if (dogBoxCount > 1 || (dogBoxCount == 0 && pluralSignal)) {
                 throw new CustomException(
                         ErrorCode.INVALID_INPUT,
-                        "여러 마리의 반려견이 감지되었어요. AI가 정확하게 인식할 수 있도록 한 마리의 반려견 정면이 담긴 단독 사진으로 다시 올려주세요!"
+                        "여러 마리의 반려견이 감지되었어요. 한 마리의 반려견 정면이 담긴 단독 사진이여야 정확한 추천이 가능해요!"
                 );
             }
 
