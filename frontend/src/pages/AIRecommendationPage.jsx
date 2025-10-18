@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axios";
 import MessageBubble from "../components/Common/MessageBubble";
 import ChecklistDrawer from "../components/Common/ChecklistDrawer";
-import SpurfyButton from "../components/Common/SpurfyButton";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faListCheck } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faListCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { formatAiMessage, sanitizeText } from "../utils/formatAiMessage";
 
 import { useChatHistory } from "../hooks/useChatHistory";
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 import { useChecklist } from "../hooks/useChecklist";
+import { useAiCallLimit } from '../hooks/useAiCallLimit';
 
 const AIRecommendationPage = () => {
   const navigate = useNavigate();
@@ -20,6 +20,12 @@ const AIRecommendationPage = () => {
   const [freeTextQuestion, setFreeTextQuestion] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+
+  const {
+    isLimitExceeded,
+    MAX_DAILY_CALLS,
+    checkAndUpdateLimit
+  } = useAiCallLimit(); // 훅 호출!
 
   // 대화/체크리스트 훅
   const { chatMessages, isLoading, addMessage, replaceMessage, removeMessage } = useChatHistory();
@@ -71,6 +77,12 @@ const AIRecommendationPage = () => {
     event.preventDefault();
     console.log("전송 버튼 눌림");
     setErrorMessage("");
+
+    // 전송 버튼이 비활성화 상태면 바로 종료 (클릭 방지)
+    if (isLimitExceeded) {
+      alert(`하루 AI 대화 횟수(${MAX_DAILY_CALLS}회)를 초과했습니다. 내일 다시 시도해주세요!`);
+      return;
+    }
 
     const payloadChecklist = hasAnySelection ? toPayload() : null;
 
@@ -131,6 +143,8 @@ const AIRecommendationPage = () => {
         id: aiResponseId, // 서버에서 받은 ID로 AI 메시지 ID 생성
       });
 
+      await checkAndUpdateLimit();
+
     } catch (error) {
       let msg = "이미지 분석 요청 중 오류가 발생했습니다!";
       const apiMsg = error.response?.data?.message;
@@ -142,8 +156,18 @@ const AIRecommendationPage = () => {
       const payloadId = error.response?.data?.data?.id;
       const serverImg = error.response?.data?.data?.imageUrl;
 
-      // ✅ 6. 오류 응답을 받으면 메시지 처리
-      if (payloadId) {
+      if (apiCode === 'CONVERSATION_LIMIT_EXCEEDED') {
+        // 횟수 초과 에러일 경우:
+        msg = `하루 AI 대화 횟수(${MAX_DAILY_CALLS}회)를 초과했습니다. 내일 다시 시도해주세요!`;
+
+        removeMessage(userTempId);
+
+        alert(msg); // ⭐️⭐️⭐️ 중요: 여기서 함수 실행을 완전히 끝내서 아래 코드가 실행되지 않게 막기!
+
+        return;
+
+        // ✅ 6. 오류 응답을 받으면 메시지 처리
+      } else if (payloadId) {
         // 서버 응답에 ID가 있을 때: 임시 유저 메시지를 서버 ID로 교체
         // ✅ 오류 응답 시 필요한 ID를 상수로 빼내기
         const userPromptId = `prompt-${payloadId}`;
@@ -224,7 +248,7 @@ const AIRecommendationPage = () => {
           ))
         ) : (
           <p className="text-center text-gray-500 p-20 empty-hint">
-            AI 챗봇과 대화를 시작해보세요!
+            스퍼피의 AI 어시스턴트, <span className="font-semibold">"스피"</span>와 대화를 시작해보세요!
           </p>
         )}
         <div ref={messagesEndRef} />
@@ -235,8 +259,8 @@ const AIRecommendationPage = () => {
         <form onSubmit={handleImageAnalysis} className="w-full flex items-center gap-4">
           <label htmlFor="dogImageFileInput" className="cursor-pointer">
             <input type="file" id="dogImageFileInput" accept="image/*" onChange={handleFileChange} className="hidden" />
-            <span className="p-2 rounded-full bg-[#67F3EC] hover:bg-[#42e3db] transition">
-              <FontAwesomeIcon icon={faCamera} />
+            <span className="pl-2 bg-transparent text-gray-600">
+              <FontAwesomeIcon icon={faCamera} size="lg" />
             </span>
           </label>
           {selectedFile && (
@@ -246,7 +270,7 @@ const AIRecommendationPage = () => {
                 alt="미리보기"
                 className="w-14 h-14 rounded-xl object-cover border border-gray-200 shadow-sm"
               />
-              <button type="button" onClick={() => setSelectedFile(null)} className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-black rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition">
+              <button type="button" onClick={() => setSelectedFile(null)} className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-gray-400 rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition">
                 ✕
               </button>
             </div>
@@ -262,14 +286,23 @@ const AIRecommendationPage = () => {
               e.target.style.height = e.target.scrollHeight + 'px';
             }}
           ></textarea>
-          <button type="submit" className="py-2 px-4 bg-[#67F3EC] hover:bg-[#42e3db] text-sm rounded-lg transition font-semibold duration-300">
-            전송
+          <button
+            type="submit"
+            disabled={isLimitExceeded}
+            className={`
+              pr-2
+
+              ${isLimitExceeded
+                ? 'text-gray-400 cursor-not-allowed bg-transparent'
+                : 'text-[#67F3EC] bg-transparent'}
+                `}>
+            <FontAwesomeIcon icon={faPaperPlane} size="lg" />
           </button>
         </form>
       </div>
       <p className="text-center bg-gray-100 pt-2 pb-1 text-[12px] leading-none text-gray-500 select-none pointer-events-none">
         스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
-        스피는 아직 배우는 중이라서 답변이 정확하지 않을 수 있어요.
+        스피는 아직 배우는 중이라 답변이 정확하지 않을 수 있어요.
       </p>
 
       <ChecklistDrawer
