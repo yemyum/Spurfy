@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,11 +24,13 @@ public class AiRecommendHistoryService {
 
     public List<AiRecommendHistoryResponseDTO> getUserRecommendationHistory(String userId) {
 
-        // 1. 레포지를 통해 DB에서 AiRecommendHistory 엔티티 리스트를 가져오기
-        List<AiRecommendHistory> histories = aiRecommendHistoryRepository.findByUserId(userId);
+        // 🌟 1. 3일 전 시점 계산 (여기 숫자만 바꾸면 7일, 5일 등으로 변경 가능!)
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
 
-        // 2. 필터링 없이 모든 엔티티를 DTO 리스트로 변환!
-        // ✅ 모든 엔티티를 DTO로 변환하되, 에러가 있어도 DTO 자체는 생성하도록 수정!
+        // 🌟 2. 레포지를 통해 3일 이후의 데이터만 가져오기
+        List<AiRecommendHistory> histories = aiRecommendHistoryRepository.findByUserIdAndCreatedAtAfter(userId, threeDaysAgo);
+
+        // 3. 필터링된 엔티티를 DTO 리스트로 변환!
         return histories.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

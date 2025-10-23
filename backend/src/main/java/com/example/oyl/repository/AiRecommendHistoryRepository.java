@@ -17,4 +17,7 @@ public interface AiRecommendHistoryRepository extends JpaRepository<AiRecommendH
     // DB 정리용
     List<AiRecommendHistory> findByImageUrl(String imageUrl);
 
+    // 3일치 기록 조회
+    List<AiRecommendHistory> findByUserIdAndCreatedAtAfter(String userId, LocalDateTime createdAt);
+
 }
