@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @PreAuthorize("isAuthenticated()")
 public class AiRecommendationController {
 
-    private final AIRecommendationService dogImageService;
+    private final AIRecommendationService aiRecommendationService;
 
     @GetMapping("/call-count")
     public ResponseEntity<ApiResponse<Integer>> getAiCallCount() {
@@ -29,7 +29,7 @@ public class AiRecommendationController {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
 
             // 2. 서비스에서 오늘 호출 횟수를 가져옴
-            int todayCount = dogImageService.getTodayAiCallCount(userEmail);
+            int todayCount = aiRecommendationService.getTodayAiCallCount(userEmail);
 
             // 3. 성공 응답으로 횟수를 리턴
             return ResponseEntity.ok(
@@ -84,7 +84,7 @@ public class AiRecommendationController {
 
         try {
             String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-            GptSpaRecommendationResponseDTO result = dogImageService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
+            GptSpaRecommendationResponseDTO result = aiRecommendationService.analyzeAndRecommendSpa(dogImageFile, userEmail, checklist, question);
 
             // 정상 추천일 때만 성공 메시지
             return ResponseEntity.ok(

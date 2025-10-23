@@ -29,13 +29,12 @@ public class ImageCleanupScheduler {
 
     // 생성자에서 값 세팅!
     public ImageCleanupScheduler(
-            @Value("${app.image.retention-hours:1h}") String retentionDurationRaw, // String으로 받아야 함!!
+            @Value("${app.image.retention-ms:2592000000}") long retentionMs,
             @Value("${ai-chatbot.upload-dir:ai_chatbot_images}") String aiChatbotUploadRaw,
             @Value("${app.image.api-base-url:/api/images/}") String imageApiBaseUrl,
             AiRecommendHistoryRepository aiRecommendHistoryRepository
     ) throws IOException {
-        // String → Duration으로 직접 변환
-        this.imageRetentionDuration = parseDuration(retentionDurationRaw);
+        this.imageRetentionDuration = Duration.ofMillis(retentionMs);
         this.uploadPath = Paths.get(aiChatbotUploadRaw).toAbsolutePath().normalize();
         this.aiRecommendHistoryRepository = aiRecommendHistoryRepository; // 주입받은 객체 저장
         this.imageApiBaseUrl = imageApiBaseUrl; // 주입받은 객체 저장

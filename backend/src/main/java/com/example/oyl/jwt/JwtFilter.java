@@ -99,7 +99,7 @@ public class JwtFilter extends OncePerRequestFilter {
                     String email = claims.getSubject();
 
                     userRepository.findByEmail(email).ifPresent(user -> {
-                        String role = user.getUserRole().getRoleName(); // "ROLE_USER" 형태 권장
+                        String role = user.getUserRole().getRoleName();
                         var auth = new UsernamePasswordAuthenticationToken(
                                 email, null, List.of(new SimpleGrantedAuthority(role))
                         );

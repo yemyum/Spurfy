@@ -28,7 +28,7 @@ public class ReservationServiceImpl implements ReservationService {
     private final PaymentRepository paymentRepository;
     private final ReviewRepository reviewRepository;
 
-    // 예약+결제 동시 (이전과 동일, 여기는 수정 안 함)
+    // 예약+결제 동시
     @Override
     public ReservationResponseDTO reserveAndPay(ReservationPaymentRequestDTO dto, String userEmail) {
         try {
@@ -56,7 +56,7 @@ public class ReservationServiceImpl implements ReservationService {
             }
             // 요청 DTO의 amount와 실제 서비스 가격이 일치하는지 확인하는 로직 추가 가능
             if (BigDecimal.valueOf(servicePrice).compareTo(BigDecimal.valueOf(dto.getAmount())) != 0) {
-                throw new CustomException(ErrorCode.INVALID_INPUT); // 금액 불일치 예외 처리 (선택 사항)
+                throw new CustomException(ErrorCode.INVALID_INPUT); // 금액 불일치 예외 처리
             }
 
             LocalDate date = LocalDate.parse(dto.getReservationDate());
