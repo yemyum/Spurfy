@@ -4,7 +4,7 @@ import MessageBubble from "../components/Common/MessageBubble";
 import ChecklistDrawer from "../components/Common/ChecklistDrawer";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCamera, faListCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faXmark, faListCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 import { formatAiMessage, sanitizeText } from "../utils/formatAiMessage";
 
 import { useChatHistory } from "../hooks/useChatHistory";
@@ -233,77 +233,108 @@ const AIRecommendationPage = () => {
 
       {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
       <div className="flex-1 min-h-[120px] bg-gray-50 overflow-y-auto p-6 flex flex-col space-y-2">
-        {isLoading ? (
-          null
-        ) : chatMessages.length > 0 ? (
-          chatMessages.map((m) => (
-            <MessageBubble
-              key={m.id}
-              text={m.text}
-              isUser={m.isUser}
-              imageUrl={m.imageUrl ?? m.image_url ?? null}
-              spaSlug={m.spaSlug}
-              onGoToSpaDetail={handleGoToSpaDetail}
-            />
-          ))
-        ) : (
-          <p className="text-center text-gray-500 p-20 empty-hint">
-            스퍼피의 AI 어시스턴트, <span className="font-semibold">"스피"</span>와 대화를 시작해보세요!
-          </p>
-        )}
-        <div ref={messagesEndRef} />
+        <div className="max-w-4xl mx-auto w-full">
+          {isLoading ? (
+            null
+          ) : chatMessages.length > 0 ? (
+            chatMessages.map((m) => (
+              <MessageBubble
+                key={m.id}
+                text={m.text}
+                isUser={m.isUser}
+                imageUrl={m.imageUrl ?? m.image_url ?? null}
+                spaSlug={m.spaSlug}
+                onGoToSpaDetail={handleGoToSpaDetail}
+              />
+            ))
+          ) : (
+            <p className="text-center text-gray-500 p-20 empty-hint">
+              스퍼피의 AI 어시스턴트, <span className="font-semibold">"스피"</span>와 대화를 시작해보세요!
+            </p>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
       </div>
 
       {/* 3. 전송 영역 */}
-      <div className="flex flex-col items-center flex-shrink-0 w-full bg-gray-100 p-2 px-4 pt-4">
-        <form onSubmit={handleImageAnalysis} className="w-full flex items-center gap-4">
-          <label htmlFor="dogImageFileInput" className="cursor-pointer">
-            <input type="file" id="dogImageFileInput" accept="image/*" onChange={handleFileChange} className="hidden" />
-            <span className="pl-2 bg-transparent text-gray-600">
-              <FontAwesomeIcon icon={faCamera} size="lg" />
-            </span>
-          </label>
-          {selectedFile && (
-            <div className="relative w-14 h-14">
-              <img
-                src={URL.createObjectURL(selectedFile)}
-                alt="미리보기"
-                className="w-14 h-14 rounded-xl object-cover border border-gray-200 shadow-sm"
+      <div className="w-full bg-gray-50 px-2">
+        <div className="max-w-6xl w-full mx-auto">
+          <form
+            onSubmit={handleImageAnalysis}
+            className="w-full bg-white rounded-3xl shadow-sm p-2 border border-gray-200 flex flex-col gap-2"
+          >
+
+            {/* 🖼️ 이미지 미리보기 */}
+            {selectedFile && (
+              <div className="relative w-32 h-32">
+                <img
+                  src={URL.createObjectURL(selectedFile)}
+                  alt="미리보기"
+                  className="w-full h-full rounded-2xl object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => setSelectedFile(null)}
+                  className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition"
+                >
+                  <FontAwesomeIcon icon={faXmark} size="sm" />
+                </button>
+              </div>
+            )}
+
+            {/* 📸 카메라 + 입력창 + 전송 버튼 */}
+            <div className="w-full flex items-end gap-3 overflow-x-hidden">
+              {/* 첨부 버튼 */}
+              <button
+                type="button"
+                onClick={() => document.getElementById('dogImageFileInput')?.click()}
+                className="flex items-center justify-center pl-2 p-2 rounded-full 
+                hover:bg-gray-100 focus:outline-none text-gray-500 transition-colors duration-150"
+              >
+                <FontAwesomeIcon icon={faPlus} size="lg" />
+              </button>
+              <input
+                type="file"
+                id="dogImageFileInput"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
               />
-              <button type="button" onClick={() => setSelectedFile(null)} className="absolute top-1 right-1 w-4 h-4 bg-white font-bold text-gray-400 rounded-full flex items-center justify-center text-[8px] hover:bg-gray-50 transition">
-                ✕
+
+              {/* 입력창 */}
+                <textarea
+                  id="freeTextQuestion"
+                  rows="1"
+                  value={freeTextQuestion}
+                  onChange={(e) => setFreeTextQuestion(e.target.value)}
+                  placeholder="어떤 스파를 받고 싶으세요?"
+                  onInput={(e) => {
+                    e.target.style.height = 'auto';
+                    e.target.style.height = e.target.scrollHeight + 'px';
+                  }}
+                  className="flex-1 p-2 focus:outline-none max-h-24 resize-none"
+                />
+
+              {/* 전송 버튼 */}
+              <button
+                type="submit"
+                disabled={isLimitExceeded}
+                className={`pr-2 p-2 ${isLimitExceeded ? 'text-gray-400 cursor-not-allowed' : 'text-[#67F3EC]'
+                  }`}
+              >
+                <FontAwesomeIcon icon={faPaperPlane} size="lg" />
               </button>
             </div>
-          )}
-          <textarea
-            id="freeTextQuestion"
-            rows="1"
-            value={freeTextQuestion}
-            onChange={(e) => setFreeTextQuestion(e.target.value)}
-            className="flex-1 p-2 bg-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-200 transition duration-200 resize-none overflow-hidden"
-            onInput={(e) => {
-              e.target.style.height = 'auto';
-              e.target.style.height = e.target.scrollHeight + 'px';
-            }}
-          ></textarea>
-          <button
-            type="submit"
-            disabled={isLimitExceeded}
-            className={`
-              pr-2
-
-              ${isLimitExceeded
-                ? 'text-gray-400 cursor-not-allowed bg-transparent'
-                : 'text-[#67F3EC] bg-transparent'}
-                `}>
-            <FontAwesomeIcon icon={faPaperPlane} size="lg" />
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
-      <p className="text-center bg-gray-100 pt-2 pb-1 text-[12px] leading-none text-gray-500 select-none pointer-events-none">
+
+      {/* 안내 문구 */}
+      <p className="text-center bg-gray-50 pt-1 pb-1 text-[12px] leading-none text-gray-500 select-none pointer-events-none">
         스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
         스피는 아직 배우는 중이라 답변이 정확하지 않을 수 있어요.
       </p>
+
 
       <ChecklistDrawer
         sheetOpen={sheetOpen}

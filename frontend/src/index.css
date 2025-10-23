@@ -101,3 +101,14 @@ body.loading::after {
     transform: translate(-50%, -50%) rotate(360deg);
   }
 }
+
+/* 1. Webkit(Chrome, Safari) 스크롤바 숨김 */
+textarea::-webkit-scrollbar {
+    display: none;
+}
+
+/* 2. IE, Edge, Firefox 스크롤바 숨김 */
+textarea {
+    -ms-overflow-style: none;  /* IE, Edge */
+    scrollbar-width: none;     /* Firefox */
+}

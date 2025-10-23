@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, errorMessage }) {
   const bubbleClasses = isUser
-    ? "bg-[#67F3EC] rounded-bl-xl rounded-tl-xl rounded-br-xl self-end"
-    : "bg-gray-200 rounded-br-xl rounded-bl-xl rounded-tr-xl self-start";
+    ? "bg-[#67F3EC] mt-2 rounded-bl-xl p-3 rounded-tl-xl rounded-br-xl self-end"
+    : "bg-gray-200 mb-2 rounded-br-xl p-3 rounded-bl-xl rounded-tr-xl self-start";
 
   const renderedMarkdown = useMemo(() => {
     if (!text) return null;
@@ -47,7 +47,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
         )}
 
         {/* 텍스트 말풍선 */}
-        <div className={`max-w-[70%] p-4 flex flex-col ${bubbleClasses} relative`}>
+        <div className={`max-w-[70%] flex flex-col ${bubbleClasses} relative`}>
           {text && <div className="whitespace-pre-wrap">{text}</div>}
         </div>
       </div>
@@ -56,8 +56,8 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
 
   return (
     <div className="flex items-start flex-row gap-2">
-      <img src={SpurfyAI} alt="AI Profile" className="w-16 h-16 object-cover flex-shrink-0 rounded-full" />
-      <div className={`max-w-[70%] p-4 mt-8 flex flex-col ${bubbleClasses} relative`}>
+      <img src={SpurfyAI} alt="AI Profile" className="w-12 h-12 object-cover flex-shrink-0 rounded-full" />
+      <div className={`max-w-[70%] mt-6 flex flex-col ${bubbleClasses} relative`}>
         {renderedMarkdown}
         {spaSlug && onGoToSpaDetail && !errorMessage && (
           <SpurfyButton
