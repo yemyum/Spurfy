@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axios";
 import MessageBubble from "../components/Common/MessageBubble";
 import ChecklistDrawer from "../components/Common/ChecklistDrawer";
+import DailyToastPopup from "../components/Common/DailyToastPopup";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faXmark, faListCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -212,7 +213,7 @@ const AIRecommendationPage = () => {
   );
 
   return (
-    <div className="w-full h-screen mx-auto bg-white flex flex-col overflow-hidden">
+    <div className="w-full h-screen mx-auto bg-gray-50 flex flex-col overflow-hidden">
       {/* 1. 고정될 헤더 영역 */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center relative">
         <h2 className="text-2xl font-bold text-spurfyAI">Spurfy AI Chat</h2>
@@ -231,8 +232,10 @@ const AIRecommendationPage = () => {
         </button>
       </div>
 
+      <DailyToastPopup />
+
       {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
-      <div className="flex-1 min-h-[120px] bg-gray-50 overflow-y-auto p-6 flex flex-col space-y-2">
+      <div className="flex-1 min-h-[120px] overflow-y-auto p-6 flex flex-col space-y-2">
         <div className="max-w-4xl mx-auto w-full">
           {isLoading ? (
             null
@@ -248,25 +251,23 @@ const AIRecommendationPage = () => {
               />
             ))
           ) : (
-            <p className="text-center text-gray-500 p-20 empty-hint">
-              스퍼피의 AI 어시스턴트, <span className="font-semibold">"스피"</span>와 대화를 시작해보세요!
-            </p>
+            null
           )}
           <div ref={messagesEndRef} />
         </div>
       </div>
 
       {/* 3. 전송 영역 */}
-      <div className="w-full bg-gray-50 px-2">
-        <div className="max-w-6xl w-full mx-auto">
+      <div className="w-full px-2 mb-2">
+        <div className="max-w-4xl mx-auto">
           <form
             onSubmit={handleImageAnalysis}
-            className="w-full bg-white rounded-3xl shadow-sm p-2 border border-gray-200 flex flex-col gap-2"
+            className="w-full bg-white/70 rounded-3xl shadow-md shadow-spurfyAI/50 p-2 border-2 border-spurfyAI flex flex-col"
           >
 
             {/* 🖼️ 이미지 미리보기 */}
             {selectedFile && (
-              <div className="relative w-32 h-32">
+              <div className="relative w-32 h-32 mb-2">
                 <img
                   src={URL.createObjectURL(selectedFile)}
                   alt="미리보기"
@@ -283,13 +284,13 @@ const AIRecommendationPage = () => {
             )}
 
             {/* 📸 카메라 + 입력창 + 전송 버튼 */}
-            <div className="w-full flex items-end gap-3 overflow-x-hidden">
+            <div className="w-full flex items-center overflow-x-hidden gap-2">
               {/* 첨부 버튼 */}
               <button
                 type="button"
                 onClick={() => document.getElementById('dogImageFileInput')?.click()}
-                className="flex items-center justify-center pl-2 p-2 rounded-full 
-                hover:bg-gray-100 focus:outline-none text-gray-500 transition-colors duration-150"
+                className="flex items-center justify-center p-2 rounded-full 
+                hover:bg-gray-100 focus:outline-none text-gray-400 transition-colors duration-150"
               >
                 <FontAwesomeIcon icon={faPlus} size="lg" />
               </button>
@@ -302,24 +303,24 @@ const AIRecommendationPage = () => {
               />
 
               {/* 입력창 */}
-                <textarea
-                  id="freeTextQuestion"
-                  rows="1"
-                  value={freeTextQuestion}
-                  onChange={(e) => setFreeTextQuestion(e.target.value)}
-                  placeholder="어떤 스파를 받고 싶으세요?"
-                  onInput={(e) => {
-                    e.target.style.height = 'auto';
-                    e.target.style.height = e.target.scrollHeight + 'px';
-                  }}
-                  className="flex-1 p-2 focus:outline-none max-h-24 resize-none"
-                />
+              <textarea
+                id="freeTextQuestion"
+                rows="1"
+                value={freeTextQuestion}
+                onChange={(e) => setFreeTextQuestion(e.target.value)}
+                placeholder="어떤 스파를 받고 싶으세요?"
+                onInput={(e) => {
+                  e.target.style.height = 'auto';
+                  e.target.style.height = e.target.scrollHeight + 'px';
+                }}
+                className="flex-1 focus:outline-none max-h-24 p-2 resize-none"
+              />
 
               {/* 전송 버튼 */}
               <button
                 type="submit"
                 disabled={isLimitExceeded}
-                className={`pr-2 p-2 ${isLimitExceeded ? 'text-gray-400 cursor-not-allowed' : 'text-[#67F3EC]'
+                className={`p-2 ${isLimitExceeded ? 'text-gray-400 cursor-not-allowed' : 'text-spurfyAI'
                   }`}
               >
                 <FontAwesomeIcon icon={faPaperPlane} size="lg" />
@@ -330,7 +331,7 @@ const AIRecommendationPage = () => {
       </div>
 
       {/* 안내 문구 */}
-      <p className="text-center bg-gray-50 pt-1 pb-1 text-[12px] leading-none text-gray-500 select-none pointer-events-none">
+      <p className="text-center p-2 text-[12px] leading-none text-gray-400 select-none pointer-events-none">
         스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
         스피는 아직 배우는 중이라 답변이 정확하지 않을 수 있어요.
       </p>
