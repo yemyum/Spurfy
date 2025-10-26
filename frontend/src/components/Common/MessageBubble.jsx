@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, errorMessage }) {
   const bubbleClasses = isUser
-    ? "bg-[#67F3EC] mt-2 rounded-bl-xl p-3 rounded-tl-xl rounded-br-xl self-end"
-    : "bg-gray-200 mb-2 rounded-br-xl p-3 rounded-bl-xl rounded-tr-xl self-start";
+    ? "bg-[#67F3EC] mb-2 rounded-bl-2xl p-3 rounded-tl-2xl rounded-br-2xl self-end"
+    : "bg-gray-200 mb-2 rounded-br-2xl p-3 rounded-bl-2xl rounded-tr-2xl self-start";
 
   const renderedMarkdown = useMemo(() => {
     if (!text) return null;
@@ -35,7 +35,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
       <div className="flex flex-col items-end">
         {/* 이미지: 말풍선 밖 */}
         {resolvedSrc && (
-          <div className="w-80 h-80 overflow-hidden rounded-md">
+          <div className="w-80 h-80 overflow-hidden rounded-2xl mb-2">
             <img
               src={resolvedSrc}
               alt="사용자가 첨부한 사진"

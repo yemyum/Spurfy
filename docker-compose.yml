@@ -4,6 +4,7 @@ services:
     env_file:
       - ./backend/.env
     volumes:
+      - ./backend:/app
       - ./secrets:/app/secrets
       - spurfy_ai_images:/app/images/ai-chatbot
       - spurfy_dog_images:/app/images/dog

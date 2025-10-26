@@ -254,7 +254,9 @@ const AIRecommendationPage = () => {
         </button>
       </div>
 
-      <DailyToastPopup />
+      <div className="px-2">
+        <DailyToastPopup />
+      </div>
 
       {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
       <div className="flex-1 min-h-[120px] overflow-y-auto p-6 flex flex-col space-y-2">

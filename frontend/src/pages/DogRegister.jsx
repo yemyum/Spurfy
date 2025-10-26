@@ -90,7 +90,7 @@ function DogRegister() {
 
   return (
     <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">반려견 등록</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">반려견 등록</h2>
       <form onSubmit={handleSubmit} className="w-full border-2 border-gray-200 p-8 rounded-lg shadow-sm bg-white mb-6 break-words">
 
         <div className="flex flex-col md:flex-row">
@@ -125,7 +125,7 @@ function DogRegister() {
           <div className="flex-grow">
             <div className="space-y-6">
               {/* 1. 이름 */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
                 <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">이름</label>
                 <input
                   type="text"
