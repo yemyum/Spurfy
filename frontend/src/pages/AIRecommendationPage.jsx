@@ -22,6 +22,8 @@ const AIRecommendationPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
+  const fileInputRef = useRef(null);
+
   const {
     isLimitExceeded,
     MAX_DAILY_CALLS,
@@ -72,6 +74,15 @@ const AIRecommendationPage = () => {
     }
     setSelectedFile(file);
     setErrorMessage("");
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null); // 상태 초기화
+
+    // input value 초기화
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleImageAnalysis = async (event) => {
@@ -144,7 +155,13 @@ const AIRecommendationPage = () => {
         id: aiResponseId, // 서버에서 받은 ID로 AI 메시지 ID 생성
       });
 
-      await checkAndUpdateLimit();
+      // checkAndUpdateLimit()를 호출하고 반환 값을 받도록 수정
+      const updatedCount = await checkAndUpdateLimit();
+
+      // 반환된 횟수가 최대 횟수와 같으면 (딱 초과된 순간) 알림 띄우기
+      if (updatedCount === MAX_DAILY_CALLS) {
+        alert(`오늘 이용 가능한 AI 추천(${MAX_DAILY_CALLS}회)을 모두 사용했습니다! 내일 다시 이용해 주세요.`);
+      }
 
     } catch (error) {
       let msg = "이미지 분석 요청 중 오류가 발생했습니다!";
@@ -202,6 +219,11 @@ const AIRecommendationPage = () => {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setSelectedFile(null);
       setFreeTextQuestion("");
+
+      // input value 초기화!
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -275,7 +297,7 @@ const AIRecommendationPage = () => {
                 />
                 <button
                   type="button"
-                  onClick={() => setSelectedFile(null)}
+                  onClick={handleRemoveFile}
                   className="absolute top-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition"
                 >
                   <FontAwesomeIcon icon={faXmark} size="sm" />
@@ -300,6 +322,7 @@ const AIRecommendationPage = () => {
                 accept="image/*"
                 onChange={handleFileChange}
                 className="hidden"
+                ref={fileInputRef}
               />
 
               {/* 입력창 */}
@@ -331,7 +354,7 @@ const AIRecommendationPage = () => {
       </div>
 
       {/* 안내 문구 */}
-      <p className="text-center p-2 text-[12px] leading-none text-gray-400 select-none pointer-events-none">
+      <p className="text-center p-2 text-xs text-gray-400 select-none leading-none ">
         스퍼피의 AI 어시스턴트 <span className="font-semibold">스피</span>에게 추천을 받아보세요!<br />
         스피는 아직 배우는 중이라 답변이 정확하지 않을 수 있어요.
       </p>
@@ -350,7 +373,7 @@ const AIRecommendationPage = () => {
       {showToast && (
         <div className="fixed bottom-28 left-1/2 -translate-x-1/2 z-50"
           role="alert" aria-live="assertive">
-          <div className="px-4 py-2 rounded-full bg-red-50 border-2 border-red-300 text-red-400 font-semibold text-sm shadow-sm">
+          <div className="px-4 py-2 mb-2 rounded-full bg-red-50 border-2 border-red-200 text-red-400 font-semibold text-xs shadow-md">
             {errorMessage}
           </div>
         </div>

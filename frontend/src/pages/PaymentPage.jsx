@@ -69,7 +69,7 @@ function PaymentPage() {
     return (
       <div className="w-1/2 mx-auto select-none mt-10 mb-10 bg-white rounded-xl shadow-md border border-gray-200">
         <div className="p-8 space-y-4">
-          <h2 className="text-2xl font-bold mt-4 text-center mb-12">예약이 완료되었습니다!</h2>
+          <h2 className="text-2xl font-semibold mt-4 text-center mb-12">예약이 완료되었습니다!</h2>
           <div className="flex justify-between mb-2 text-lg">
             <span>스파 서비스명</span>
             <span className="font-semibold">{reservation.serviceName}</span>

@@ -32,7 +32,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
 
   if (isUser) {
     return (
-      <div className="flex flex-col items-end gap-2">
+      <div className="flex flex-col items-end">
         {/* 이미지: 말풍선 밖 */}
         {resolvedSrc && (
           <div className="w-80 h-80 overflow-hidden rounded-md">

@@ -2,39 +2,41 @@ import { useState, useEffect } from 'react';
 import api from "../api/axios";
 
 // 횟수는 백엔드와 동일해야 함!
-const MAX_DAILY_CALLS = 3; 
+const MAX_DAILY_CALLS = 3;
 
 export const useAiCallLimit = () => {
     const [isLimitExceeded, setIsLimitExceeded] = useState(false);
-    
+
     // 현재 횟수를 조회하고 상태를 업데이트하는 핵심 함수
     const checkAndUpdateLimit = async () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
         try {
-            // 조회 API 호출!
             const response = await api.get("/ai-recommendation/call-count");
-            // 백엔드 응답 형식에 맞춰 todayCount를 가져와야 함
-            const todayCount = response.data.data; 
-            
-            if (todayCount >= MAX_DAILY_CALLS) {
+            const newTodayCount = response.data.data;
+
+            setTodayCount(newTodayCount);
+
+            if (newTodayCount >= MAX_DAILY_CALLS) {
                 setIsLimitExceeded(true);
-                // 성공적으로 초과 상태를 감지했으면 true로 설정
             } else {
-                setIsLimitExceeded(false); 
+                setIsLimitExceeded(false);
             }
+
+            // 업데이트된 횟수 반환!
+            return newTodayCount;
 
         } catch (e) {
             console.error("AI 호출 횟수 업데이트 조회 실패", e);
-            // 조회 실패해도 버튼을 막지는 않음 (false 유지)
+            return todayCount; // 실패 시 현재 카운트 반환
         }
     };
-    
+
     // 1. 컴포넌트 마운트 시 초기 상태를 설정 (조회 API 호출)
     useEffect(() => {
         checkAndUpdateLimit();
-    }, []); 
+    }, []);
 
     // 훅이 반환할 값들
     return {

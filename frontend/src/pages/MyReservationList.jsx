@@ -93,8 +93,8 @@ function MyReservationList() {
 
   return (
     <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 내역</h2>
-      <h2 className="text-xl font-bold mb-6">나의 예약 목록</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">예약 내역</h2>
+      <h2 className="text-xl font-semibold mb-6">나의 예약 목록</h2>
 
       {/* 1. 아직 데이터를 불러오지 않았다면 (API 요청 중) 아무것도 렌더링하지 않음 */}
       {isLoading ? (
@@ -109,7 +109,7 @@ function MyReservationList() {
             className="mt-6 px-4 py-2"
             variant="primary"
           >
-            서비스 예약하러 가기
+            스파 예약하러 가기
           </SpurfyButton>
         </div>
       ) : (

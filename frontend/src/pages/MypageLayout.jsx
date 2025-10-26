@@ -39,7 +39,7 @@ function MypageLayout() {
                     className={({ isActive }) =>
                       `block w-full rounded-lg px-3 py-2 transition
                        ${isActive
-                         ? "bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] text-white font-semibold shadow-sm"
+                         ? "bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] text-white font-semibold shadow-md"
                          : "hover:bg-sky-100"}`
                     }
                   >

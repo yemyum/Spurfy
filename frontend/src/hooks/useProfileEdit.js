@@ -24,7 +24,7 @@ const useProfileEdit = (navigate) => {
                     setEditedPhone(fetchedProfile.phone);
                     setIsNicknameAvailable(true);
                     setIsNicknameChecked(true);
-                    setNicknameCheckMessage('현재 사용 중인 닉네임입니다.');
+                    setNicknameCheckMessage('현재 사용 중인 닉네임 입니다.');
                 } else {
                     alert(res.data.message || '프로필 정보를 불러오는데 실패했습니다.');
                 }
@@ -55,7 +55,7 @@ const useProfileEdit = (navigate) => {
         }
 
         if (profile && editedNickname === profile.nickname) {
-            setNicknameCheckMessage('현재 사용 중인 닉네임입니다.');
+            setNicknameCheckMessage('현재 사용 중인 닉네임 입니다.');
             setIsNicknameAvailable(true);
             setIsNicknameChecked(true);
             return;
@@ -84,11 +84,11 @@ const useProfileEdit = (navigate) => {
 
     const handleUpdateProfile = async () => {
         if (isEditing && editedNickname !== profile.nickname && !isNicknameChecked) {
-            alert("변경하려는 닉네임에 대해 중복 확인을 해주세요.");
+            alert("변경하려는 닉네임에 대해 중복 확인 해주세요.");
             return;
         }
         if (isEditing && editedNickname !== profile.nickname && !isNicknameAvailable) {
-            alert("사용할 수 없는 닉네임입니다. 다시 확인해주세요.");
+            alert("사용할 수 없는 닉네임 입니다. 다시 확인해주세요.");
             return;
         }
 

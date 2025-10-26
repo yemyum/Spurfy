@@ -73,7 +73,7 @@ function ReviewWrite() {
 
   return (
     <div className="max-w-2xl mx-auto mt-10 mb-10 p-6 select-none bg-white shadow-md rounded-xl border border-gray-200">
-      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">리뷰 작성</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">리뷰 작성</h2>
       <p className="font-semibold text-gray-400 mb-4">우리 반려견의 소중한 경험이 다른 친구들에게 도움을 줄 수 있어요!</p>
 
       <div className="bg-gray-50 p-4 rounded-lg mb-4">

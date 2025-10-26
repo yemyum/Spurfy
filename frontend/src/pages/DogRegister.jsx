@@ -100,7 +100,7 @@ function DogRegister() {
               {imagePreview ? (
                 <img src={imagePreview} alt="Dog Preview" className="w-full h-full object-cover" />
               ) : (
-                <span>사진 미리보기</span>
+                <span>이미지 없음</span>
               )}
             </div>
             {/* 실제 파일 선택 input은 숨기고, 버튼을 클릭하면 input을 클릭하도록 연결 */}

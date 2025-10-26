@@ -42,15 +42,13 @@ function MyReservationDetail() {
     const month = date.getMonth() + 1; // 월은 0부터 시작
     const day = date.getDate();
 
-    let hour = date.getHours();
+    // 💡 hour 변수를 24시간 형식으로 바로 사용
+    const hour = date.getHours().toString().padStart(2, '0'); // 00~23시 (24시간제)
+
     const minute = date.getMinutes().toString().padStart(2, '0');
     const second = date.getSeconds().toString().padStart(2, '0');
 
-    const period = hour < 12 ? '오전' : '오후';
-    if (hour > 12) hour -= 12;
-    if (hour === 0) hour = 12;
-
-    return `${year}. ${month}. ${day} ${period} ${hour}:${minute}:${second}`;
+    return `${year}. ${month}. ${day} ${hour}:${minute}:${second}`;
   };
 
   const handleReviewWrite = () => {
@@ -138,7 +136,7 @@ function MyReservationDetail() {
 
   return (
     <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-bold mb-6 text-spurfyBlue">예약 상세</h2>
+      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">예약 상세</h2>
 
       <div className="border-2 border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6 relative">
         <span
@@ -147,9 +145,9 @@ function MyReservationDetail() {
           {statusLabel[reservation.reservationStatus]?.text || reservation.reservationStatus}
         </span>
         <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
-          <p className="text-xl font-semibold">
+          <p className="text-lg font-semibold">
             <span className="text-gray-500">예약번호 | </span>
-            <span className="text-lg font-medium">{reservation.reservationId}</span>
+            <span className="font-medium">{reservation.reservationId}</span>
           </p>
         </div>
 

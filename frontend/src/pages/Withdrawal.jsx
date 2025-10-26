@@ -55,7 +55,7 @@ function Withdrawal() {
 
   return (
     <div className="max-w-4xl mx-auto mt-4 mb-10 bg-white rounded-xl shadow-md border border-gray-200 p-10">
-      <h2 className="text-4xl font-bold mb-20 mt-4 text-center">회원 탈퇴</h2>
+      <h2 className="text-4xl font-semibold mb-20 mt-4 text-center">회원 탈퇴</h2>
 
       <form onSubmit={handleWithdrawalSubmit}> {/* 폼 제출 시 handleWithdrawalSubmit 실행 */}
         {/* 비밀번호 입력 필드 */}
