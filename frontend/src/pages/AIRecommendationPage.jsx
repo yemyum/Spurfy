@@ -246,7 +246,7 @@ const AIRecommendationPage = () => {
   );
 
   return (
-    <div className="w-full h-screen mx-auto bg-gray-50 flex flex-col overflow-hidden">
+    <div className="w-full h-screen mx-auto bg-white flex flex-col overflow-hidden">
       {/* 1. 고정될 헤더 영역 */}
       <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 p-4 shadow-lg flex justify-center items-center relative">
         <h2 className="text-2xl font-bold text-spurfyAI">Spurfy AI Chat</h2>
@@ -270,8 +270,8 @@ const AIRecommendationPage = () => {
       </div>
 
       {/* 2. 채팅 내용 영역 (flex-1로 남은 공간 전부 차지하고 스크롤!) */}
-      <div className="flex-1 min-h-[120px] overflow-y-auto p-6 flex flex-col space-y-2">
-        <div className="max-w-4xl mx-auto w-full">
+      <div className="flex-1 min-h-[120px] overflow-y-auto p-6 flex flex-col">
+        <div className="max-w-4xl mx-auto w-full flex flex-col space-y-6">
           {isLoading ? (
             null
           ) : chatMessages.length > 0 ? (

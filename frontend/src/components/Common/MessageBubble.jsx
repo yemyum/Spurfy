@@ -10,8 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, errorMessage }) {
   const bubbleClasses = isUser
-    ? "bg-[#67F3EC] mb-2 rounded-bl-2xl p-3 rounded-tl-2xl rounded-br-2xl self-end"
-    : "bg-gray-200 mb-2 rounded-br-2xl p-3 rounded-bl-2xl rounded-tr-2xl self-start";
+    ? "bg-[#67F3EC] rounded-bl-2xl p-3 rounded-tl-2xl rounded-br-2xl self-end"
+    : "rounded-br-2xl rounded-bl-2xl rounded-tr-2xl self-start";
 
   const renderedMarkdown = useMemo(() => {
     if (!text) return null;
@@ -21,7 +21,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
         remarkPlugins={[gfm, remarkBreaks]}
         components={{
           p: (props) => <p className="mb-4" {...props} />,
-          li: (props) => <li className="list-disc list-inside ml-2 mb-1 last:mb-4" {...props} />
+          li: (props) => <li className="list-disc list-inside ml-2 last:mb-4" {...props} />
         }}
       >
         {text}
@@ -48,7 +48,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
         )}
 
         {/* 텍스트 말풍선 */}
-        <div className={`max-w-[70%] flex flex-col ${bubbleClasses} relative`}>
+        <div className={`max-w-[80%] flex flex-col ${bubbleClasses} relative`}>
           {text && <div className="whitespace-pre-wrap">{text}</div>}
         </div>
       </div>
@@ -56,9 +56,9 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
   }
 
   return (
-    <div className="flex items-start flex-row gap-2">
+    <div className="flex items-start flex-col gap-4">
       <img src={SpurfyAI} alt="AI Profile" className="w-12 h-12 object-cover flex-shrink-0 rounded-full" />
-      <div className={`max-w-[70%] mt-6 flex flex-col ${bubbleClasses} relative`}>
+      <div className={`max-w-[80%] flex flex-col ${bubbleClasses} relative`}>
         {renderedMarkdown}
         {spaSlug && onGoToSpaDetail && !errorMessage && (
           <SpurfyButton
