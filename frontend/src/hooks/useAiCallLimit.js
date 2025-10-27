@@ -5,6 +5,7 @@ import api from "../api/axios";
 const MAX_DAILY_CALLS = 3;
 
 export const useAiCallLimit = () => {
+    const [todayCount, setTodayCount] = useState(0);
     const [isLimitExceeded, setIsLimitExceeded] = useState(false);
 
     // 현재 횟수를 조회하고 상태를 업데이트하는 핵심 함수

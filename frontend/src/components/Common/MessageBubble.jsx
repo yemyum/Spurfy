@@ -15,6 +15,7 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
 
   const renderedMarkdown = useMemo(() => {
     if (!text) return null;
+
     return (
       <ReactMarkdown
         remarkPlugins={[gfm, remarkBreaks]}

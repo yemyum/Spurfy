@@ -69,7 +69,7 @@ export const useChatHistory = () => {
     const loadAndMergeMessages = async () => {
       let serverMsgs = [];
 
-       setIsLoading(true);
+      setIsLoading(true);
 
       try {
         const { data } = await api.get("/recommendations/history");
@@ -77,9 +77,18 @@ export const useChatHistory = () => {
         const serverMsgsFromApi = items.flatMap((item) => {
           const ai = formatAiMessage(item);
           const img = toAbs(item.imageUrl ?? item.image_url) || null;
-          const promptText = (item.prompt ?? ai.prompt ?? "").trim();
+
+          // promptText가 비어있을 때 '사진 첨부' 텍스트로 대체
+          let promptText = (item.prompt ?? ai.prompt ?? "").trim();
+          if (!promptText && img) { // prompt가 비어있고, 이미지 URL이 있다면
+            promptText = "사진 첨부"; // 사용자 메시지로 사용할 텍스트를 지정
+          }
+
           const msgs = [];
-          if (promptText) {
+
+          // 사용자 메시지 생성 조건 수정
+          // promptText가 있거나 (일반 메시지) 또는 이미지가 있을 때만 버블 생성
+          if (promptText || img) { // (promptText가 "사진 첨부"이거나, 아니면 실제 내용이 있을 때)
             msgs.push({
               id: `user-${ai.id}`, // ✅ user- 접두사로 통일
               timestamp: ai.timestamp - 1,

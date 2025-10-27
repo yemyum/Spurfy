@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axios";
 import MessageBubble from "../components/Common/MessageBubble";
 import ChecklistDrawer from "../components/Common/ChecklistDrawer";
@@ -168,8 +168,19 @@ const AIRecommendationPage = () => {
       const apiMsg = error.response?.data?.message;
       const apiCode = error.response?.data?.code;
 
-      if (apiMsg) msg = `오류: ${apiMsg}${apiCode ? ` (${apiCode})` : ""}`;
-      else if (error.message) msg = `오류: ${error.message}`;
+      // 2. 백엔드(API) 응답이 명확하게 있을 경우:
+      if (apiMsg) {
+        msg = apiMsg;
+
+        // 필요하다면 에러 코드만 뒤에 붙여서 개발자에게 힌트를 줄 수 있어.
+        if (apiCode) {
+          msg += ` (Code: ${apiCode})`;
+        }
+
+        // 3. 백엔드 응답은 없지만, 통신 실패 등 네트워크 에러일 경우:
+      } else if (error.message) {
+        msg = "네트워크 연결 상태가 불안정하여 요청에 실패했습니다.";
+      }
 
       const payloadId = error.response?.data?.data?.id;
       const serverImg = error.response?.data?.data?.imageUrl;
