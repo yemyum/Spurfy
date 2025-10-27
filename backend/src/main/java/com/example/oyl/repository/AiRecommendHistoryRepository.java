@@ -9,7 +9,7 @@ import java.util.List;
 public interface AiRecommendHistoryRepository extends JpaRepository<AiRecommendHistory, Long> {
 
     // 하루 요청 제한 확인용!
-    long countByUserIdAndCreatedAtBetween(String userId, LocalDateTime start, LocalDateTime end);
+    long countByUserIdAndCreatedAtBetweenAndErrorMessageIsNull(String userId, LocalDateTime start, LocalDateTime end);
 
     // AI 추천 기록들 가져오기
     List<AiRecommendHistory> findByUserId(String userId);

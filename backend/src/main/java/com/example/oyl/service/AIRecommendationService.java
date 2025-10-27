@@ -70,8 +70,10 @@ public class AIRecommendationService {
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
 
-        // Repository를 사용해 오늘 횟수 조회
-        long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetween(userEmail, startOfDay, endOfDay);
+        // errorMessage가 NULL인 경우, 즉 '성공한' 기록만 카운트하도록
+        long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetweenAndErrorMessageIsNull(
+                userEmail, startOfDay, endOfDay
+        );
 
         // 서비스 로직을 그대로 재활용하는 것이 핵심!
         return (int) todayCount;
@@ -90,7 +92,10 @@ public class AIRecommendationService {
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
 
-        long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetween(userEmail, startOfDay, endOfDay);
+        // // errorMessage가 NULL인 경우, 즉 '성공한' 기록만 카운트하도록
+        long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetweenAndErrorMessageIsNull(
+                userEmail, startOfDay, endOfDay
+        );
 
         if (todayCount >= MAX_DAILY_AI_CALLS) {
             log.warn("DogImageService.analyzeAndRecommendSpa - AI 대화 횟수 제한 초과! 현재 호출 횟수: {}, 최대 허용: {}", todayCount, MAX_DAILY_AI_CALLS);
