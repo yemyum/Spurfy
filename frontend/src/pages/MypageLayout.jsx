@@ -30,7 +30,7 @@ function MypageLayout() {
         {/* 사이드바 */}
         <aside className="hidden lg:block sticky top-24">
           <div className="rounded-xl border border-gray-200 bg-white shadow-md p-4 py-4">
-            <h2 className="text-lg font-bold mb-4 px-2 border-b pb-2 border-b-gray-200">마이페이지</h2>
+            <h2 className="text-lg font-semibold mb-4 px-2 border-b pb-2 border-b-gray-200">마이페이지</h2>
             <ul className="space-y-2">
               {menu.map(m => (
                 <li key={m.path}>

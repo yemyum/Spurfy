@@ -53,7 +53,7 @@ function MyReviewList() {
               {r.serviceName}
             </h3>
 
-            <p className="text-sm text-gray-400">작성일 : {r.createdAt}</p>
+            <p className="text-sm text-gray-400">작성일 | {r.createdAt}</p>
             <p className="mt-2 text-gray-800">{r.content}</p>
 
             <div className="flex flex-wrap gap-2 mt-4">

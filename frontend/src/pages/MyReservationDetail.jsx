@@ -146,8 +146,8 @@ function MyReservationDetail() {
         </span>
         <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
           <p className="text-lg font-semibold">
-            <span className="text-gray-500">예약번호 | </span>
-            <span className="font-medium">{reservation.reservationId}</span>
+            <span className="">예약번호</span>
+            <span className="ml-1">[{reservation.reservationId}]</span>
           </p>
         </div>
 
@@ -190,7 +190,7 @@ function MyReservationDetail() {
             {reservation.amount !== null && reservation.amount !== undefined && ( // amount 값이 있을 때만 표시
               <p className="mb-2">
                 <span className="text-gray-500">결제 금액 : </span>
-                <span className="font-semibold text-spurfyBlue">{reservation.amount.toLocaleString()}원</span>
+                <span className="font-semibold">{reservation.amount.toLocaleString()}원</span>
               </p>
             )}
           </div>
@@ -223,7 +223,7 @@ function MyReservationDetail() {
         <div className="flex justify-between px-6 pt-5 border-t-2 border-gray-200">
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition duration-300"
+            className="px-3 py-2 font-semibold text-sm bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition duration-300"
           >
             뒤로가기
           </button>
@@ -232,7 +232,7 @@ function MyReservationDetail() {
           {canCancel && (
             <SpurfyButton variant="danger"
               onClick={handleCancel}
-              className="px-4 py-2"
+              className="px-3 py-2 text-sm"
             >
               예약취소
             </SpurfyButton>
@@ -240,7 +240,7 @@ function MyReservationDetail() {
           {canWriteReview && (
             <SpurfyButton variant="ai"
               onClick={handleReviewWrite}
-              className="px-4 py-2"
+              className="px-3 py-2 text-sm"
             >
               리뷰 작성하기
             </SpurfyButton>

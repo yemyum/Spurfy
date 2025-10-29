@@ -182,8 +182,8 @@ function MyReviewDetail() {
             </>
           ) : (
             <>
-              <SpurfyButton variant = "danger" onClick={handleDelete} className="px-4 py-2 text-sm">삭제하기</SpurfyButton>
-              <SpurfyButton variant = "primary" onClick={handleEditMode} className="px-4 py-2 text-sm">수정하기</SpurfyButton>
+              <SpurfyButton variant = "danger" onClick={handleDelete} className="px-3 py-2 text-sm">삭제하기</SpurfyButton>
+              <SpurfyButton variant = "primary" onClick={handleEditMode} className="px-3 py-2 text-sm">수정하기</SpurfyButton>
             </>
           )}
         </div>

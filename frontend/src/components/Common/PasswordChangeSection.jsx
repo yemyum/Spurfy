@@ -46,7 +46,7 @@ const PasswordChangeSection = ({
                     />
                 </div>
                 {passwordChangeError && (
-                    <p className="text-red-400 text-sm mt-2">{passwordChangeError}</p>
+                    <p className="text-red-400 mt-2">{passwordChangeError}</p>
                 )}
                 <div className="flex justify-end">
                     <SpurfyButton variant='outline'

@@ -96,7 +96,7 @@ function Withdrawal() {
           {/* '기타 (직접 입력)' 옵션이 선택되면 텍스트 에리어 보여주기 */}
           {reason === "기타 (직접 입력)" && (
             <textarea
-              className="appearance-none border border-gray-200 rounded-md w-full px-3 py-3 leading-tight focus:outline-none focus:ring-2 focus:ring-gray-100"
+              className="appearance-none border border-gray-200 rounded-md w-full px-3 py-3 leading-tight resize-none focus:outline-none focus:ring-2 focus:ring-gray-100"
               placeholder="기타 사유를 입력해주세요. (최대 100자)"
               maxLength={100}
               value={otherReason}

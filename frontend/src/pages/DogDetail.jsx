@@ -105,13 +105,13 @@ function DogDetail() {
         <div className="flex justify-between mt-6 pt-5 px-6 border-t-2 border-gray-200">
           <SpurfyButton variant='danger'
             onClick={handleDelete}
-            className="px-4 py-2"
+            className="px-3 py-2 text-sm"
           >
             삭제하기
           </SpurfyButton>
           <SpurfyButton variant='primary'
             onClick={() => navigate(`/mypage/dogs/${dog.dogId}/edit`)}
-            className="py-2 px-4"
+            className="py-2 px-3 text-sm"
           >
             수정하기
           </SpurfyButton>

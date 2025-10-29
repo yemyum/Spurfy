@@ -89,15 +89,15 @@ function SpaReviewsPage() {
                             <StarRating rating={averageRating} readOnly={true} size="middle" />
                         </div>
 
-                        <span className="text-base text-gray-400 mt-4">총 {reviews.length} 개 후기</span>
+                        <span className="text-gray-400 mt-4">총 {reviews.length} 개 후기</span>
                     </div>
                 )}
 
-                {reviews.length === 0 && <div className="text-center text-lg font-semibold">아직 작성된 리뷰가 없습니다.</div>}
+                {reviews.length === 0 && <div className="text-center text-gray-400 text-lg font-semibold">아직 작성된 리뷰가 없습니다.</div>}
 
                 <div className="flex items-center justify-center space-y-4">
                     {reviews.map(r => (
-                        <div key={r.reviewId} className="w-full border rounded-lg shadow-sm p-4 bg-white">
+                        <div key={r.reviewId} className="w-full border-2 border-gray-200 rounded-lg shadow-sm p-4 bg-white">
                             {/* ⭐ 첫 번째 줄: 닉네임만 ⭐ */}
                             <div className="font-semibold text-lg mb-1">{r.userNickname}</div>
 

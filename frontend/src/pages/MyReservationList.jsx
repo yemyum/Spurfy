@@ -129,7 +129,7 @@ function MyReservationList() {
               <div> {/* 서비스명 */}
                 <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
                 {/* 날짜, 가격 */}
-                <p className="text-gray-400 text-sm mb-4">예약날짜 : {r.reservationDate} {r.reservationTime}</p>
+                <p className="text-gray-400 text-sm mb-4">이용 날짜 | {r.reservationDate} {r.reservationTime}</p>
                 <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
               </div>
             </div>
