@@ -4,7 +4,6 @@ services:
     env_file:
       - ./backend/.env
     volumes:
-      - ./backend:/app
       - ./secrets:/app/secrets
       - spurfy_ai_images:/app/images/ai-chatbot
       - spurfy_dog_images:/app/images/dog
@@ -20,6 +19,7 @@ services:
       - ./db/.env
     volumes:
       - spurfy_data:/var/lib/mysql
+      - ./docker-init/spurfy_init_data.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
 
@@ -31,3 +31,5 @@ services:
 
 volumes:
   spurfy_data:
+  spurfy_ai_images:
+  spurfy_dog_images:
