@@ -130,7 +130,7 @@ public class AIRecommendationService {
 
             // 1) 강아지 여부 1차 필터 : "강아지가 맞는가?" (라벨 보조) -> !isDog()일 때 예외
             if (!visionResult.isDog()) {
-                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속에서 반려견을 찾지 못했어요. AI가 헷갈리지 않도록 반려견의 정면이 잘 보이는 사진으로 다시 부탁드려요!");
+                throw new CustomException(ErrorCode.INVALID_INPUT, "사진 속 반려견을 찾지 못했어요. AI가 헷갈리지 않도록 반려견의 정면이 잘 보이는 사진으로 다시 부탁드려요!");
             }
 
             // 2) 객체탐지 결과로 마릿수 판단, 0.6 이상 점수인 것만 카운트
@@ -159,7 +159,7 @@ public class AIRecommendationService {
             if (dogBoxCount > 1 || (dogBoxCount == 0 && pluralSignal)) {
                 throw new CustomException(
                         ErrorCode.INVALID_INPUT,
-                        "여러 마리의 반려견이 감지되었어요. 한 마리의 반려견 정면이 담긴 단독 사진이여야 정확한 추천이 가능해요!"
+                        "여러 마리의 강아지가 감지되었어요! 한 마리의 강아지 사진으로만 올려주세요."
                 );
             }
 

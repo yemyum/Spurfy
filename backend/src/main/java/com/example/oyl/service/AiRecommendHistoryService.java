@@ -25,7 +25,7 @@ public class AiRecommendHistoryService {
     public List<AiRecommendHistoryResponseDTO> getUserRecommendationHistory(String userId) {
 
         // 🌟 1. 3일 전 시점 계산 (여기 숫자만 바꾸면 7일, 5일 등으로 변경 가능!)
-        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+        LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(7);
 
         // 🌟 2. 레포지를 통해 3일 이후의 데이터만 가져오기
         List<AiRecommendHistory> histories = aiRecommendHistoryRepository.findByUserIdAndCreatedAtAfter(userId, threeDaysAgo);
