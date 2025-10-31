@@ -38,7 +38,7 @@ function SpaList() {
         {list.map((spa) => (
           <div
             key={spa.serviceId}
-            className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-sky-100 transition-all duration-300 ease-in-out"
+            className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-spurfyBlue/30 transition-all duration-300 ease-in-out"
           >
             {/* 이미지 영역 */}
             <div
@@ -60,7 +60,7 @@ function SpaList() {
             {/* 이름 + 가격 */}
             <div className="mb-2">
               <h3 className="text-lg font-semibold text-spurfyBlue">{spa.name}</h3>
-              <p className="text-gray-800">가격: {spa.price.toLocaleString()} 원 ~</p>
+              <p className="">{spa.price.toLocaleString()}원</p>
             </div>
 
             {/* 태그 영역 */}

@@ -65,7 +65,7 @@ function RootLayout() {
             <div className="flex-1 min-w-0">
               <Link
                 to="/"
-                className="inline-block cursor-pointer truncate text-2xl sm:text-3xl lg:text-4xl font-logo font-bold bg-gradient-to-r from-[#54DAFF] to-[#91B2FF] bg-clip-text text-transparent"
+                className="inline-block cursor-pointer truncate text-2xl sm:text-3xl lg:text-4xl font-logo font-bold bg-gradient-to-r from-spurfyLogo to-spurfyBlue bg-clip-text text-transparent"
               >
                 SPURFY
               </Link>

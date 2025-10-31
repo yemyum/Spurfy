@@ -41,7 +41,7 @@ function MyDogs() {
 
   return (
     <div className="mx-auto p-8 select-none">
-      <div className="text-2xl font-semibold mb-6 text-spurfyBlue">반려견 케어</div>
+      <div className="text-2xl font-semibold mb-6 text-spurfyColor">반려견 케어</div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">나의 반려견 리스트</h2>
         <SpurfyButton variant='outline'
