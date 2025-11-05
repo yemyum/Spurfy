@@ -159,7 +159,7 @@ public class AIRecommendationService {
             if (dogBoxCount > 1 || (dogBoxCount == 0 && pluralSignal)) {
                 throw new CustomException(
                         ErrorCode.INVALID_INPUT,
-                        "여러 마리의 강아지가 감지되었어요! 한 마리의 강아지 사진으로만 올려주세요."
+                        "여러 마리의 강아지가 감지되었어요! 한 마리의 강아지 사진으로 올려주셔야 추천이 가능해요."
                 );
             }
 

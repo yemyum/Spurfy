@@ -25,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 public class AuthController {
 
     private final RefreshTokenService refreshTokenService;
-    private final UserService userService; // 로그인/유저 로직
+    private final UserService userService;
 
     /* ===================== 리프레시 토큰 재발급 ===================== */
     @PostMapping("/refresh-token")
