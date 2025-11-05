@@ -61,7 +61,7 @@ function ChecklistForm({ onSubmit }) {
           name="breed"
           value={selectedBreed ?? ""}   // 빈문자열이 "미선택"
           onChange={(e) => setSelectedBreed(e.target.value)}
-          className="w-1/2 p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
+          className="w-full p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-100 transition duration-200"
         >
           {breedOptions.map((o) => (
             <option key={o.label} value={o.value}>

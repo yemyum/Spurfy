@@ -1,6 +1,6 @@
 function SpurfyButton({
   children,
-  variant = 'primary', // primary | danger | ai | outline | ghost | disabled
+  variant = 'primary', // primary | danger | ai | outline | first | second
   className = '',
   ...props
 }) {
@@ -9,7 +9,8 @@ function SpurfyButton({
   rounded-lg 
   transition 
   font-semibold
-  duration-300
+  duration-300 
+  shadow-sm 
 `;
 
   // *** 컬러·상태별 스타일

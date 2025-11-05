@@ -16,7 +16,7 @@ function Login() {
     e.preventDefault();
     try {
       await login(form.email, form.password);
-      alert('로그인 성공');
+      await new Promise(resolve => setTimeout(resolve, 50));
       navigate('/', { replace: true });
     } catch (err) {
       console.error('로그인 실패:', err);

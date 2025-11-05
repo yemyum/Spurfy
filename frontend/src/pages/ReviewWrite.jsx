@@ -72,19 +72,19 @@ function ReviewWrite() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 mb-10 p-6 select-none bg-white shadow-md rounded-xl border border-gray-200">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">리뷰 작성</h2>
-      <p className="font-semibold text-gray-400 mb-4">우리 반려견의 소중한 경험이 다른 친구들에게 도움을 줄 수 있어요!</p>
+    <div className="max-w-3xl mx-auto mt-12 mb-4 p-6 select-none bg-white shadow-md rounded-xl border border-gray-200">
+      <h2 className="text-2xl font-semibold mb-2 text-spurfyBlue">리뷰 작성</h2>
+      <p className="text-sm text-gray-400 mb-8">반려견의 소중한 경험이 다른 친구들에게 도움이 될 수 있어요!</p>
 
-      <div className="bg-gray-50 p-4 rounded-lg mb-4">
-        <p className="text-xl font-semibold">{reservationData.serviceName}</p>
-        <p>
+      <div className="bg-gray-100 p-4 rounded-lg mb-4 font-semibold">
+        <p className="text-lg text-gray-500">{reservationData.serviceName}</p>
+        <p className="text-gray-500">
           {reservationData.dogName} | {formatDate(reservationData.reservationDate)}
         </p>
       </div>
 
       <div className="pb-2 border-b border-gray-200 mb-4">
-        <label className="block text-base font-semibold mb-2">별점을 선택해주세요.</label>
+        <label className="block text-sm text-gray-400 mb-2">별점을 선택해주세요.</label>
         {/* StarRating 컴포넌트 삽입 및 props 이름 맞추기! */}
         <div>
           <StarRating
@@ -96,11 +96,11 @@ function ReviewWrite() {
         </div>
       </div>
 
-      <div className="pb-4 border-b border-gray-200">
-        <label className="block text-base font-semibold mb-2">리뷰를 작성해주세요.</label>
+      <div className="pb-2">
+        <label className="block text-sm text-gray-400 mb-2">리뷰를 작성해주세요.</label>
         <textarea
           rows="4"
-          className="border border-gray-200 p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-gray-100"
+          className="border border-gray-200 p-2 resize-none rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-gray-100"
           placeholder="최소 30자 이상 작성해주세요."
           value={form.content}
           onChange={(e) => setForm({ ...form, content: e.target.value })}
@@ -122,7 +122,7 @@ function ReviewWrite() {
       <div className="flex justify-end mt-6">
         <SpurfyButton variant="primary"
           onClick={handleSubmit}
-          className="px-4 py-2"
+          className="px-3 py-2 text-sm"
         >
           등록하기
         </SpurfyButton>

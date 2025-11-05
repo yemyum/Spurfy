@@ -233,7 +233,7 @@ function SpaDetail() {
         {/* 6. 강아지 선택 */}
         <div className="border-t border-gray-200 py-6">
           <h3 className="font-semibold">반려견 선택</h3>
-          <p className="text-sm text-gray-400 mb-2">
+          <p className="text-sm text-gray-500 mb-2">
             (반려견을 등록하셔야 예약이 가능하며, 등록하신 정보를 토대로 진행됩니다.)
           </p>
           <select

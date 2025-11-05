@@ -89,18 +89,18 @@ function DogRegister() {
   };
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">반려견 등록</h2>
-      <form onSubmit={handleSubmit} className="w-full border-2 border-gray-200 p-8 rounded-lg shadow-sm bg-white mb-6 break-words">
+    <div className="mx-auto p-6 select-none">
+      <h2 className="text-2xl font-semibold mb-8">반려견 등록</h2>
+      <form onSubmit={handleSubmit} className="w-full border-2 border-gray-100 p-6 rounded-xl shadow-sm bg-white mb-6 break-words">
 
         <div className="flex flex-col md:flex-row">
           {/* ⭐ 1. 이미지 미리보기 영역과 파일 입력 버튼 ⭐ */}
           <div className="flex flex-col flex-shrink-0 w-full md:w-64">
-            <div className="w-56 h-56 bg-gray-200 rounded-lg overflow-hidden flex justify-center items-center text-gray-400 text-sm"> {/* 이미지 미리보기 자리 */}
+            <div className="w-56 h-56 bg-gray-100 rounded-xl overflow-hidden flex justify-center items-center"> {/* 이미지 미리보기 자리 */}
               {imagePreview ? (
                 <img src={imagePreview} alt="Dog Preview" className="w-full h-full object-cover" />
               ) : (
-                <span>이미지 없음</span>
+                <span className="text-gray-500 text-sm">이미지 없음</span>
               )}
             </div>
             {/* 실제 파일 선택 input은 숨기고, 버튼을 클릭하면 input을 클릭하도록 연결 */}
@@ -114,7 +114,7 @@ function DogRegister() {
             />
             <button
               type="button"
-              className="w-56 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm border-2 border-gray-200 bg-white"
+              className="w-56 px-2 py-1 mt-2 text-gray-500 font-semibold rounded-md shadow-sm hover:bg-gray-50 transition duration-300 border-2 border-gray-100 bg-white"
               onClick={() => document.getElementById('dogImage').click()} // 버튼 클릭 시 input 클릭
             >
               <FontAwesomeIcon icon={faCamera} className="mr-2" />사진 선택하기
@@ -125,8 +125,8 @@ function DogRegister() {
           <div className="flex-grow">
             <div className="space-y-6">
               {/* 1. 이름 */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">이름</label>
+              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">이름</label>
                 <input
                   type="text"
                   id="name"
@@ -134,24 +134,24 @@ function DogRegister() {
                   value={form.name}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
-                  placeholder="반려견 이름"
+                  className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  placeholder="(반려견 이름)"
                 />
               </div>
 
               {/* 2. 견종 */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                <label htmlFor="breed" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">견종</label>
+              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                <label htmlFor="breed" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">견종</label>
                 <select
                   id="breed"
                   name="breed"
                   value={form.breed}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">견종을 선택하세요.</option>
-                  {BREED_OPTIONS.map((breed) => ( // breedOptions 대신 BREED_OPTIONS로 변경했어!
+                  {BREED_OPTIONS.map((breed) => (
                     <option key={breed} value={breed}>
                       {breed}
                     </option>
@@ -161,8 +161,8 @@ function DogRegister() {
 
               {/* '기타' 견종 선택 시 직접 입력 필드 */}
               {form.breed === '기타' && (
-                <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                  <label htmlFor="customBreed" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">직접 입력</label>
+                <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                  <label htmlFor="customBreed" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">직접 입력</label>
                   <input
                     type="text"
                     id="customBreed"
@@ -170,14 +170,14 @@ function DogRegister() {
                     value={form.customBreed}
                     onChange={handleChange}
                     required
-                    className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                    className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                   />
                 </div>
               )}
 
               {/* 3. 생일 (캘린더 영역) */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                <label htmlFor="birthDate" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">생일</label>
+              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                <label htmlFor="birthDate" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">생일</label>
                 <input
                   type="date"
                   id="birthDate"
@@ -185,20 +185,20 @@ function DogRegister() {
                   value={form.birthDate}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 />
               </div>
 
               {/* 4. 성별 */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                <label htmlFor="gender" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">성별</label>
+              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                <label htmlFor="gender" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">성별</label>
                 <select
                   id="gender"
                   name="gender"
                   value={form.gender}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 >
                   <option value="">성별을 선택하세요.</option>
                   {GENDER_OPTIONS.map((option) => ( // GENDER_OPTIONS 사용!
@@ -210,8 +210,8 @@ function DogRegister() {
               </div>
 
               {/* 5. 몸무게 */}
-              <div className="flex items-center gap-2 border-b-2 border-gray-200 pb-5">
-                <label htmlFor="weight" className="w-16 font-semibold text-lg text-gray-700 flex-shrink-0">몸무게</label>
+              <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
+                <label htmlFor="weight" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">몸무게</label>
                 <input
                   type="number"
                   id="weight"
@@ -221,14 +221,14 @@ function DogRegister() {
                   value={form.weight}
                   onChange={handleChange}
                   required
-                  className="flex-grow p-2 border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
                 />
               </div>
             </div> {/* space-y-4 끝 */}
 
             {/* 6. 정보 작성란 (특이사항) */}
             <div className="mt-6">
-              <label htmlFor="notes" className="block font-semibold text-lg text-gray-700 mb-2">특이사항</label>
+              <label htmlFor="notes" className="block font-semibold text-lg text-gray-500 mb-2">특이사항</label>
               <textarea
                 id="notes"
                 name="notes"
@@ -236,13 +236,13 @@ function DogRegister() {
                 value={form.notes}
                 onChange={handleChange}
                 rows={5}
-                className="w-full p-2 border-2 border-gray-200 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-gray-100"
+                className="w-full p-2 border-2 border-gray-100 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-gray-100"
               />
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between gap-3 mt-6">
+        <div className="flex justify-between mt-6">
           <button
             type="button"
             className="px-6 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300"

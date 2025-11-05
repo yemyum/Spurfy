@@ -105,18 +105,18 @@ function MyReviewDetail() {
   }
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <div className="text-2xl font-semibold mb-6 text-spurfyBlue">리뷰 관리</div>
+    <div className="mx-auto p-6 select-none">
+      <div className="text-2xl font-semibold mb-8">리뷰 상세</div>
 
-      <div className="border-2 border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6">
-        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
-        <h3 className='text-xl font-semibold'>{reviewDetail.serviceName}</h3>
-        <p className='text-lg font-semibold'>{reviewDetail.price}원</p>
-        <p className='text-gray-400'>{reviewDetail.dogName} | 작성일 {reviewDetail.createdAt}</p>
+      <div className="border-2 border-gray-100 py-4 rounded-xl shadow-sm bg-white mb-6">
+        <div className="pb-3 mb-4 border-b-2 border-gray-100 px-4">
+        <h3 className='text-lg font-semibold'>{reviewDetail.serviceName}</h3>
+        <p className='font-semibold'>{reviewDetail.price}원</p>
+        <p className='text-gray-500'>{reviewDetail.dogName} | 작성일 {reviewDetail.createdAt}</p>
         </div>
 
         {/* ⭐⭐ MUI StarRating 컴포넌트 사용 ⭐⭐ */}
-        <div className="pb-4 px-6">
+        <div className="pb-4 px-4">
           {isEditing ? (
             // 수정 모드일 때: onRate를 통해 setEditedRating 연결, readOnly={false}
             <StarRating rating={editedRating} onRate={setEditedRating} readOnly={false} /> 
@@ -128,7 +128,7 @@ function MyReviewDetail() {
         {/* 리뷰 내용 */}
         {isEditing ? (
           <textarea
-            className="w-full p-2 border-2 border-gray-200 rounded-lg mt-2 min-h-24 resize-y focus:outline-none"
+            className="w-full p-2 border-2 border-gray-100 rounded-lg mt-2 min-h-24 resize-none focus:outline-none"
             value={editedContent}
             onChange={(e) => setEditedContent(e.target.value)}
             rows="5"
@@ -174,7 +174,7 @@ function MyReviewDetail() {
         )}
 
         {/* 버튼 */}
-        <div className="mt-6 flex justify-between pt-5 px-6 border-t-2 border-gray-200">
+        <div className="mt-6 flex justify-between pt-4 px-4 border-t-2 border-gray-100">
           {isEditing ? (
             <>
               <button onClick={handleCancelEdit} className="px-4 py-2 font-semibold bg-gray-200 text-gray-600 rounded-lg shadow-sm hover:bg-gray-300 transition duration-300">취소</button>

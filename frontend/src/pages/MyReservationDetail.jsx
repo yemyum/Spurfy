@@ -135,24 +135,24 @@ function MyReservationDetail() {
   const canWriteReview = reservation.reservationStatus === "COMPLETED" && !reservation.hasReview;
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">예약 상세</h2>
+    <div className="mx-auto p-6 select-none">
+      <h2 className="text-2xl font-semibold mb-8">예약 상세</h2>
 
-      <div className="border-2 border-gray-200 py-5 rounded-xl shadow-sm bg-white mb-6 relative">
+      <div className="border-2 border-gray-100 py-4 rounded-xl shadow-sm bg-white mb-6 relative">
         <span
           className={`absolute top-4 right-4 inline-block px-3 py-1 rounded-full text-xs font-semibold ${statusLabel[reservation.reservationStatus]?.tagClass || 'bg-red-100 text-red-500'}`}
         >
           {statusLabel[reservation.reservationStatus]?.text || reservation.reservationStatus}
         </span>
-        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
-          <p className="text-lg font-semibold">
-            <span className="">예약번호</span>
-            <span className="ml-1">[{reservation.reservationId}]</span>
+        <div className="pb-3 mb-4 border-b-2 border-gray-100 px-4">
+          <p className="text-lg">
+            <span className="font-semibold">예약번호 </span>
+            <span className="text-base text-spurfyBlue">{reservation.reservationId}</span>
           </p>
         </div>
 
-        <div className="px-6">
-          <div className="pb-2 mb-4 border-b-2 border-gray-200">
+        <div className="px-4">
+          <div className="pb-2 mb-4 border-b-2 border-gray-100">
             <p className="mb-4">
               <span className="text-gray-500">스파 서비스명 : </span>
               <span>{reservation.serviceName}</span>
@@ -195,7 +195,7 @@ function MyReservationDetail() {
             )}
           </div>
           {(reservation.cancelReason || reservation.refundStatus !== 'NONE' || reservation.refundedAt) && (
-            <div className="pt-4 mb-4 border-t-2 border-gray-200">
+            <div className="pt-4 mb-4 border-t-2 border-gray-100">
               {reservation.cancelReason && (
                 <p className="mb-4">
                   <span className="text-gray-500">취소 사유 : </span>
@@ -220,7 +220,7 @@ function MyReservationDetail() {
         </div>
 
         {/* 세 번째 섹션: 버튼들 */}
-        <div className="flex justify-between px-6 pt-5 border-t-2 border-gray-200">
+        <div className="flex justify-between px-4 pt-4 border-t-2 border-gray-100">
           <button
             onClick={() => navigate(-1)}
             className="px-3 py-2 font-semibold text-sm bg-gray-200 text-gray-600 rounded-lg hover:bg-gray-300 transition duration-300"

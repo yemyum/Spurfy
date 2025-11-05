@@ -172,7 +172,6 @@ const AIRecommendationPage = () => {
       if (apiMsg) {
         msg = apiMsg;
 
-        // 필요하다면 에러 코드만 뒤에 붙여서 개발자에게 힌트를 줄 수 있어.
         if (apiCode) {
           msg += ` (Code: ${apiCode})`;
         }
@@ -191,7 +190,7 @@ const AIRecommendationPage = () => {
 
         removeMessage(userTempId);
 
-        alert(msg); // ⭐️⭐️⭐️ 중요: 여기서 함수 실행을 완전히 끝내서 아래 코드가 실행되지 않게 막기!
+        alert(msg); // 중요: 여기서 함수 실행을 완전히 끝내서 아래 코드가 실행되지 않게 막기!
 
         return;
 

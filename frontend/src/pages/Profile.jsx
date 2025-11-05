@@ -45,7 +45,7 @@ function Profile() {
   }
 
   return (
-    <div className="mx-auto p-8 select-none">
+    <div className="mx-auto p-6 select-none">
       <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">내 프로필</h2>
 
       {/* ⭐️ 컴포넌트를 props와 함께 불러오기! ⭐️ */}

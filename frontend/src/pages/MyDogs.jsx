@@ -40,10 +40,9 @@ function MyDogs() {
   };
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <div className="text-2xl font-semibold mb-6 text-spurfyColor">반려견 케어</div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">나의 반려견 리스트</h2>
+    <div className="mx-auto p-6 select-none">
+      <div className="flex justify-between items-center mb-8">
+      <div className="text-2xl font-semibold text-spurfyColor">반려견 케어</div>
         <SpurfyButton variant='outline'
           className="whitespace-nowrap px-4 py-2 shadow-sm text-sm"
           onClick={() => navigate('/mypage/dogs/register')}>
@@ -63,10 +62,10 @@ function MyDogs() {
           {dogs.map((dog) => (
             <li key={dog.dogId}
               onClick={() => navigate(`/mypage/dogs/${dog.dogId}`)}
-              className="border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex flex-col gap-4">
+              className="border-2 border-gray-100 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex flex-col gap-4">
               {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
               <div className="flex items-stretch gap-4">
-                <div className="w-32 h-32 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+                <div className="w-32 h-32 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
                   {dog.imageUrl ? (
                     <img
                       src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`}
@@ -79,8 +78,8 @@ function MyDogs() {
                 </div>
 
                 {/* ⭐ 2. 중간: 강아지 정보 영역 - flex-grow로 남은 공간 다 차지 ⭐ */}
-                <div className="flex-grow flex flex-col mt-1">
-                  <h3 className="font-semibold text-xl">{dog.name}</h3>
+                <div className="flex-grow flex flex-col">
+                  <h3 className="font-semibold text-lg">{dog.name}</h3>
                   <p>견종 : {dog.breed}</p>
                   <p>성별 : {dog.gender === 'M' ? '남아' : '여아'}</p>
                 </div>

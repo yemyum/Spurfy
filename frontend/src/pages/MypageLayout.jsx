@@ -29,9 +29,9 @@ function MypageLayout() {
       <div className="lg:grid lg:grid-cols-[220px,1fr] gap-6">
         {/* 사이드바 */}
         <aside className="hidden lg:block sticky top-24">
-          <div className="rounded-xl border border-gray-200 bg-white shadow-md p-4 py-4">
-            <h2 className="text-lg font-semibold mb-4 px-2 border-b pb-2 border-b-gray-200">마이페이지</h2>
-            <ul className="space-y-2">
+          <div className="rounded-xl border border-gray-200 bg-white shadow-md p-4">
+            <h2 className="text-lg font-semibold px-2 border-b pb-2 border-b-gray-200">마이페이지</h2>
+            <ul className="mt-4 mb-1 space-y-2">
               {menu.map(m => (
                 <li key={m.path}>
                   <NavLink
@@ -39,8 +39,8 @@ function MypageLayout() {
                     className={({ isActive }) =>
                       `block w-full rounded-lg px-3 py-2 transition
                        ${isActive
-                         ? "bg-gradient-to-r from-spurfyLogo to-spurfyBlue text-white font-semibold shadow-sm"
-                         : "hover:bg-sky-100"}`
+                         ? "bg-gradient-to-r from-spurfyLogo to-spurfyBlue font-semibold text-white shadow-sm"
+                         : "hover:bg-sky-50"}`
                     }
                   >
                     {m.label}

@@ -22,9 +22,8 @@ function MyReviewList() {
   }, []);
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">리뷰 내역</h2>
-      <h2 className="text-xl font-semibold mb-6">내가 작성한 리뷰 목록</h2>
+    <div className="mx-auto p-6 select-none">
+      <h2 className="text-2xl font-semibold mb-8 text-spurfyBlue">리뷰 내역</h2>
 
       {isLoading ? (
         null
@@ -34,7 +33,7 @@ function MyReviewList() {
         reviews.map((r) => (
           <div
             key={r.reviewId}
-            className="w-full bg-white border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 break-words"
+            className="w-full bg-white border-2 border-gray-100 px-4 py-3 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 break-words"
             onClick={() => navigate(`/mypage/reviews/${r.reviewId}`, { state: r })}
           >
             <h3
@@ -54,7 +53,7 @@ function MyReviewList() {
             </h3>
 
             <p className="text-sm text-gray-400">작성일 | {r.createdAt}</p>
-            <p className="mt-2 text-gray-800">{r.content}</p>
+            <p className="mt-2">{r.content}</p>
 
             <div className="flex flex-wrap gap-2 mt-4">
               <SpurfyButton variant="primary"

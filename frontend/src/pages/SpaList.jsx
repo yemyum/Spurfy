@@ -31,14 +31,14 @@ function SpaList() {
   };
 
   return (
-    <div className="w-full mx-auto select-none bg-white rounded-xl shadow-md border border-gray-200 p-8">
+    <div className="w-full mx-auto select-none bg-white rounded-xl shadow-md border border-gray-200 p-6">
       <h2 className="text-2xl font-semibold mb-8 text-spurfyBlue">스파 서비스</h2>
 
       <div className="flex flex-col space-y-8 mb-4">
         {list.map((spa) => (
           <div
             key={spa.serviceId}
-            className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col hover:ring-4 hover:ring-spurfyBlue/30 transition-all duration-300 ease-in-out"
+            className="w-full bg-white rounded-xl shadow-sm border-2 border-gray-100 p-6 flex flex-col hover:ring-4 hover:ring-spurfyBlue/30 transition-all duration-300 ease-in-out"
           >
             {/* 이미지 영역 */}
             <div
@@ -59,14 +59,14 @@ function SpaList() {
 
             {/* 이름 + 가격 */}
             <div className="mb-2">
-              <h3 className="text-lg font-semibold text-spurfyBlue">{spa.name}</h3>
-              <p className="">{spa.price.toLocaleString()}원</p>
+              <h3 className="text-xl font-semibold text-spurfyBlue">{spa.name}</h3>
+              <p className="font-semibold">{spa.price.toLocaleString()}원</p>
             </div>
 
             {/* 태그 영역 */}
-            <div className="flex flex-wrap gap-1 my-2">
+            <div className="flex flex-wrap gap-2">
               {spa.tagNames?.map((tagName, index) => (
-                <span key={index} className="text-sm font-semibold bg-sky-50 text-spurfyLogo px-2 py-1 rounded-full">
+                <span key={index} className="text-sm font-semibold bg-sky-50 text-spurfyColor px-2 py-1 rounded-full">
                   #{tagName}
                 </span>
               ))}
@@ -74,7 +74,7 @@ function SpaList() {
 
             {/* 예약 버튼 */}
             <Link to={`/spalist/slug/${spa.slug}`}>
-              <SpurfyButton variant="primary" className="w-full px-4 py-3 text-center mt-2">
+              <SpurfyButton variant="primary" className="w-full px-4 py-3 text-center mt-4">
                 예약하러 가기
               </SpurfyButton>
             </Link>

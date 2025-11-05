@@ -49,7 +49,7 @@ function DogDetail() {
   }, [dogId]);
 
   if (error) {
-    return <div className="p-4 text-red-600">에러 발생: {error}</div>;
+    return <div className="p-4 text-red-400">{error}</div>;
   }
 
   // 아직 dog 데이터가 없으면 null 반환
@@ -59,23 +59,20 @@ function DogDetail() {
 
   return (
 
-    <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">반려견 정보</h2>
+    <div className="mx-auto p-6 select-none">
+      <h2 className="text-2xl font-semibold mb-8">반려견 상세</h2>
 
-      <div className="border-2 border-gray-200 py-6 rounded-xl shadow-sm bg-white mb-6">
-
-        <div className="pb-4 mb-4 border-b-2 border-gray-200 px-6">
-          <h2 className="text-xl font-semibold ">
-            <span className="text-2xl mr-1">
-              {dog.name}
-            </span>의 상세 정보
-          </h2>
+      <div className="border-2 border-gray-100 py-4 rounded-xl shadow-sm bg-white mb-6">
+        <div className="pb-3 mb-4 border-b-2 border-gray-100 px-4">
+          <span className="text-lg font-semibold text-spurfyBlue">
+            {dog.name}
+          </span>
         </div>
 
         {/* 1. 이미지와 상세 정보를 가로로 배치할 새로운 flex 컨테이너 */}
-        <div className="flex items-start gap-4 px-6 pt-2">
+        <div className="flex items-start gap-4 px-4">
           {/* ⭐ 1.1. 이미지 영역 ⭐ */}
-          <div className="w-40 h-40 bg-gray-200 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
+          <div className="w-40 h-40 bg-gray-100 rounded-lg flex-shrink-0 flex items-center justify-center overflow-hidden">
             {dog.imageUrl ? (
               <img
                 src={`${import.meta.env.VITE_IMAGE_BASE_URL}${dog.imageUrl}`}
@@ -102,7 +99,7 @@ function DogDetail() {
           </div>
         </div>
 
-        <div className="flex justify-between mt-6 pt-5 px-6 border-t-2 border-gray-200">
+        <div className="flex justify-between mt-4 pt-4 px-4 border-t-2 border-gray-100">
           <SpurfyButton variant='danger'
             onClick={handleDelete}
             className="px-3 py-2 text-sm"

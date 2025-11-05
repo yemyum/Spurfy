@@ -92,9 +92,8 @@ function MyReservationList() {
   };
 
   return (
-    <div className="mx-auto p-8 select-none">
-      <h2 className="text-2xl font-semibold mb-6 text-spurfyBlue">예약 내역</h2>
-      <h2 className="text-xl font-semibold mb-6">나의 예약 목록</h2>
+    <div className="mx-auto p-6 select-none">
+      <h2 className="text-2xl font-semibold mb-8 text-spurfyBlue">예약 내역</h2>
 
       {/* 1. 아직 데이터를 불러오지 않았다면 (API 요청 중) 아무것도 렌더링하지 않음 */}
       {isLoading ? (
@@ -116,7 +115,7 @@ function MyReservationList() {
         reservations.map((r) => (
           <div
             key={r.reservationId}
-            className="w-full border border-gray-200 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex items-stretch gap-4"
+            className="w-full border-2 border-gray-100 p-4 mb-4 rounded-xl shadow-sm cursor-pointer hover:bg-sky-50 flex items-stretch gap-4"
             onClick={() => handleItemClick(r.reservationId)}
           >
             {/* ⭐ 1. 왼쪽: 이미지 영역 ⭐ */}
@@ -127,10 +126,10 @@ function MyReservationList() {
             {/* ⭐ 2. 가운데: 예약 정보 텍스트 (서비스명, 날짜, 가격)⭐ */}
             <div className="flex-grow flex flex-col justify-between mt-1">
               <div> {/* 서비스명 */}
-                <p className="text-lg font-bold text-gray-800">{r.serviceName}</p>
+                <p className="text-lg font-semibold">{r.serviceName}</p>
                 {/* 날짜, 가격 */}
                 <p className="text-gray-400 text-sm mb-4">이용 날짜 | {r.reservationDate} {r.reservationTime}</p>
-                <p className="text-gray-900 font-bold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
+                <p className="font-semibold text-lg">{r.price ? r.price.toLocaleString() : "가격 정보 없음"}원</p>
               </div>
             </div>
 

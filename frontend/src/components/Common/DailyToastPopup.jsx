@@ -3,10 +3,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 const DailyToastPopup = () => {
-  const [showToast, setShowToast] = useState(true);
+  const [showToast, setShowToast] = useState(false);
 
-  // 닫기 버튼 핸들러
+  const STORAGE_KEY = 'dailyToastClosedTime'; // localStorage 키
+
+  useEffect(() => {
+    const closedTime = localStorage.getItem(STORAGE_KEY);
+    const now = Date.now();
+    const ONE_DAY = 24 * 60 * 60 * 1000; // 86,400,000 밀리초 = 24시간
+
+    // 저장된 시간이 없거나 (첫 방문), 24시간이 지났으면 팝업을 띄움
+    if (!closedTime || (now - closedTime > ONE_DAY)) {
+      setShowToast(true);
+    } else {
+      // (2) 24시간이 안 지났으면 false를 유지 (없어도 됨, 다만 로직 명확화)
+      setShowToast(false);
+    }
+  }, []);
+
+  // 2. 닫기 버튼 핸들러
   const handleCloseToast = () => {
+    // 현재 시각을 localStorage에 저장
+    localStorage.setItem(STORAGE_KEY, String(Date.now()));
+    // 상태를 업데이트해서 팝업을 닫음
     setShowToast(false);
   };
 
