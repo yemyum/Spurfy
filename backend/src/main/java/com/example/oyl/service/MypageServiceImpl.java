@@ -9,7 +9,7 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MypageServiceImpl implements MypageService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService;
 
     @Override
@@ -102,6 +102,10 @@ public class MypageServiceImpl implements MypageService {
         // 3. 새 비밀번호 암호화 후 업데이트
         user.updatePassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user); // JPA Dirty Checking으로 자동 저장될 수도 있지만 명시적으로 save
+
+        // 비밀번호 변경 성공 후 모든 토큰 철회
+        // 사용자의 모든 Refresh Token을 DB에서 무효화시켜서 기존 세션을 끊음
+        refreshTokenService.revokeAllTokensForUser(user);
     }
 
     @Override
