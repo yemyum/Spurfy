@@ -2,6 +2,8 @@ package com.example.oyl.service;
 
 import com.example.oyl.domain.RefreshToken;
 import com.example.oyl.domain.User;
+import com.example.oyl.dto.LoginResult;
+import com.example.oyl.dto.UserLoginRequestDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -22,11 +24,4 @@ public interface RefreshTokenService {
 
     // 만료/폐기된 토큰 청소
     void cleanUpExpiredTokens();
-
-    // 새 AccessToken 발급
-    String issueNewAccessToken(String refreshToken, HttpServletResponse response);
-
-    void logout(HttpServletRequest request, HttpServletResponse response);
-
-    void expireRefreshCookie(HttpServletResponse response);
 }

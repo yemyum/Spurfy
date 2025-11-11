@@ -40,36 +40,6 @@ public class UserController {
         );
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<String>> login(
-            @RequestBody UserLoginRequestDTO requestDTO,
-            HttpServletResponse response
-    ) {
-        // userService.login()에서 AccessToken, RefreshToken 둘 다 발급
-        LoginResult loginResult = userService.login(requestDTO);
-
-        boolean isProd = false; // 로컬 개발중: HTTP라 false
-
-        String refreshToken = loginResult.getRefreshToken();
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .httpOnly(true)
-                .path("/api/users")
-                .maxAge(Duration.ofDays(7))
-                .secure(isProd ? true : false)
-                .sameSite(isProd ? "None" : "Lax")
-                // .domain("your-domain.com")
-                .build();
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-        return ResponseEntity.ok(
-                ApiResponse.<String>builder()
-                        .code("S002")
-                        .message("로그인 성공")
-                        .data(loginResult.getAccessToken())
-                        .build()
-        );
-    }
-
     @GetMapping("/check-email")
     public ResponseEntity<Boolean> checkEmailDuplicate(@RequestParam String email) {
         boolean isDuplicate = userService.existsByEmail(email);

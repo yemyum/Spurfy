@@ -7,6 +7,7 @@ import com.example.oyl.dto.UserProfileResponseDTO;
 import com.example.oyl.dto.UserUpdateRequestDTO;
 import com.example.oyl.dto.WithdrawalRequestDTO;
 import com.example.oyl.repository.UserRepository;
+import com.example.oyl.service.AuthService;
 import com.example.oyl.service.MypageService;
 import com.example.oyl.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class MypageController {
 
     private final MypageService mypageService;
-    private final RefreshTokenService refreshTokenService;
+    private final AuthService authService;
 
     @GetMapping("/profile")
     @PreAuthorize("isAuthenticated()")
@@ -100,7 +101,7 @@ public class MypageController {
         mypageService.withdrawUser(email, request); // 내부에서 revokeAllTokensForUser 호출
 
         // (서비스에서 쿠키 옵션 동일하게 처리)
-        refreshTokenService.expireRefreshCookie(response);
+        authService.expireRefreshCookie(response);
 
         return ResponseEntity.ok(
                 ApiResponse.<Void>builder()

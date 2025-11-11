@@ -18,8 +18,6 @@ public interface UserService {
 
     void signup(UserSignupRequestDTO requestDTO);
 
-    LoginResult login(UserLoginRequestDTO requestDTO);
-
     boolean existsByEmail(String email);
 
 }

@@ -26,10 +26,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
-    private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder; // 의존성 주입
-    private final RefreshTokenService refreshTokenService;
 
     @Override
     @Transactional
@@ -64,26 +62,6 @@ public class UserServiceImpl implements UserService{
                 .build();
 
         userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    public LoginResult login(UserLoginRequestDTO dto) {
-        User user = userRepository.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
-        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD);
-        }
-
-        // Access / Refresh 발급
-        String accessToken = jwtUtil.createAccessToken(user);
-        String refreshToken = jwtUtil.createRefreshToken(user);
-
-        // refreshToken 저장 (expiresAt 계산은 서비스가 알아서 함)
-        refreshTokenService.save(user, refreshToken);
-
-        return new LoginResult(accessToken, refreshToken);
     }
 
     @Override
