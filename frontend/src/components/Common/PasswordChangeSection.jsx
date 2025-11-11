@@ -1,4 +1,3 @@
-import React from 'react';
 import SpurfyButton from './SpurfyButton';
 
 const PasswordChangeSection = ({

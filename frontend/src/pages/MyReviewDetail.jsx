@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';

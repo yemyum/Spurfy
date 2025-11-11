@@ -8,8 +8,8 @@ const api = axios.create({
 // 공개 경로 목록 (baseURL 제외한 경로 기준)
 const PUBLIC_PATHS = [
   /^\/users\/signup$/,
-  /^\/users\/login$/,
-  /^\/users\/refresh-token$/,
+  /^\/auth\/login$/,
+  /^\/auth\/refresh-token$/,
   /^\/images\/.*/,
   /^\/dog-images\/.*/,
   /^\/users\/check-email$/,
@@ -31,9 +31,9 @@ const isPublicPath = (url) => {
 const isRefreshPath = (url) => {
   try {
     const p = new URL(url, 'http://dummy').pathname;
-    return /\/users\/refresh-token\/?$/.test(p);
+    return /\/auth\/refresh-token\/?$/.test(p);
   } catch {
-    return /\/users\/refresh-token\/?$/.test(url || '');
+    return /\/auth\/refresh-token\/?$/.test(url || '');
   }
 };
 
@@ -113,7 +113,7 @@ function flushQueue(newToken) {
 }
 
 async function callRefresh() {
-  const resp = await api.post('/users/refresh-token', {}, { withCredentials: true });
+  const resp = await api.post('/auth/refresh-token', {}, { withCredentials: true });
   const newToken =
     resp?.data?.data?.accessToken ??
     resp?.data?.accessToken ??

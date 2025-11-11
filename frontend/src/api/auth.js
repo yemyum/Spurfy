@@ -3,7 +3,7 @@ import api, { setAccessToken, beginForceLogout } from './axios';
 
 // 로그인
 export async function login(email, password) {
-  const res = await api.post('/users/login', { email, password }, { withCredentials: true });
+  const res = await api.post('/auth/login', { email, password }, { withCredentials: true });
   const token = res?.data?.data ?? res?.data?.accessToken; // ApiResponse<String> or {accessToken}
   if (!token) throw new Error('로그인 응답에 accessToken 없음');
   setAccessToken(token);
@@ -16,7 +16,7 @@ export async function login(email, password) {
 export async function logout() {
   try {
     beginForceLogout(); // 명시적 로그아웃 중엔 리프레시 금지
-    await api.post('/users/logout', {}, { withCredentials: true });
+    await api.post('/auth/logout', {}, { withCredentials: true });
   } catch (e) {
     console.error('logout error:', e);
   } finally {

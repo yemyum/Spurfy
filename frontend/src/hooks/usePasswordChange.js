@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import api from '../api/axios';
 
-const usePasswordChange = () => {
+const usePasswordChange = (navigate, setAccessToken) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmNewPassword, setConfirmNewPassword] = useState('');
@@ -32,6 +32,13 @@ const usePasswordChange = () => {
 
             if (res.data.code === 'S001') {
                 alert('비밀번호가 성공적으로 변경되었습니다!');
+
+                // Access Token 초기화 (유효하지 않은 토큰 정리)
+                if (setAccessToken) setAccessToken(null);
+
+                // 로그인 페이지로 강제 이동 (재로그인 유도)
+                if (navigate) navigate('/login');
+
                 setCurrentPassword('');
                 setNewPassword('');
                 setConfirmNewPassword('');
