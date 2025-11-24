@@ -7,6 +7,7 @@ import com.example.oyl.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,9 +82,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     // 5. DB에 남은 만료된/오래된 토큰 정리
     @Transactional
+    @Scheduled(cron = "0 30 3 * * *")
     @Override
     public void cleanUpExpiredTokens() {
-        refreshTokenRepository.deleteRevokedOrExpired(LocalDateTime.now());
+        log.info("📢 [Scheduler] Refresh Token DB 청소 시작...");
+
+        // delete 쿼리 실행하고, 삭제된 개수를 받아옴
+        int deletedCount = refreshTokenRepository.deleteRevokedOrExpired(LocalDateTime.now());
+
+        // ✅ 결과 로그 출력
+        log.info("✅ [Scheduler] Refresh Token DB 청소 완료. 삭제된 토큰 개수: {}", deletedCount);
+
     }
 
 }

@@ -92,7 +92,7 @@ public class AIRecommendationService {
         LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).withNano(999_999_999);
 
-        // // errorMessage가 NULL인 경우, 즉 '성공한' 기록만 카운트하도록
+        // errorMessage가 NULL인 경우, 즉 '성공한' 기록만 카운트하도록
         long todayCount = aiRecommendHistoryRepository.countByUserIdAndCreatedAtBetweenAndErrorMessageIsNull(
                 userEmail, startOfDay, endOfDay
         );

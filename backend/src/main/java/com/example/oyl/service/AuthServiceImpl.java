@@ -27,9 +27,13 @@ public class AuthServiceImpl implements AuthService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RefreshTokenService refreshTokenService; // 토큰 관리에 필요
 
-    @Value("${app.cookie.secure:true}") private boolean cookieSecure;
-    @Value("${app.cookie.domain:}")    private String cookieDomain;
-    private String blankToNull(String v){ return (v==null||v.isBlank())?null:v; }
+    @Value("${app.cookie.secure:true}")
+    private boolean cookieSecure;
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+    private String blankToNull(String v) {
+        return (v==null||v.isBlank())?null:v;
+    }
 
     @Override
     @Transactional
