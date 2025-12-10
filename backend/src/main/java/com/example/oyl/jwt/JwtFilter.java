@@ -32,9 +32,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // 퍼블릭 경로 목록
     private static final List<String> SKIP_PATHS = List.of(
-            "/api/users/login",
+            "/api/auth/login",
             "/api/users/signup",
-            "/api/users/refresh-token",
+            "/api/auth/refresh-token",
             "/api/images/**",
             "/dog-images/**",
             "/api/users/check-email",
