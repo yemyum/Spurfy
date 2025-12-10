@@ -41,16 +41,16 @@ public class AuthController {
         // userService.login()에서 AccessToken, RefreshToken 둘 다 발급
         LoginResult loginResult = authService.login(requestDTO);
 
-        boolean isProd = false; // 로컬 개발중: HTTP라 false
+        boolean isProd = false; // 로컬 개발중: HTTP라 false, 운영 중: true로 변경 필요
 
         String refreshToken = loginResult.getRefreshToken();
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
-                .path("/api/users")
+                .path("/")
                 .maxAge(Duration.ofDays(7))
                 .secure(isProd ? true : false)
                 .sameSite(isProd ? "None" : "Lax")
-                // .domain("your-domain.com")
+                // .domain("your-domain.com"), 정확한 도메인 기입 필요!
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
