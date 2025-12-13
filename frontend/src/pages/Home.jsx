@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import SpurfyDog from '../assets/SpurfyDog.png';
-import SpurfyCA from '../assets/SpurfyCA.png';
+import SpurfyDog from './assets/SpurfyDog.png';
+import SpurfyCA from './assets/SpurfyCA.png';
 import SpurfyButton from '../components/Common/SpurfyButton';
 
 function Home() {
