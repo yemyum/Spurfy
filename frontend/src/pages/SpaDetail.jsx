@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';
-import welcomeSpa from '../assets/welcomeSpa.png';
+import WelcomeSpa from '../assets/WelcomeSpa.png';
 import PremiumbrushingSpa from '../assets/PremiumbrushingSpa.png';
 import RelaxingtherapySpa from '../assets/RelaxingtherapySpa.png';
 import CalmingskinSpa from '../assets/CalmingskinSpa.png';
@@ -23,7 +23,7 @@ function SpaDetail() {
   const [serviceInfos, setServiceInfos] = useState([]);
 
   const spaDetailImageMap = {
-    'welcome-spa': welcomeSpa,
+    'welcome-spa': WelcomeSpa,
     'premium-brushing-spa': PremiumbrushingSpa,
     'relaxing-therapy-spa': RelaxingtherapySpa,
     'calming-skin-spa': CalmingskinSpa,
