@@ -50,4 +50,3 @@ dog_images/
 # 프론트엔드 빌드 결과 및 Node modules 무시 (Vite + React 기준)
 frontend/node_modules/
 frontend/dist/
-frontend/src/assets/
