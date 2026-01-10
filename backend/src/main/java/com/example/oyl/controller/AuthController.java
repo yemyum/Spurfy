@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -33,25 +34,29 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Value("${app.cookie.secure}")
+    private boolean isSecure;
+
+    @Value("${app.cookie.domain}")
+    private String cookieDomain;
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(
             @RequestBody UserLoginRequestDTO requestDTO,
             HttpServletResponse response
     ) {
-        // userService.login()에서 AccessToken, RefreshToken 둘 다 발급
         LoginResult loginResult = authService.login(requestDTO);
-
-        boolean isProd = false; // 로컬 개발중: HTTP라 false, 운영 중: true로 변경 필요
 
         String refreshToken = loginResult.getRefreshToken();
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .secure(isProd ? true : false)
-                .sameSite(isProd ? "None" : "Lax")
-                // .domain("your-domain.com"), 정확한 도메인 기입 필요!
+                .secure(isSecure) // 프로퍼티 값에 따라 자동 설정 (운영에선 true)
+                .sameSite(isSecure ? "None" : "Lax") // 보안 설정
+                .domain(cookieDomain) // spurfy.site 반영
                 .build();
+
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return ResponseEntity.ok(
