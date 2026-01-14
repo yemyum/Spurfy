@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
+public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
     // ✅ 유효한 토큰 하나 찾기 (검증용)
     Optional<RefreshToken> findFirstByTokenHashAndRevokedFalseAndExpiresAtAfter(
