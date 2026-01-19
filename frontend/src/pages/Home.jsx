@@ -20,12 +20,6 @@ function Home() {
 
   // 추천받으러 가기 클릭 핸들러
   const handleGoAI = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      alert('로그인 후 이용 가능합니다.');
-      navigate('/login');
-      return;
-    }
     navigate('/dog-spa-ai');
   };
 

@@ -51,15 +51,6 @@ const AIRecommendationPage = () => {
     return () => clearTimeout(t);
   }, [errorMessage]);
 
-  // 로그인 체크
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("로그인 후 이용 가능합니다.");
-      navigate("/login");
-    }
-  }, [navigate]);
-
   // 자동 스크롤
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "auto", block: "end" });

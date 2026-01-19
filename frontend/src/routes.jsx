@@ -1,9 +1,9 @@
 // src/routes.jsx
 import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
+import ProtectedRoute from './components/Common/ProtectedRoute';
 import RootLayout from './layouts/RootLayout';
 
-// 모든 페이지 컴포넌트들을 임포트 (네 기존 코드에서 가져옴)
 import Home from './pages/Home';
 import About from './pages/About';
 import Signup from './pages/Signup';
@@ -29,18 +29,22 @@ import NotFoundPage from './pages/NotFoundPage';
 
 const router = createBrowserRouter([
   {
-    path: '/', // 웹사이트의 가장 기본 경로. 모든 페이지가 이 RootLayout 안에 들어갈 거
+    path: '/', // 웹사이트의 가장 기본 경로. 모든 페이지가 이 RootLayout 안에 들어갈 것
     element: <RootLayout />,
     errorElement: <NotFoundPage />,
-    children: [ 
+    children: [
       { index: true, element: <Home /> },
       { path: 'about', element: <About /> },
       { path: 'spalist', element: <SpaList /> },
       { path: 'spalist/slug/:spaSlug', element: <SpaDetail /> },
-      { path: 'mypage/withdrawal', element: <WithdrawalPage /> },
+      { path: 'mypage/withdrawal', element: <ProtectedRoute><WithdrawalPage /></ProtectedRoute> },
       {
         path: 'mypage',
-        element: <MypageLayout />,
+        element: (
+          <ProtectedRoute>
+            <MypageLayout />
+          </ProtectedRoute>
+        ),
         errorElement: <NotFoundPage />,
         children: [
           { path: 'profile', element: <Profile /> },
@@ -58,10 +62,10 @@ const router = createBrowserRouter([
   },
   { path: '/login', element: <Login /> },
   { path: '/signup', element: <Signup /> },
-  { path: '/payment', element: <PaymentPage /> },
-  { path: '/payment/:reservationId', element: <PaymentPage /> },
-  { path: '/review/write', element: <ReviewWrite /> },
-  { path: '/dog-spa-ai', element: <AIRecommendationPage /> },
+  { path: '/payment', element: <ProtectedRoute><PaymentPage /></ProtectedRoute> },
+  { path: '/payment/:reservationId', element: <ProtectedRoute><PaymentPage /></ProtectedRoute> },
+  { path: '/review/write', element: <ProtectedRoute><ReviewWrite /></ProtectedRoute> },
+  { path: '/dog-spa-ai', element: <ProtectedRoute><AIRecommendationPage /></ProtectedRoute> },
   { path: '/spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
 
   { path: '*', element: <NotFoundPage /> }
