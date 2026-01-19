@@ -19,7 +19,6 @@ services:
       - ./db/.env
     volumes:
       - spurfy_data:/var/lib/mysql
-      - ./docker-init/spurfy_init_data.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "3306:3306"
 

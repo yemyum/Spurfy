@@ -219,13 +219,13 @@ function SpaDetail() {
             onChange={e => setTime(e.target.value)}
             className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
           >
-            <option value="">시간 선택</option>
+            <option value="">이용하실 시간을 선택해주세요.</option>
             {Array.isArray(spa.availableTimes) && spa.availableTimes.length > 0 ? (
               spa.availableTimes.map((t) => (
                 <option key={t} value={t}>{t}</option>
               ))
             ) : (
-              <option disabled>가능한 시간이 없습니다</option>
+              <option disabled>가능한 시간이 없습니다.</option>
             )}
           </select>
         </div>
@@ -241,7 +241,7 @@ function SpaDetail() {
             onChange={(e) => setSelectedDogId(e.target.value)}
             className="border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100 p-2 w-1/2"
           >
-            <option value="">강아지 선택</option>
+            <option value="">반려견을 선택해주세요.</option>
             {dogList.map((d) => (
               <option key={d.dogId} value={d.dogId}>{d.name}</option>
             ))}
