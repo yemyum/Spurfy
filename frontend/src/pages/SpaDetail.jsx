@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import StarRating from '../components/Common/StarRating';
 import SpurfyButton from '../components/Common/SpurfyButton';
-import WelcomeSpa from '../assets/WelcomeSpa.png';
-import PremiumbrushingSpa from '../assets/PremiumbrushingSpa.png';
-import RelaxingtherapySpa from '../assets/RelaxingtherapySpa.png';
-import CalmingskinSpa from '../assets/CalmingskinSpa.png';
+import WelcomeSpa from '../assets/WelcomeSpa.webp';
+import PremiumbrushingSpa from '../assets/PremiumbrushingSpa.webp';
+import RelaxingtherapySpa from '../assets/RelaxingtherapySpa.webp';
+import CalmingskinSpa from '../assets/CalmingskinSpa.webp';
 
 function SpaDetail() {
   const navigate = useNavigate();
@@ -126,12 +126,13 @@ function SpaDetail() {
     <div className="w-full mx-auto bg-white rounded-xl shadow-md border border-gray-200 p-6">
       <div className="flex flex-col">
         {/* 1. 스파 사진 영역 (임시) */}
-        <div className="w-full h-[220px] sm:h-[420px] bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+        <div className="w-full h-[280px] sm:h-[480px] bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
           {spa && spaDetailImageMap[spa.slug] ? (
             <img
               src={spaDetailImageMap[spa.slug]}
               alt={`${spa.name} 상세 이미지`}
-              className="w-full h-[220px] sm:h-[420px] object-cover"
+              className="w-full h-[280px] sm:h-[480px] object-cover"
+              loading="lazy"
             />
           ) : (
             <span className="text-gray-400">이미지 준비중</span>
