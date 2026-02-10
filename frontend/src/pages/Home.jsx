@@ -25,6 +25,30 @@ function Home() {
 
   return (
     <div className="w-full flex flex-col items-center">
+
+      {/* 데모 안내 배너 */}
+      <div className="w-full bg-stone-800/80 text-white md:text-md mb-6 py-2 px-4 text-center font-semibold z-50">
+        <div className="flex flex-col justify-center items-center gap-1">
+
+          {/* 1. 한글 안내 */}
+          <span>본 사이트는 포트폴리오용 데모입니다.</span>
+
+          {/* 2. 영어 안내 */}
+          <span className="text-sm text-stone-400">
+            This is a demo for portfolio purposes.
+          </span>
+
+          {/* 3. 연락처 */}
+          <span className="mt-1 text-xs">
+            Contact me<span className="mx-1 text-stone-500 font-normal">|</span>
+            <a href="mailto:oyl582@naver.com" className="text-spurfyBlue hover:underline">
+              oyl582@naver.com
+            </a>
+          </span>
+
+        </div>
+      </div>
+
       {/* 1. 상단 메인 배너 섹션 */}
       <div className="w-full min-h-[500px] md:h-[580px]
               flex flex-col md:flex-row md:items-stretch
@@ -69,7 +93,7 @@ function Home() {
       <div className="w-full min-h-[500px] md:h-[580px]
                 flex flex-col md:flex-row md:items-stretch
                 md:p-28 bg-gradient-to-r from-[#F4FFF9] to-[#67F8F1]
-                mt-12 mb-16 md:gap-10">
+                mt-6 mb-16 md:gap-10">
 
         {/* 왼쪽 텍스트 */}
         <div className="flex-1 md:basis-[420px] md:shrink-0
