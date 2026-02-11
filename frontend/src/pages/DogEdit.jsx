@@ -169,7 +169,7 @@ function DogEdit() {
           <div className="flex-grow">
             <div className="space-y-6">
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">이름</label>
+                <label htmlFor="name" className="w-16 font-semibold text-gray-600 flex-shrink-0">이름</label>
                 <input
                   type="text"
                   id="name"
@@ -183,7 +183,7 @@ function DogEdit() {
               </div>
 
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="breed" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">견종</label>
+                <label htmlFor="breed" className="w-16 font-semibold text-gray-600 flex-shrink-0">견종</label>
                 <select
                   id="breed"
                   name="breed"
@@ -202,7 +202,7 @@ function DogEdit() {
               </div>
 
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="birthDate" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">생일</label>
+                <label htmlFor="birthDate" className="w-16 font-semibold text-gray-600 flex-shrink-0">생일</label>
                 <input
                   type="date"
                   id="birthDate"
@@ -215,7 +215,7 @@ function DogEdit() {
               </div>
 
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="gender" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">성별</label>
+                <label htmlFor="gender" className="w-16 font-semibold text-gray-600 flex-shrink-0">성별</label>
                 <select
                   id="gender"
                   name="gender"
@@ -234,13 +234,13 @@ function DogEdit() {
               </div>
 
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="weight" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">몸무게</label>
+                <label htmlFor="weight" className="w-16 font-semibold text-gray-600 flex-shrink-0">몸무게</label>
                 <input
                   type="number"
                   id="weight"
                   step="0.1"
                   name="weight"
-                  placeholder="몸무게(kg)"
+                  placeholder="kg"
                   value={form.weight}
                   onChange={handleChange}
                   required
@@ -250,11 +250,11 @@ function DogEdit() {
             </div>
 
             <div className="mt-6">
-              <label htmlFor="notes" className="block font-semibold text-lg text-gray-500 mb-2">특이사항</label>
+              <label htmlFor="notes" className="block font-semibold text-gray-600 mb-2">특이사항</label>
               <textarea
                 id="notes"
                 name="notes"
-                placeholder="(알레르기, 습관, 주의할 점 등)"
+                placeholder="알레르기, 습관, 주의할 점 등"
                 value={form.notes}
                 onChange={handleChange}
                 rows={5}

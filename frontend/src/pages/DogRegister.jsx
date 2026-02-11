@@ -126,7 +126,7 @@ function DogRegister() {
             <div className="space-y-6">
               {/* 1. 이름 */}
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="name" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">이름</label>
+                <label htmlFor="name" className="w-16 font-semibold text-gray-600 flex-shrink-0">이름</label>
                 <input
                   type="text"
                   id="name"
@@ -135,13 +135,13 @@ function DogRegister() {
                   onChange={handleChange}
                   required
                   className="flex-grow p-2 border-2 border-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-100"
-                  placeholder="(반려견 이름)"
+                  placeholder="반려견 이름"
                 />
               </div>
 
               {/* 2. 견종 */}
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="breed" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">견종</label>
+                <label htmlFor="breed" className="w-16 font-semibold text-gray-600 flex-shrink-0">견종</label>
                 <select
                   id="breed"
                   name="breed"
@@ -162,7 +162,7 @@ function DogRegister() {
               {/* '기타' 견종 선택 시 직접 입력 필드 */}
               {form.breed === '기타' && (
                 <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                  <label htmlFor="customBreed" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">직접 입력</label>
+                  <label htmlFor="customBreed" className="w-16 font-semibold text-gray-600 flex-shrink-0">직접 입력</label>
                   <input
                     type="text"
                     id="customBreed"
@@ -177,7 +177,7 @@ function DogRegister() {
 
               {/* 3. 생일 (캘린더 영역) */}
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="birthDate" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">생일</label>
+                <label htmlFor="birthDate" className="w-16 font-semibold text-gray-600 flex-shrink-0">생일</label>
                 <input
                   type="date"
                   id="birthDate"
@@ -191,7 +191,7 @@ function DogRegister() {
 
               {/* 4. 성별 */}
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="gender" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">성별</label>
+                <label htmlFor="gender" className="w-16 font-semibold text-gray-600 flex-shrink-0">성별</label>
                 <select
                   id="gender"
                   name="gender"
@@ -211,13 +211,13 @@ function DogRegister() {
 
               {/* 5. 몸무게 */}
               <div className="flex items-center gap-2 border-b-2 border-gray-100 pb-5">
-                <label htmlFor="weight" className="w-16 font-semibold text-lg text-gray-500 flex-shrink-0">몸무게</label>
+                <label htmlFor="weight" className="w-16 font-semibold text-gray-600 flex-shrink-0">몸무게</label>
                 <input
                   type="number"
                   id="weight"
                   step="0.1"
                   name="weight"
-                  placeholder="(kg)"
+                  placeholder="kg"
                   value={form.weight}
                   onChange={handleChange}
                   required
@@ -228,11 +228,11 @@ function DogRegister() {
 
             {/* 6. 정보 작성란 (특이사항) */}
             <div className="mt-6">
-              <label htmlFor="notes" className="block font-semibold text-lg text-gray-500 mb-2">특이사항</label>
+              <label htmlFor="notes" className="block font-semibold text-gray-600 mb-2">특이사항</label>
               <textarea
                 id="notes"
                 name="notes"
-                placeholder="(알레르기, 건강상태, 주의할 점 등)"
+                placeholder="알레르기, 건강상태, 주의할 점 등"
                 value={form.notes}
                 onChange={handleChange}
                 rows={5}
