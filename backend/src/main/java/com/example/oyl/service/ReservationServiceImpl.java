@@ -6,6 +6,7 @@ import com.example.oyl.exception.CustomException;
 import com.example.oyl.exception.ErrorCode;
 import com.example.oyl.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +19,6 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ReservationServiceImpl implements ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -27,9 +27,11 @@ public class ReservationServiceImpl implements ReservationService {
     private final SpaServiceRepository spaServiceRepository;
     private final PaymentRepository paymentRepository;
     private final ReviewRepository reviewRepository;
+    private final RefundPolicy refundPolicy;
 
     // 예약+결제 동시
     @Override
+    @Transactional
     public ReservationResponseDTO reserveAndPay(ReservationPaymentRequestDTO dto, String userEmail) {
         try {
             System.out.println("🎯 [START] reserveAndPay 진입");
@@ -80,7 +82,6 @@ public class ReservationServiceImpl implements ReservationService {
                     .refundType(RefundType.FULL)
                     .cancelReason("")
                     .refundedAt(null)
-                    .createdAt(LocalDateTime.now())
                     .build();
             reservationRepository.save(reservation);   // INSERT
             System.out.println("✅ 예약 저장 완료");
@@ -92,21 +93,24 @@ public class ReservationServiceImpl implements ReservationService {
                     .amount(BigDecimal.valueOf(dto.getAmount()))
                     .paymentMethod(dto.getPaymentMethod())
                     .paymentStatus(PaymentStatus.PAID)
-                    .createdAt(LocalDateTime.now())
                     .build();
             paymentRepository.save(payment);
             System.out.println("✅ 결제 저장 완료");
 
             return ReservationResponseDTO.from(reservation, false);
+        } catch (CustomException e) {
+            throw e;  // 이미 정의한 비즈니스 예외는 그대로 전달
+        } catch (DataIntegrityViolationException e) {
+            throw new CustomException(ErrorCode.DUPLICATE_RESERVATION); // 유니크 충돌
         } catch (Exception e) {
-            System.out.println("💥 예외 발생! " + e.getMessage());
-            e.printStackTrace(); // ❗ 콘솔에 에러 로그 출력!!
+            e.printStackTrace();
             throw new CustomException(ErrorCode.INTERNAL_ERROR);
         }
     }
 
     // 예약 취소
     @Override
+    @Transactional
     public void cancelReservation(String userEmail, CancelReservationDTO dto) {
         try { // ⭐ try 블록 시작 ⭐
             User user = userRepository.findByEmail(userEmail)
@@ -126,32 +130,37 @@ public class ReservationServiceImpl implements ReservationService {
                 throw new CustomException(ErrorCode.CANNOT_CANCEL_PAST_RESERVATION);
             }
 
+            // 중복 취소 방지, CANCELED 상태 체크
+            if (reservation.getReservationStatus() == ReservationStatus.CANCELED) {
+                throw new CustomException(ErrorCode.ALREADY_CANCELED);
+            }
+
             // Payment 정보 가져오기 (만약 환불에 Payment 정보가 필요하다면)
             // findByReservation_ReservationId 메서드가 PaymentRepository에 정의되어 있어야 함!
-            Payment payment = paymentRepository.findByReservation_ReservationId(reservation.getReservationId())
+            Payment payment = paymentRepository
+                    .findByReservation_ReservationId(reservation.getReservationId())
                     .orElseThrow(() -> new CustomException(ErrorCode.PAYMENT_NOT_FOUND));
+
+            // ⭐ 환불 정책 적용 ⭐
+            RefundPolicy.RefundResult result = refundPolicy.calculate(reservation, payment);
 
             // ⭐ 더미 결제 처리 로직 (실제 PG사 연동 대신 바로 성공 처리) ⭐
             System.out.println("✅ [LOG] 더미 결제이므로 PG사 환불 요청을 성공으로 간주하고 처리합니다.");
 
-            // PaymentStatus 업데이트 (선택 사항) - PaymentStatus enum에 CANCELED가 없다면 PAID 유지
-            // payment.setPaymentStatus(PaymentStatus.CANCELED); // PaymentStatus에 CANCELED 추가 후 사용 권장
-            // paymentRepository.save(payment);
+            payment.refund();
 
+            // 상태 변경 시작
             reservation.setReservationStatus(ReservationStatus.CANCELED);
             reservation.setCancelReason(dto.getCancelReason());
             reservation.setRefundStatus(RefundStatus.COMPLETED); // 바로 '환불 완료'로!
-            reservation.setRefundType(RefundType.AUTO);
+            reservation.setRefundType(result.getRefundType());
             reservation.setRefundedAt(LocalDateTime.now()); // ⭐⭐ 환불 완료 시간 기록! ⭐⭐
-
-            reservationRepository.save(reservation); // 변경된 예약 정보 저장
 
             System.out.println("✅ 예약 및 환불 상태 업데이트 완료 (더미 환불)");
 
         } catch (CustomException e) {
             System.err.println("❌ CustomException 발생: " + e.getMessage());
             throw e;
-
         } catch (Exception e) {
             System.out.println("❌ 예약 취소 처리 중 예상치 못한 오류 발생: " + e.getMessage());
             e.printStackTrace();

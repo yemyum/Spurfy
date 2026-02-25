@@ -43,21 +43,22 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "reservation_status", nullable = false)
-    private ReservationStatus reservationStatus;
+    private ReservationStatus reservationStatus = ReservationStatus.RESERVED;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "refund_type")
-    private RefundType refundType;
+    @Column(name = "refund_type", nullable = false)
+    private RefundType refundType = RefundType.AUTO;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "refund_status")
-    private RefundStatus refundStatus;
+    @Column(name = "refund_status", nullable = false)
+    private RefundStatus refundStatus = RefundStatus.NONE;
 
     private String cancelReason;
 
     private LocalDateTime refundedAt;
 
     @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)

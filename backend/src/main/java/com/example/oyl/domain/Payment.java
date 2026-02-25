@@ -1,7 +1,10 @@
 package com.example.oyl.domain;
 
+import com.example.oyl.exception.CustomException;
+import com.example.oyl.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -36,7 +39,15 @@ public class Payment {
     @Column(name = "payment_status", length = 20)
     private PaymentStatus paymentStatus;
 
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    public void refund() { // 외부에서 무분별하게 setter 쓰지 못하게 메서드 추가
+        if (this.paymentStatus != PaymentStatus.PAID) {
+            throw new CustomException(ErrorCode.REFUND_POLICY_VIOLATION);
+        }
+        this.paymentStatus = PaymentStatus.REFUNDED;
+    }
 
 }
