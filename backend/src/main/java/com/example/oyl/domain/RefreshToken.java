@@ -2,6 +2,7 @@ package com.example.oyl.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -20,7 +21,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -33,17 +34,8 @@ public class RefreshToken {
     @Column(name = "revoked", nullable = false)
     private boolean revoked = false;
 
-    @Column(name = "created_at", nullable = false, updatable = false,
-            columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    // 빌더/생성자 등 원하는 방식
-    public RefreshToken(User user, String tokenHash, LocalDateTime expiresAt) {
-        this.user = user;
-        this.tokenHash = tokenHash;
-        this.expiresAt = expiresAt;
-        this.revoked = false;
-        this.createdAt = LocalDateTime.now();
-    }
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
 
 }

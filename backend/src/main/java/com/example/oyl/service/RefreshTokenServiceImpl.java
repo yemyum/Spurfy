@@ -50,7 +50,6 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
                 .tokenHash(hash)
                 .expiresAt(expiresAt)
                 .revoked(false)
-                .createdAt(LocalDateTime.now())
                 .build();
         return refreshTokenRepository.save(token);
     }

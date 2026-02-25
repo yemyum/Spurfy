@@ -21,21 +21,19 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     // ✅ 특정 토큰 revoke
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Transactional
     @Query("update RefreshToken r set r.revoked = true " +
             "where r.tokenHash = :hash and r.revoked = false")
     int revokeByHash(@Param("hash") String hash);
 
     // ✅ 특정 유저의 모든 토큰 revoke
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Transactional
     @Query("update RefreshToken r set r.revoked = true " +
             "where r.user = :user and r.revoked = false")
     int revokeAllByUser(@Param("user") User user);
 
     // ✅ 정기 청소 (만료/철회된 토큰 DB에서 삭제)
+    // OR 조건이 인덱스 효율을 떨어뜨릴 수 있으나, 현재 규모에선 괜찮음
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Transactional
     @Query("delete from RefreshToken r " +
             "where r.revoked = true or r.expiresAt < :now")
     int deleteRevokedOrExpired(@Param("now") LocalDateTime now);

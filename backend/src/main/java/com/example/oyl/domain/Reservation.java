@@ -2,6 +2,7 @@ package com.example.oyl.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,10 +46,6 @@ public class Reservation {
     private ReservationStatus reservationStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", length = 20)
-    private PaymentStatus paymentStatus;
-
-    @Enumerated(EnumType.STRING)
     @Column(name = "refund_type")
     private RefundType refundType;
 
@@ -57,23 +54,19 @@ public class Reservation {
     private RefundStatus refundStatus;
 
     private String cancelReason;
+
     private LocalDateTime refundedAt;
+
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    // 예약이 삭제되면 리뷰도 같이 삭제!, 더이상 참조 하지 않는다면 자동으로 삭제!
-    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
     private Review review;
 
-    public void setReservationStatus(ReservationStatus reservationStatus) {
-        this.reservationStatus = reservationStatus;
-    }
+    public void setReservationStatus(ReservationStatus reservationStatus) {this.reservationStatus = reservationStatus;}
 
     public void setRefundStatus(RefundStatus refundStatus) {
         this.refundStatus = refundStatus;
-    }
-
-    public void setPaymentStatus(PaymentStatus paymentStatus) {
-        this.paymentStatus = paymentStatus;
     }
 
     public void setRefundType(RefundType refundType) {

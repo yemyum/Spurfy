@@ -97,9 +97,10 @@ public class AuthController {
             );
         } catch (Exception e) {
             log.error("refresh unexpected err", e);
-            return ResponseEntity.status(401).body(
+            // 내부 예외는 500
+            return ResponseEntity.status(500).body(
                     ApiResponse.<TokenResponseDTO>builder()
-                            .code("A401").message("유효하지 않은 리프레시 토큰 입니다.").data(null).build()
+                            .code("A500").message("유효하지 않은 리프레시 토큰 입니다.").data(null).build()
             );
         }
     }
