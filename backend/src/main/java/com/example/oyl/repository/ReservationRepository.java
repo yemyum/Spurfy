@@ -27,8 +27,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
 
     boolean existsByDogAndReservationDate(Dog dog, LocalDate reservationDate);
 
-    List<Reservation> findByReservationDateBeforeAndReservationStatus(
-            LocalDate date, ReservationStatus status);
+    // 종료시간 <= 현재시간 AND 상태 = RESERVED
+    @Query("SELECT r FROM Reservation r " +
+            "JOIN FETCH r.spaService s " +
+            "WHERE r.reservationStatus = :status")
+    List<Reservation> findAllByStatus(@Param("status") ReservationStatus status);
 
     @Query("SELECT r FROM Reservation r " +
             "LEFT JOIN FETCH r.payment p " +

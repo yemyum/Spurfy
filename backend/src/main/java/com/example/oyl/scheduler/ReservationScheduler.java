@@ -8,8 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -19,31 +21,33 @@ public class ReservationScheduler {
 
     private final ReservationRepository reservationRepository;
 
-    // 주기(밀리초) 기본값: 하루(24시간) = 86400000
-    @Value("${app.reservation.auto-complete-interval-ms:86400000}")
-    private long autoCompleteIntervalMs;
-
-    // 예약 완료로 바꿀 기준일 (오늘 이전만 완료로)
-    // 필요하다면 @Value로 기준일 변경 가능
-    // @Value("${app.reservation.complete-before-days:0}") // 오늘 이전만 완료로 (기본 0)
-    // private int completeBeforeDays;
-
-    // 주기적으로 실행: @Scheduled(fixedDelay = ...) 대신, fixedDelayString!
-    @Scheduled(fixedDelayString = "${app.reservation.auto-complete-interval-ms:86400000}")
+    // 실제 서비스 종료 시점 기준으로 상태를 전환
+    @Transactional
+    @Scheduled(fixedDelayString = "${app.reservation.auto-complete-interval-ms}")  // n분 간격으로 실행
     public void autoCompleteReservations() {
-        LocalDate today = LocalDate.now();
-        List<Reservation> targets = reservationRepository
-                .findByReservationDateBeforeAndReservationStatus(today, ReservationStatus.RESERVED);
+        LocalDateTime now = LocalDateTime.now();  // 현재 시간 저장
 
-        if (targets.isEmpty()) {
-            log.info("[스케줄러] 자동 완료 예약 없음! (오늘: {})", today);
-            return;
+        List<Reservation> targets =
+                reservationRepository.findAllByStatus(ReservationStatus.RESERVED);  // 예약된+이용완료전 리스트 가져옴
+
+        int count = 0;
+
+        // 검사 시작!
+        for (Reservation r : targets) {  // targets 안의 예약들을 하나씩 꺼냄 (r 처리)
+
+            LocalDateTime startTime =
+                    LocalDateTime.of(r.getReservationDate(), r.getReservationTime());  // 예약 날짜+시간을 합침
+
+            LocalDateTime endTime =
+                    startTime.plusMinutes(r.getSpaService().getDurationMinutes());  // 서비스 소요 시간만큼 더해 종료 시간 계산
+
+            // "끝나는 시간이 현재시간보다 과거?"인지 체크 (=이미 서비스가 끝?)
+            if (endTime.isBefore(now)) {
+                r.setReservationStatus(ReservationStatus.COMPLETED);  // 이용완료로 바꿈
+                count++;                                              // 완료 처리 수 +1
+            }
         }
 
-        for (Reservation r : targets) {
-            r.setReservationStatus(ReservationStatus.COMPLETED);
-        }
-        reservationRepository.saveAll(targets);
-        log.info("[스케줄러] {}건의 예약을 COMPLETED 상태로 자동 변경 완료!", targets.size());
+        log.info("[스케줄러] {}건 자동 완료 처리", count);
     }
 }
