@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -31,9 +33,6 @@ public class AuthServiceImpl implements AuthService {
     private boolean cookieSecure;
     @Value("${app.cookie.domain:}")
     private String cookieDomain;
-    private String blankToNull(String v) {
-        return (v==null||v.isBlank())?null:v;
-    }
 
     @Override
     @Transactional
@@ -58,17 +57,20 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = extractRefreshToken(request);
+
         if (refreshToken != null) {
-            try { refreshTokenService.revokeToken(refreshToken); } catch (Exception ignore) {}
+            refreshTokenService.revokeToken(refreshToken);
         }
+
         expireRefreshCookie(response); // 브라우저 쿠키 만료
     }
 
     // 재발급: Optional 안 쓰는 현재 시그니처 기준
+    @Transactional
     @Override
     public String issueNewAccessToken(String refreshToken, HttpServletResponse response) {
         // 0) JWT 자체 검증(서명/만료)
-        jwtUtil.validateTokenOrThrow(refreshToken);
+        jwtUtil.validateRefreshToken(refreshToken);
 
         // 1) DB 유효 토큰 조회 (revoked=false && exp>now && hash 일치)
         RefreshToken token = refreshTokenService.findValidToken(refreshToken);
@@ -86,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
         refreshTokenService.revokeToken(refreshToken);           // 기존 것 무효화
         refreshTokenService.save(user, newRefresh);              // DB 저장(해시/만료일은 save 내부)
 
-        long maxAge = jwtUtil.getRefreshExpDays() * 24L * 60 * 60; // 초 단위
+        long maxAge = Duration.ofDays(jwtUtil.getRefreshExpDays()).getSeconds(); // 초 단위
         setRefreshCookie(response, newRefresh, maxAge);            // 새 쿠키 심기
 
         return newAccess;
@@ -97,12 +99,7 @@ public class AuthServiceImpl implements AuthService {
         if (cookies == null) return null;
         for (var c : cookies) {
             if ("refreshToken".equals(c.getName())) {
-                // 인코딩 안 했으면 아래 try/catch 통과해도 원문 그대로 돌아옴
-                try {
-                    return java.net.URLDecoder.decode(c.getValue(), java.nio.charset.StandardCharsets.UTF_8);
-                } catch (Exception ignore) {
-                    return c.getValue();
-                }
+                return c.getValue();
             }
         }
         return null;
@@ -120,8 +117,9 @@ public class AuthServiceImpl implements AuthService {
             b.secure(false).sameSite("Lax");      // ✅ 로컬(HTTP localhost)
         }
 
-        String domain = blankToNull(cookieDomain);
-        if (domain != null) b.domain(domain);
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            b.domain(cookieDomain);
+        }
 
         resp.addHeader(HttpHeaders.SET_COOKIE, b.build().toString());
     }

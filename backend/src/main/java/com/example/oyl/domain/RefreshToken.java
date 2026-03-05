@@ -12,9 +12,15 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "refresh_tokens",
-        uniqueConstraints = {@UniqueConstraint(name = "uk_token_hash", columnNames = "token_hash")},
-        indexes = {@Index(name = "ix_user_exp", columnList = "user_id, expires_at")})
+@Table(
+        name = "refresh_tokens",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_token_hash", columnNames = "token_hash")
+        },
+        indexes = {
+                @Index(name = "ix_user_exp", columnList = "user_id, expires_at")
+        }
+)
 public class RefreshToken {
 
     @Id

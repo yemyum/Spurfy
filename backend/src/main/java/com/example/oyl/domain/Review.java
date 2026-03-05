@@ -17,7 +17,7 @@ public class Review {
     @Column(name = "review_id", length = 36)
     private String reviewId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 

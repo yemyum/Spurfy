@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -22,7 +23,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // 💡 추가: 설정 파일에서 'jwt.secret-key' 값을 주입받을 필드
+    // 설정 파일에서 'jwt.secret-key' 값을 주입받을 필드
     @Value("${jwt.secret-key}")
     private String secretKeyString;
 
@@ -55,7 +56,7 @@ public class JwtUtil {
 
     public String createRefreshToken(User user) {
         Date now = new Date();
-        Date exp = new Date(now.getTime() + refreshExpDays * 24 * 60 * 60 * 1000L);
+        Date exp = new Date(now.getTime() + Duration.ofDays(refreshExpDays).toMillis());
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .claim("userId", user.getUserId())
@@ -66,7 +67,7 @@ public class JwtUtil {
     }
 
     // 검증/파싱
-    public void validateTokenOrThrow(String token) {
+    public void validateRefreshToken(String token) {
         try {
             parseClaims(token);
         } catch (JwtException e) {
