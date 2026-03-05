@@ -11,6 +11,7 @@ import com.example.oyl.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -18,8 +19,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -51,6 +55,8 @@ public class AuthServiceImpl implements AuthService {
         // refreshToken 저장
         refreshTokenService.save(user, refreshToken);
 
+        log.info("🔐 로그인 성공 userId={} email={}", user.getUserId(), user.getEmail());
+
         return new LoginResult(accessToken, refreshToken);
     }
 
@@ -59,10 +65,14 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = extractRefreshToken(request);
 
         if (refreshToken != null) {
-            refreshTokenService.revokeToken(refreshToken);
+            try {
+                refreshTokenService.revokeToken(refreshToken);
+            } catch (Exception ignore) {}
         }
 
         expireRefreshCookie(response); // 브라우저 쿠키 만료
+
+        log.info("🚪 로그아웃 처리 완료 refreshToken 존재 여부={}", refreshToken != null);
     }
 
     // 재발급: Optional 안 쓰는 현재 시그니처 기준
@@ -75,10 +85,13 @@ public class AuthServiceImpl implements AuthService {
         // 1) DB 유효 토큰 조회 (revoked=false && exp>now && hash 일치)
         RefreshToken token = refreshTokenService.findValidToken(refreshToken);
         if (token == null) {
+            log.warn("⚠️ refresh 실패: DB에서 유효 토큰 없음");
             throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         User user = token.getUser();
+
+        log.info("🔄 refresh 요청 userId={}", user.getUserId());
 
         // 2) 새 Access 발급
         String newAccess = jwtUtil.createAccessToken(user);
@@ -91,6 +104,8 @@ public class AuthServiceImpl implements AuthService {
         long maxAge = Duration.ofDays(jwtUtil.getRefreshExpDays()).getSeconds(); // 초 단위
         setRefreshCookie(response, newRefresh, maxAge);            // 새 쿠키 심기
 
+        log.info("✅ refresh 성공 userId={}", user.getUserId());
+
         return newAccess;
     }
 
@@ -99,7 +114,11 @@ public class AuthServiceImpl implements AuthService {
         if (cookies == null) return null;
         for (var c : cookies) {
             if ("refreshToken".equals(c.getName())) {
-                return c.getValue();
+                try {
+                    return URLDecoder.decode(c.getValue(), StandardCharsets.UTF_8);
+                } catch (Exception e) {
+                    return c.getValue();
+                }
             }
         }
         return null;
@@ -108,7 +127,7 @@ public class AuthServiceImpl implements AuthService {
     private void setRefreshCookie(HttpServletResponse resp, String value, long maxAgeSec) {
         ResponseCookie.ResponseCookieBuilder b = ResponseCookie.from("refreshToken", value)
                 .httpOnly(true)
-                .path("/api/users")
+                .path("/")
                 .maxAge(maxAgeSec);
 
         if (cookieSecure) {
@@ -117,6 +136,7 @@ public class AuthServiceImpl implements AuthService {
             b.secure(false).sameSite("Lax");      // ✅ 로컬(HTTP localhost)
         }
 
+        // 도메인이 빈 값일 시 방어(쿠키가 2개 되는 문제 발생)
         if (cookieDomain != null && !cookieDomain.isBlank()) {
             b.domain(cookieDomain);
         }

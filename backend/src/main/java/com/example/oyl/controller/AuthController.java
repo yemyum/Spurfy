@@ -37,7 +37,7 @@ public class AuthController {
     @Value("${app.cookie.secure}")
     private boolean isSecure;
 
-    @Value("${app.cookie.domain}")
+    @Value("${app.cookie.domain:}")
     private String cookieDomain;
 
     @PostMapping("/login")
