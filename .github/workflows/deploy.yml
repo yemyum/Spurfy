@@ -34,12 +34,12 @@ jobs:
             chmod +x mvnw
             ./mvnw clean package -DskipTests
 
-            echo "[3/5] docker compose rebuild"
+            echo "[3/5] docker-compose rebuild"
             cd .. || exit 1
-            docker compose up -d --build
+            docker-compose up -d --build
 
             echo "[4/5] container status"
-            docker compose ps
+            docker-compose ps
 
             echo "[5/5] recent backend logs"
-            docker compose logs backend --tail=30
+            docker-compose logs backend --tail=30
