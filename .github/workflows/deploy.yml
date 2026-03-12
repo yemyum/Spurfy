@@ -1,0 +1,45 @@
+name: Deploy to EC2
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy on EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            set -e
+
+            cd ~/Spurfy || exit 1
+
+            echo "[1/5] git pull"
+            git pull origin main
+
+            echo "[2/5] backend build"
+            cd backend || exit 1
+            chmod +x mvnw
+            ./mvnw clean package -DskipTests
+
+            echo "[3/5] docker compose rebuild"
+            cd .. || exit 1
+            docker compose up -d --build
+
+            echo "[4/5] container status"
+            docker compose ps
+
+            echo "[5/5] recent backend logs"
+            docker compose logs backend --tail=30
