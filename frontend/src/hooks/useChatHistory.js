@@ -18,12 +18,17 @@ export const useChatHistory = () => {
     imageUrl: m.imageUrl || null,
     spaSlug: m.spaSlug || null,
     errorMessage: m.errorMessage || null,
+    isLoading: !!m.isLoading,
   });
 
   const addMessage = useCallback((newMessageObj) => {
     setChatMessages((prev) => {
       const next = [...prev, newMessageObj]; // ✅ 단순 append
-      const store = next.filter((m) => m.isUser).map(sanitizeForStorage).slice(-MAX_LOCAL_ITEMS);
+      const store = next.
+        filter((m) => m.isUser)
+        .map(sanitizeForStorage)
+        .slice(-MAX_LOCAL_ITEMS);
+
       localStorage.setItem("chatMessages", JSON.stringify(store));
       return next;
     });
@@ -34,7 +39,12 @@ export const useChatHistory = () => {
       const next = prev.map((msg) =>
         msg.id === idToUpdate ? { ...msg, imageUrl: toAbs(newImageUrl) } : msg
       );
-      const store = next.filter((m) => m.isUser).map(sanitizeForStorage).slice(-MAX_LOCAL_ITEMS);
+
+      const store = next
+        .filter((m) => m.isUser)
+        .map(sanitizeForStorage)
+        .slice(-MAX_LOCAL_ITEMS);
+
       localStorage.setItem("chatMessages", JSON.stringify(store));
       return next;
     });
@@ -46,7 +56,28 @@ export const useChatHistory = () => {
       const next = prev.map((msg) =>
         msg.id === oldId ? { ...msg, id: newId, imageUrl: toAbs(serverImg) } : msg
       );
-      const store = next.filter((m) => m.isUser).map(sanitizeForStorage).slice(-MAX_LOCAL_ITEMS);
+
+      const store = next.
+        filter((m) => m.isUser)
+        .map(sanitizeForStorage)
+        .slice(-MAX_LOCAL_ITEMS);
+
+      localStorage.setItem("chatMessages", JSON.stringify(store));
+      return next;
+    });
+  }, []);
+
+  const updateMessage = useCallback((idToUpdate, patch) => {
+    setChatMessages((prev) => {
+      const next = prev.map((msg) =>
+        msg.id === idToUpdate ? { ...msg, ...patch } : msg
+      );
+
+      const store = next
+        .filter((m) => m.isUser)
+        .map(sanitizeForStorage).
+        slice(-MAX_LOCAL_ITEMS);
+
       localStorage.setItem("chatMessages", JSON.stringify(store));
       return next;
     });
@@ -56,7 +87,12 @@ export const useChatHistory = () => {
   const removeMessage = useCallback((idToRemove) => {
     setChatMessages((prev) => {
       const next = prev.filter((msg) => msg.id !== idToRemove);
-      const store = next.filter((m) => m.isUser).map(sanitizeForStorage).slice(-MAX_LOCAL_ITEMS);
+
+      const store = next
+        .filter((m) => m.isUser)
+        .map(sanitizeForStorage)
+        .slice(-MAX_LOCAL_ITEMS);
+
       localStorage.setItem("chatMessages", JSON.stringify(store));
       return next;
     });
@@ -72,8 +108,12 @@ export const useChatHistory = () => {
       setIsLoading(true);
 
       try {
-        const { data } = await api.get("/recommendations/history");
+        const { data } = await api.get("/recommendations/history", {
+          skipGlobalLoading: true,
+        });
+
         const items = data?.data ?? [];
+        
         const serverMsgsFromApi = items.flatMap((item) => {
           const ai = formatAiMessage(item);
           const img = toAbs(item.imageUrl ?? item.image_url) || null;
@@ -137,5 +177,5 @@ export const useChatHistory = () => {
     loadAndMergeMessages();
   }, []);
 
-  return { chatMessages, isLoading, addMessage, replaceImageUrl, replaceMessage, removeMessage };
+  return { chatMessages, isLoading, addMessage, replaceImageUrl, replaceMessage, removeMessage, updateMessage, };
 };

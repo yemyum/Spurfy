@@ -54,17 +54,24 @@ let accessToken = null;
 export function setAccessToken(token) {
   accessToken = token || null;
   if (token) {
-    try { localStorage.setItem('token', token); } catch { }
+    try {
+      localStorage.setItem('token', token);
+
+    } catch { }
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
-    try { localStorage.removeItem('token'); } catch { }
+    try {
+      localStorage.removeItem('token');
+    } catch { }
     delete api.defaults.headers.common.Authorization;
   }
 }
 
 // 명시적 로그아웃 중 리프레시 금지 플래그
 let forceLogout = false;
-export function beginForceLogout() { forceLogout = true; }
+export function beginForceLogout() {
+  forceLogout = true;
+}
 
 // 다탭 동기화: 다른 탭에서 token 바뀌면 기본헤더도 갱신
 window.addEventListener('storage', (e) => {
@@ -83,14 +90,22 @@ const showLoading = () => {
 
 const hideLoading = () => {
   activeRequests = Math.max(0, activeRequests - 1);
-  if (activeRequests === 0) document.body.classList.remove('loading');
+  if (activeRequests === 0) {
+    document.body.classList.remove("loading");
+  }
 };
 
 // ===== 요청 인터셉터 =====
 api.interceptors.request.use(
   (config) => {
-    showLoading();
+    const skipGlobalLoading = config?.skipGlobalLoading === true;
+
+    if (!skipGlobalLoading) {
+      showLoading();
+    }
+
     config.headers = config.headers || {};
+
     if (isPublicPath(config.url)) {
       delete config.headers.Authorization;
     } else if (accessToken) {
@@ -99,7 +114,12 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    hideLoading();
+    const skipGlobalLoading = error?.config?.skipGlobalLoading === true;
+
+    if (!skipGlobalLoading) {
+      hideLoading();
+    }
+
     return Promise.reject(error);
   }
 );
@@ -113,13 +133,23 @@ function flushQueue(newToken) {
 }
 
 async function callRefresh() {
-  const resp = await api.post('/auth/refresh-token', {}, { withCredentials: true });
+  const resp = await api.post(
+    '/auth/refresh-token',
+    {},
+    {
+      withCredentials: true,
+      skipGlobalLoading: true,
+    }
+  );
+
   const newToken =
     resp?.data?.data?.accessToken ??
     resp?.data?.accessToken ??
     resp?.data?.data ??
     null;
+
   if (!newToken) throw new Error('No accessToken in refresh response');
+
   setAccessToken(newToken);
   return newToken;
 }
@@ -129,11 +159,20 @@ window.__alreadyRedirected = false;
 
 api.interceptors.response.use(
   (res) => {
-    hideLoading();
+    const skipGlobalLoading = res?.config?.skipGlobalLoading === true;
+
+    if (!skipGlobalLoading) {
+      hideLoading();
+    }
+
     return res;
   },
   async (err) => {
-    hideLoading();
+    const skipGlobalLoading = err?.config?.skipGlobalLoading === true;
+
+    if (!skipGlobalLoading) {
+      hideLoading();
+    }
 
     const status = err.response?.status;
     const reqUrl = err.config?.url;
@@ -161,15 +200,18 @@ api.interceptors.response.use(
           // 재시도 시 새 토큰 주입
           original.headers = original.headers || {};
           original.headers.Authorization = `Bearer ${newToken}`;
+
           return api(original);
         } catch (e) {
           flushQueue(null);
           setAccessToken(null);
+
           if (!window.__alreadyRedirected) {
             window.__alreadyRedirected = true;
             alert('로그인 시간이 만료되었습니다. 다시 로그인해주세요.');
             window.location.href = '/login';
           }
+
           return Promise.reject(e);
         } finally {
           isRefreshing = false;
@@ -179,6 +221,7 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           queue.push((newToken) => {
             if (!newToken) return reject(err);
+            
             original.headers = original.headers || {};
             original.headers.Authorization = `Bearer ${newToken}`;
             resolve(api(original));

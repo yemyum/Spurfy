@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import api from "../api/axios";
-import MessageBubble from "../components/Common/MessageBubble";
-import ChecklistDrawer from "../components/Common/ChecklistDrawer";
-import DailyToastPopup from "../components/Common/DailyToastPopup";
+import MessageBubble from "../components/AI/MessageBubble";
+import ChecklistDrawer from "../components/AI/ChecklistDrawer";
+import DailyToastPopup from "../components/AI/DailyToastPopup";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faXmark, faListCheck, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
@@ -31,7 +31,7 @@ const AIRecommendationPage = () => {
   } = useAiCallLimit(); // 훅 호출!
 
   // 대화/체크리스트 훅
-  const { chatMessages, isLoading, addMessage, replaceMessage, removeMessage } = useChatHistory();
+  const { chatMessages, isLoading, addMessage, replaceMessage, removeMessage, updateMessage } = useChatHistory();
 
   const {
     sheetOpen, setSheetOpen,
@@ -94,12 +94,14 @@ const AIRecommendationPage = () => {
       return;
     }
 
-    // ✅ 1. 임시 유저 메시지의 고유 ID를 생성
+    // ✅ 0. 임시 유저 메시지의 고유 ID를 생성
+    const now = Date.now();
     const userTempId = `temp-${Date.now()}`;
+    const loadingMessageId = `ai-loading-${Date.now()}`;
     const previewUrl = URL.createObjectURL(selectedFile);
-    const userTs = Date.now();
+    const userTs = now;
 
-    // ✅ 2. API 요청 전에 임시 유저 메시지를 추가
+    // ✅ 1. API 요청 전에 임시 유저 메시지를 추가
     addMessage({
       id: userTempId, // 이 임시 ID로 나중에 메시지를 찾아서 교체
       text: sanitizeText(freeTextQuestion),
@@ -109,44 +111,62 @@ const AIRecommendationPage = () => {
       timestamp: userTs,
     });
 
+    // ✅ 2. AI 로딩 메시지 추가
+    addMessage({
+      id: loadingMessageId,
+      isUser: false,
+      text: "",
+      isLoading: true,
+      timestamp: Date.now(),
+    });
+
     try {
       // 3. 업로드 + 분석 요청
       const formData = new FormData();
       formData.append("dogImageFile", selectedFile);
       formData.append("question", sanitizeText(freeTextQuestion));  // 빈 문자열도 허용 가능
+      
       if (payloadChecklist) {
         formData.append("checklist", JSON.stringify(payloadChecklist));
       }
 
       const response = await api.post("/ai-recommendation", formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        skipGlobalLoading: true,
       });
 
       const payload = response?.data?.data;
+
       if (!payload) {
-        setErrorMessage("이미지 분석은 성공했지만 응답 형식이 이상합니다!");
+        updateMessage(loadingMessageId, {
+          text: "이미지 분석은 성공했지만 응답 형식이 이상합니다!",
+          isLoading: false,
+          errorMessage: "이미지 분석은 성공했지만 응답 형식이 이상합니다!",
+          timestamp: Date.now(),
+        });
         return;
       }
 
-      // ✅ 4. 성공 응답을 받으면 임시 메시지를 진짜 메시지로 교체
+      // ✅ 5. 유저 임시 메시지를 서버 ID 기반 메시지로 교체
       const serverId = payload.id;
       const userPromptId = `user-${serverId}`; // ✅ user- 접두사로 통일
-      const aiResponseId = `ai-${serverId}`;   // ✅ ai- 접두사로 통일
       const serverImgUrl = payload.imageUrl;
 
       // (useChatHistory에서 만든 replaceMessage를 활용)
       replaceMessage(userTempId, userPromptId, serverImgUrl);
 
-      // ✅ 5. AI 메시지 추가
+      // ✅ 6. 로딩 메시지를 실제 AI 답변으로 교체
       const aiResult = formatAiMessage(payload);
-      addMessage({
+      updateMessage(loadingMessageId, {
         ...aiResult,
+        id: `ai-${serverId}`,
         isUser: false,
         imageUrl: null,
-        id: aiResponseId, // 서버에서 받은 ID로 AI 메시지 ID 생성
+        isLoading: false,
+        errorMessage: null,
       });
 
-      // checkAndUpdateLimit()를 호출하고 반환 값을 받도록 수정
+      // ✅ 7. 호출 횟수 갱신
       const updatedCount = await checkAndUpdateLimit();
 
       // 반환된 횟수가 최대 횟수와 같으면 (딱 초과된 순간) 알림 띄우기
@@ -159,7 +179,7 @@ const AIRecommendationPage = () => {
       const apiMsg = error.response?.data?.message;
       const apiCode = error.response?.data?.code;
 
-      // 2. 백엔드(API) 응답이 명확하게 있을 경우:
+      // 백엔드(API) 응답이 명확하게 있을 경우:
       if (apiMsg) {
         msg = apiMsg;
 
@@ -167,7 +187,7 @@ const AIRecommendationPage = () => {
           msg += ` (Code: ${apiCode})`;
         }
 
-        // 3. 백엔드 응답은 없지만, 통신 실패 등 네트워크 에러일 경우:
+        // 백엔드 응답은 없지만, 통신 실패 등 네트워크 에러일 경우:
       } else if (error.message) {
         msg = "네트워크 연결 상태가 불안정하여 요청에 실패했습니다.";
       }
@@ -179,44 +199,36 @@ const AIRecommendationPage = () => {
         // 횟수 초과 에러일 경우:
         msg = `하루 AI 대화 횟수(${MAX_DAILY_CALLS}회)를 초과했습니다. 내일 다시 시도해주세요!`;
 
+        // 유저 임시 메시지 제거
         removeMessage(userTempId);
+
+        // 로딩 메시지도 제거
+        removeMessage(loadingMessageId);
 
         alert(msg); // 중요: 여기서 함수 실행을 완전히 끝내서 아래 코드가 실행되지 않게 막기!
 
         return;
 
-        // ✅ 6. 오류 응답을 받으면 메시지 처리
-      } else if (payloadId) {
-        // 서버 응답에 ID가 있을 때: 임시 유저 메시지를 서버 ID로 교체
-        // ✅ 오류 응답 시 필요한 ID를 상수로 빼내기
-        const userPromptId = `prompt-${payloadId}`;
-        const aiResponseId = `ai-${payloadId}`;
-        replaceMessage(userTempId, userPromptId, serverImg);
-
-        // AI 오류 메시지 추가
-        addMessage({
-          id: aiResponseId,
-          isUser: false,
-          text: msg,
-          errorMessage: msg,
-          timestamp: Date.now(),
-        });
-      } else {
-        // 서버 응답에 ID가 없을 때: 임시 유저 메시지 삭제
-        removeMessage(userTempId);
-
-        // AI 오류 메시지 추가
-        addMessage({
-          id: `ai-error-${Date.now()}`,
-          isUser: false,
-          text: msg,
-          errorMessage: msg,
-          timestamp: Date.now(),
-        });
       }
 
+      // 서버가 payloadId를 내려준 경우: 유저 메시지는 서버 ID로 교체
+      if (payloadId) {
+        const userPromptId = `user-${payloadId}`;
+        replaceMessage(userTempId, userPromptId, serverImg);
+      } else {
+        // 서버 응답에 ID 없으면 유저 임시 메시지 제거
+        removeMessage(userTempId);
+      }
+
+      // 로딩 메시지를 에러 메시지로 교체
+      updateMessage(loadingMessageId, {
+        text: msg,
+        isLoading: false,
+        errorMessage: msg,
+        timestamp: Date.now(),
+      });
+
     } finally {
-      // 성공/실패와 상관없이 항상 실행
       if (previewUrl) URL.revokeObjectURL(previewUrl);
       setSelectedFile(null);
       setFreeTextQuestion("");
@@ -272,6 +284,8 @@ const AIRecommendationPage = () => {
                 isUser={m.isUser}
                 imageUrl={m.imageUrl ?? m.image_url ?? null}
                 spaSlug={m.spaSlug}
+                errorMessage={m.errorMessage}
+                isLoading={m.isLoading}
                 onGoToSpaDetail={handleGoToSpaDetail}
               />
             ))

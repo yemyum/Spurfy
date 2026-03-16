@@ -1,14 +1,13 @@
 // src/routes.jsx
-import React from 'react';
 import { createBrowserRouter } from 'react-router-dom';
 import ProtectedRoute from './components/Common/ProtectedRoute';
 import RootLayout from './layouts/RootLayout';
+import MypageLayout from './layouts/MypageLayout';
 
 import Home from './pages/Home';
 import About from './pages/About';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
-import MypageLayout from './pages/MypageLayout';
 import Profile from './pages/Profile';
 import MyDogs from './pages/MyDogs';
 import DogRegister from './pages/DogRegister';
@@ -67,6 +66,7 @@ const router = createBrowserRouter([
   { path: '/review/write', element: <ProtectedRoute><ReviewWrite /></ProtectedRoute> },
   { path: '/dog-spa-ai', element: <ProtectedRoute><AIRecommendationPage /></ProtectedRoute> },
   { path: '/spa-reviews/slug/:spaSlug', element: <SpaReviewsPage /> },
+  
 
   { path: '*', element: <NotFoundPage /> }
 ]);

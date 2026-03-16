@@ -1,6 +1,6 @@
 import React from 'react';
 import ChecklistForm from "./ChecklistForm";
-import SpurfyButton from "./SpurfyButton";
+import SpurfyButton from "../Common/SpurfyButton";
 
 const ChecklistDrawer = ({
   sheetOpen,

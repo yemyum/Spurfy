@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import SpurfyButton from "./SpurfyButton";
+import SpurfyButton from "../Common/SpurfyButton";
 import SpurfyAI from "../../assets/SpurfyAI.png";
 import { toAbs } from '../../utils/url';
 import ReactMarkdown from 'react-markdown';
@@ -8,7 +8,15 @@ import gfm from 'remark-gfm';
 import { faAngleRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, errorMessage }) {
+function MessageBubble({
+  text,
+  isUser,
+  imageUrl,
+  spaSlug,
+  onGoToSpaDetail,
+  errorMessage,
+  isLoading = false,
+}) {
   const bubbleClasses = isUser
     ? "bg-spurfyAI rounded-bl-2xl p-3 rounded-tl-2xl rounded-br-2xl self-end"
     : "rounded-br-2xl rounded-bl-2xl rounded-tr-2xl self-start";
@@ -57,17 +65,35 @@ function MessageBubble({ text, isUser, imageUrl, spaSlug, onGoToSpaDetail, error
 
   return (
     <div className="flex items-start flex-col gap-4">
-      <img src={SpurfyAI} alt="AI Profile" className="w-12 h-12 object-cover flex-shrink-0 rounded-full" />
+      <img
+        src={SpurfyAI}
+        alt="AI Profile"
+        className="w-12 h-12 object-cover flex-shrink-0 rounded-full"
+      />
+
       <div className={`max-w-[80%] flex flex-col ${bubbleClasses} relative`}>
-        {renderedMarkdown}
-        {spaSlug && onGoToSpaDetail && !errorMessage && (
-          <SpurfyButton
-            variant="primary"
-            onClick={() => onGoToSpaDetail(spaSlug)}
-            className="py-2 px-4 text-sm self-start"
-          >
-            추천받은 스파 보러가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs ml-4" />
-          </SpurfyButton>
+        {isLoading ? (
+          <div className="flex flex-col gap-3 min-w-[220px]">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-300 animate-bounce" />
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-400 animate-bounce [animation-delay:0.15s]" />
+              <span className="w-2.5 h-2.5 rounded-full bg-gray-500 animate-bounce [animation-delay:0.3s]" />
+            </div>
+          </div>
+        ) : (
+          <>
+            {renderedMarkdown}
+
+            {spaSlug && onGoToSpaDetail && !errorMessage && (
+              <SpurfyButton
+                variant="primary"
+                onClick={() => onGoToSpaDetail(spaSlug)}
+                className="py-2 px-4 text-sm self-start"
+              >
+                추천받은 스파 보러가기 <FontAwesomeIcon icon={faAngleRight} className="text-xs ml-4" />
+              </SpurfyButton>
+            )}
+          </>
         )}
       </div>
     </div>
