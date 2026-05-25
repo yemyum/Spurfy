@@ -36,6 +36,47 @@ public class AiRecommendHistoryService {
                 .collect(Collectors.toList());
     }
 
+    // 성공 엔티티 리턴 버전 (메인 서비스에서 id랑 날짜 세팅할 수 있게)
+    public AiRecommendHistory saveSuccess(String userEmail, String imageUrl, String detectedBreed,
+                                          boolean isDog, String recommendResultJson, String question) {
+        try {
+            AiRecommendHistory history = AiRecommendHistory.builder()
+                    .userId(userEmail)
+                    .imageUrl(imageUrl)
+                    .detectedBreed(detectedBreed)
+                    .isDog(isDog)
+                    .recommendResult(recommendResultJson)
+                    .prompt(question)
+                    .errorMessage(null)
+                    .build();
+
+            return aiRecommendHistoryRepository.save(history);
+        } catch (Exception e) {
+            log.warn("AI 추천 기록 DB 저장 중 오류 발생: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    // 실패 이력 저장 전담
+    public void saveFailureHistory(String userEmail, String imageUrl, String detectedBreed, String errorMessage, String question) {
+        try {
+            AiRecommendHistory history = AiRecommendHistory.builder()
+                    .userId(userEmail)
+                    .imageUrl(imageUrl)
+                    .detectedBreed(detectedBreed)
+                    .isDog(false)
+                    .recommendResult(null)
+                    .prompt(question)
+                    .errorMessage(errorMessage)
+                    .build();
+
+            aiRecommendHistoryRepository.save(history);
+            log.info("AI 추천 기록 저장 완료 (실패) → user={}, reason={}", userEmail, errorMessage);
+        } catch (Exception e) {
+            log.warn("AI 추천 실패 기록 DB 저장 중 오류 발생: {}", e.getMessage());
+        }
+    }
+
     // AiRecommendHistory 엔티티 하나를 AiRecommendHistoryResponseDto 하나로 변환하는 도우미 메서드
     private AiRecommendHistoryResponseDTO convertToDTO(AiRecommendHistory history) {
         String intro = null, compliment = null, recommendationHeader = null, spaName = null, closing = null, spaSlug = null;

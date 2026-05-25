@@ -32,7 +32,7 @@ public enum ErrorCode {
     AI_ANALYSIS_FAILED("AI01", "이미지 분석 AI 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
     GPT_RECOMMENDATION_FAILED("AI02", "GPT 추천 서비스 연동에 실패했습니다.", HttpStatus.SERVICE_UNAVAILABLE),
     NOT_A_DOG_IMAGE("AI03", "사진 속 반려견을 찾지 못했어요. 반려견의 정면이 잘 보이는 사진으로 업로드해주세요!", HttpStatus.BAD_REQUEST),
-    CONVERSATION_LIMIT_EXCEEDED("E005", "오늘 하루 AI 대화 횟수 제한을 초과했습니다.", HttpStatus.TOO_MANY_REQUESTS),
+    CONVERSATION_LIMIT_EXCEEDED("E005", "오늘 하루 AI 대화 횟수를 초과했습니다.", HttpStatus.TOO_MANY_REQUESTS),
     FILE_SIZE_LIMIT_EXCEEDED("E003", "파일 크기는 50MB를 초과할 수 없습니다.", HttpStatus.BAD_REQUEST),
     MULTIPLE_DOG_DETECTED("AI04", "여러 마리의 강아지가 감지되었습니다. 한 마리의 사진만 업로드해주세요!", HttpStatus.BAD_REQUEST),
     INVALID_REFRESH_TOKEN("AUTH401", "유효하지 않은 리프레시 토큰입니다.", HttpStatus.UNAUTHORIZED),

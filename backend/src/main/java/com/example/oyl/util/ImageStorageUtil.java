@@ -55,4 +55,15 @@ public class ImageStorageUtil {
             throw new CustomException(ErrorCode.INTERNAL_ERROR, "파일 저장 중 오류 발생: " + e.getMessage());
         }
     }
+
+    public String saveAndGetWebUrl(MultipartFile file) {
+        // 기존에 잘 만들어둔 save 메서드를 재활용해서 파일 저장하기
+        String savedFileName = this.save(file);
+
+        if (savedFileName == null) return null;
+
+        // 메인 서비스가 하던 웹 경로 조합 책임을 유틸이 직접 수행!
+        return "/api/images/" + savedFileName;
+    }
+
 }

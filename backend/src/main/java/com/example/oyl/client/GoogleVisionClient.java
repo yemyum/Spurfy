@@ -13,10 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -171,9 +168,16 @@ public class GoogleVisionClient {
                     // ④ 공통 상수로 통일
                     .orElse(UNKNOWN_BREED);
 
+            // 구글 원시 라벨 객체 리스트를 깔끔한 String 리스트로 미리 변환해서 빌더에 넣어주기
+            List<String> stringLabels = labels.stream()
+                    .map(GoogleVisionResponseDTO.Response.LabelAnnotation::getDescription)
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            // Analyzer가 읽기 편하게 가공된 데이터만 패킹
             return VisionAnalysisResult.builder()
                     .detectedBreed(detectedBreed)
-                    .labels(labels)
+                    .labels(stringLabels)
                     .objects(mappedObjects)
                     .isDog(isDogDetected)
                     .build();
