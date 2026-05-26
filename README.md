@@ -2,7 +2,7 @@
 
 > “It’s a dog spa, Spurfy!”  
 > 반려견을 위한 감성 스파 예약 서비스를 중심으로,
-AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추천을 지원하는
+AI 챗봇을 통해 사용자의 반려견 이미지를 분석하여 서비스 추천을 지원하는
 대화형 사용자 경험 기반의 스파 플랫폼입니다.
 
 ---
@@ -10,12 +10,10 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 ## 🧼 주요 기능
 
 ### 👤 사용자
-- 회원가입 / 로그인 (JWT 인증)
-- 반려견 등록 / 예약 / 리뷰 작성
-- 스파 서비스 목록 조회
-- 마이페이지 예약 확인
-- 리뷰 작성 및 이미지 업로드
-- Vision: 반려견 사진 분석 -> ChatGPT: 견종별 맞춤 스파 추천
+- 회원가입 / 로그인 / 회원탈퇴
+- 프로필 / 반려견 / 예약 / 리뷰
+- 스파 서비스 목록 및 상세 조회
+- 이미지 분석 기반 AI 추천 기능 (Vision: 반려견 이미지 분석 -> ChatGPT: 견종별 맞춤 스파 추천)
 
 ---
 
@@ -23,11 +21,11 @@ AI 챗봇을 통해 사용자의 반려견 사진을 분석하여 서비스 추�
 
 | 구분 | 기술 |
 |------|------|
-| 백엔드 | Spring Boot 3, Spring Security, JPA, Maven, Java17 |
+| 백엔드 | Spring Boot 3, JPA, Maven, Java17 |
 | 프론트 | React (Vite), TailwindCSS, JavaScript |
-| 챗봇 연동 | GPT API, Google Vision API 등 |
+| 챗봇 연동 | GPT API, Google Vision API |
 | 데이터베이스 | MySQL |
-| 기타 도구 | Postman, Notion, Miro, figma |
+| 기타 도구 | Postman, Notion, Miro, figma, k6 |
 
 ---
 
