@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class VisionAnalysisResult {
-    private String detectedBreed;  // ex: "푸들", "알 수 없는 견종의 강아지"
+    private String detectedBreed;  // ex: "푸들", "알 수 없는 견종"
 
     private List<String> labels;  // GoogleVision 라벨 객체 리스트
 

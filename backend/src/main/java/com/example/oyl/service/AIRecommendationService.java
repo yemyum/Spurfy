@@ -44,7 +44,7 @@ public class AIRecommendationService {
         return aiRecommendationValidator.getTodayAiCallCount(userEmail);
     }
 
-    // 대화 횟수 감지 + 이미지 저장 -> vision 사진 분석 -> GPT 추천
+    // [1단계: 문지기 검사] ➡️ [2단계: 사진 분석] ➡️ [3단계: 설문지 정제] ➡️ [4단계: GPT 추천] ➡️ [5단계: 성공 기록 저장]
     public GptSpaRecommendationResponseDTO analyzeAndRecommendSpa(MultipartFile dogImageFile, String userEmail, String checklist, String question) {
 
         // 💡 검증기한테 "이 유저 오늘 한도 초과인지 검사해줘!"
@@ -55,7 +55,7 @@ public class AIRecommendationService {
             throw new CustomException(ErrorCode.INVALID_INPUT);
         }
 
-        // ✅ 파일 저장
+        // ✅ 이미지 파일 저장
         final String imageUrlForHistory = imageStorageUtil.saveAndGetWebUrl(dogImageFile);
 
         String detectedBreed;
@@ -120,7 +120,7 @@ public class AIRecommendationService {
             );
         }
 
-        // ✅ 결정된 값들을 바탕으로 GPT API를 호출하고 응답을 처리하는 로직 시작
+        // 결정된 값들을 바탕으로 GPT API를 호출하고 응답을 처리하는 로직 시작
         GptSpaRecommendationResponseDTO spaRecommendationDto;
         try {
 
@@ -130,12 +130,10 @@ public class AIRecommendationService {
                     inputData.finalHealthIssues() != null ? inputData.finalHealthIssues().size() : 0);
 
             // Vision API 결과에 따라 다른 GPT 클라이언트를 호출
-            if (!visionBreedUsable) { // Vision이 견종 모름 → 라벨 기반 GPT 호출
+            if (!visionBreedUsable) {
                 log.info("Calling gptClient.recommendSpaByLabels...");
 
-                // Vision도 모름 + 라벨 단서도 없음 -> 실패 처리
                 if (!labelsUsable) {
-                    // 💡 [리팩토링 1] 빌더로 직접 구워 저장하던 걸 전담 서비스 호출로 한 줄 컷!
                     aiRecommendHistoryService.saveFailureHistory(
                             userEmail, imageUrlForHistory, detectedBreed,
                             "사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!", question
@@ -145,7 +143,7 @@ public class AIRecommendationService {
                             "사진 정보가 부족합니다. 반려견의 정면이 담긴 단독 사진으로 다시 올려주세요!", imageUrlForHistory
                     );
                 }
-
+                // 💡 상황 A: 구글이 견종은 못 맞췄지만, 'longcoat' 같은 라벨 단서가 있을 때! -> 라벨 기반 GPT 호출
                 SpaLabelRecommendationRequestDTO labelDto = SpaLabelRecommendationRequestDTO.builder()
                         .labels(Optional.ofNullable(visionLabels).orElse(List.of()))
                         .ageGroup(inputData.finalAgeGroup())
@@ -160,7 +158,8 @@ public class AIRecommendationService {
 
                 spaRecommendationDto = gptClient.recommendSpaByLabels(labelDto);
 
-            } else {  // Vision이 견종 확정 → 견종 기반 GPT 호출
+            } else {
+                // 💡 상황 B: 구글이 "포메라니안"이라고 견종을 딱 맞췄을 때! -> 견종 기반 GPT 호출
                 log.info("Calling gptClient.recommendSpa...");
                 SpaRecommendationRequestDTO request = SpaRecommendationRequestDTO.builder()
                         .breed(detectedBreed)
@@ -175,13 +174,13 @@ public class AIRecommendationService {
                 spaRecommendationDto = gptClient.recommendSpa(request);
             }
 
-            // 3) 널 가드 (GPT가 응답을 안 준 경우)
+            // 널 가드 (GPT가 응답을 안 준 경우)
             if (spaRecommendationDto == null) {
                 throw new CustomException(ErrorCode.GPT_RECOMMENDATION_FAILED,
                         "AI 추천 결과를 가져오지 못했어요. 잠시 후 다시 시도해주세요.");
             }
 
-            // 4) spaSlug 보정 (GPT가 slug를 안줬다면 DB에서 찾아 채움)
+            // spaSlug 보정 (GPT가 slug를 안줬다면 DB에서 찾아 채움)
             if (spaRecommendationDto.getSpaSlug() == null && spaRecommendationDto.getSpaName() != null) {
                 String cleanSpaName = TextUtils.normalizeSpaName(spaRecommendationDto.getSpaName());
                 spaServiceRepository.findByName(cleanSpaName).ifPresent(spa ->
@@ -189,7 +188,7 @@ public class AIRecommendationService {
                 );
             }
 
-            // 5) 출력 문구 후처리 (중복 수식어 정리)
+            // 출력 문구 후처리 (중복 수식어 정리)
             recommendationProcessor.cleanUpResponseText(spaRecommendationDto);
 
         } catch (CustomException e) {
@@ -206,12 +205,12 @@ public class AIRecommendationService {
         // ✅ AI 추천 기록을 DB에 저장하는 로직 시작
         try {
             spaRecommendationDto.setImageUrl(imageUrlForHistory); // 프론트로 보낼 URL
-            String jsonStr = objectMapper.writeValueAsString(spaRecommendationDto); // DB 저장을 위해 json 문자열 사용
+            String jsonStr = objectMapper.writeValueAsString(spaRecommendationDto); // DB 저장을 위해 json 문자로 굽기
 
             AiRecommendHistory saved = aiRecommendHistoryService.saveSuccess(
                     userEmail, imageUrlForHistory, detectedBreed,
                     true, jsonStr, question
-            );
+            );  // DB 영구 저장
 
             if (saved != null) {
                 log.info("AI 추천 기록 저장 완료 → id={}, user={}, breed={}", saved.getId(), userEmail, detectedBreed);
@@ -224,7 +223,7 @@ public class AIRecommendationService {
             log.warn("AI 추천 기록 저장 중 알 수 없는 오류: {}", e.getMessage());
         }
 
-        return spaRecommendationDto; // 그대로 반환
+        return spaRecommendationDto; // (프론트엔드) 그대로 반환
     }
 
 }

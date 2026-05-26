@@ -16,8 +16,11 @@ import java.util.Optional;
 public class VisionResultAnalyzer {
 
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
+
+    // 최소 60% 이상 일 때만 강아지로 인정
     private static final float DOG_OBJECT_MIN_SCORE = 0.6f;
 
+    // 금지어 목록
     private static final List<String> BANNED_LABELS = List.of(
             "clothes", "costume", "pet supply", "clothing", "supply"
     );
@@ -76,18 +79,24 @@ public class VisionResultAnalyzer {
             throw new CustomException(ErrorCode.MULTIPLE_DOG_DETECTED);
         }
 
-        // 3) 견종 설정 조율
-        String detectedBreed = UNKNOWN_BREED;
-        if (visionResult.getDetectedBreed() != null && !visionResult.getDetectedBreed().isEmpty()) {
-            detectedBreed = visionResult.getDetectedBreed();
+        // 3) 견종 설정 조율 (검독관을 먼저 통과시키기!)
+        String rawBreed = visionResult.getDetectedBreed();
+        String detectedBreed;
+
+        // 구글이 준 견종이 아예 없거나, '알 수 없는 패턴'의 지저분한 글자라면?
+        if (rawBreed == null || isUnknownBreed(rawBreed)) {
+            detectedBreed = UNKNOWN_BREED; // 깔끔하게 "알 수 없는 견종"으로 통일!
+        } else {
+            detectedBreed = rawBreed;      // 진짜 올바른 견종일 때만 저장!
         }
 
-        // 4) 보조 라벨 사용 가능 여부 판정 (강아지 단서 확인)
+        // 4) 보조 라벨 사용 가능 여부 판정
+        // 이제 detectedBreed는 무조건 "알 수 없는 견종"이거나 "진짜 견종" 둘 중 하나만 가짐!
         boolean labelsUsable = visionLabels.stream()
                 .map(String::toLowerCase)
                 .anyMatch(label -> POSITIVE_LABEL_HINTS.stream().anyMatch(label::contains));
 
-        boolean visionBreedUsable = !isUnknownBreed(detectedBreed);
+        boolean visionBreedUsable = !detectedBreed.equals(UNKNOWN_BREED);
 
         log.info("[Analyzer] 분석 완료 -> 최종 견종='{}', breedUsable={}, labelsUsable={}",
                 detectedBreed, visionBreedUsable, labelsUsable);
@@ -100,16 +109,16 @@ public class VisionResultAnalyzer {
         return s == null ? "" : s.trim();
     }
 
-    // 💡 Vision unknown 판정 메서드
+    // 💡 Vision unknown 판정 메서드 ("이 견종을 믿고 써도 되는지?")
     public boolean isUnknownBreed(String s) {
-        String t = norm(s).toLowerCase(Locale.ROOT);
-        if (t.isEmpty()) return true;
+        String t = norm(s).toLowerCase(Locale.ROOT);       // 공백 제거, 소문자 변경
+        if (t.isEmpty()) return true;                      // 글자가 없음 -> 견종 정보가 없으니 알 수 없음(=true, 끝)
 
-        if (t.equals(UNKNOWN_BREED.toLowerCase(Locale.ROOT))) return true;
-        String compact = t.replaceAll("\\s+", "");
+        if (t.equals(UNKNOWN_BREED.toLowerCase(Locale.ROOT))) return true;  // "알 수 없는 견종" = true
+        String compact = t.replaceAll("\\s+", "");          // 모든 공백(띄워쓰기) 제거
         if (compact.contains("알수없는")) return true;
 
-        return t.contains("unknown") || t.contains("unidentified");
+        return t.contains("unknown") || t.contains("unidentified");          // unknown, unidentified가 포함?
     }
 
     // 메인 서비스가 꺼내 쓸 최종 결과 바구니 패키지

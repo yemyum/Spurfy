@@ -62,7 +62,7 @@ public class ImageStorageUtil {
 
         if (savedFileName == null) return null;
 
-        // 메인 서비스가 하던 웹 경로 조합 책임을 유틸이 직접 수행!
+        // 웹 경로 조합 책임을 유틸이 직접 수행!
         return "/api/images/" + savedFileName;
     }
 

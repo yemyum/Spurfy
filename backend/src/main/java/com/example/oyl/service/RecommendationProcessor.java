@@ -17,7 +17,7 @@ public class RecommendationProcessor {
 
     private static final String UNKNOWN_BREED = "알 수 없는 견종";
 
-    // 파싱 + 조건 정제 로직
+    // 파싱 + 조건 정제 로직 (GPT용)
     public RefinedGptInputData refineInputData(String checklistJson, String detectedBreed) {
 
         // 1. 파서로 안전하게 JSON 파싱
@@ -38,9 +38,9 @@ public class RecommendationProcessor {
 
         // 3. 연령 / 활동성 / 건강이슈 정제
         String finalAgeGroupToUse = norm(checklistResult.ageGroup);
-        String finalAdjActivity = TextUtils.toAdjective(norm(checklistResult.activityLevel));
+        String finalAdjActivity = TextUtils.toAdjective(norm(checklistResult.activityLevel));  // 형용사 형태 변환
         List<String> finalHealthIssuesToUse = new ArrayList<>(
-                Optional.ofNullable(checklistResult.healthIssues).orElse(List.of())
+                Optional.ofNullable(checklistResult.healthIssues).orElse(List.of())  // null 방어
         );
 
         log.info("[Processor] 데이터 정제 완료 -> breed='{}', age='{}', act='{}', issues={}",
@@ -70,7 +70,7 @@ public class RecommendationProcessor {
 
     // 지저분한 텍스트 중복 제거(후처리) 세팅만 따로 모은 메서드
     public void cleanUpResponseText(GptSpaRecommendationResponseDTO dto) {
-        if (dto == null) return;
+        if (dto == null) return;   // 데이터가 없다면 패스
 
         dto.setIntro(TextUtils.dedupeKo(dto.getIntro()));
         dto.setCompliment(TextUtils.dedupeKo(dto.getCompliment()));
