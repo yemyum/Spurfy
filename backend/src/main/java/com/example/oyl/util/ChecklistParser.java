@@ -34,7 +34,7 @@ public class ChecklistParser {
     // 문자열 청소 (아래 3가지 조건 중 하나라도 걸리면 기본값 유지, 정상적인 글자일 때만 이쁘게 돌려줌)
     private static String getString(Map<String,Object> map, String key, String defaultVal) {
         String v = (String) map.get(key);
-        return (v != null && !v.isBlank() && !"선택 안 함".equals(v)) ? v.trim() : defaultVal; // 값이 없고, 띄워쓰기만 있고, 선택 안 함을 골랐을 때
+        return (v != null && !v.isBlank() && !"선택 안 함".equals(v)) ? v.trim() : defaultVal; // 값이 없거나, 공백만 있거나, '선택 안 함'일 경우 -> 기본값 반환
     }
 
     // 여러 개를 체크했을 시 정제

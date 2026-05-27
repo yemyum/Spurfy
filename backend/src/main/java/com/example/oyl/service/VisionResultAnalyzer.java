@@ -79,7 +79,7 @@ public class VisionResultAnalyzer {
             throw new CustomException(ErrorCode.MULTIPLE_DOG_DETECTED);
         }
 
-        // 3) 견종 설정 조율 (검독관을 먼저 통과시키기!)
+        // 3) 견종 설정 조율 (감독관을 먼저 통과시키기!)
         String rawBreed = visionResult.getDetectedBreed();
         String detectedBreed;
 
